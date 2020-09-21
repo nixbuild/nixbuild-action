@@ -1,0 +1,36 @@
+name: nixbuild.net
+description: Run Nix builds on nixbuild.net
+author: Rickard Nilsson
+
+inputs:
+
+  nixbuild_ssh_key:
+    required: true
+    description: |
+      The private ssh key used to authenticate with nixbuild.net
+
+      You should not add your private key directly to the workflow file but
+      instead define a GitHub Secret for it, to avoid mistakenly sharing your
+      key with others.
+
+      It is advisable to create a new nixbuild.net ssh key specifically for
+      use within GitHub (or even per repository or workflow). That way you can
+      revoke access to your nixbuild.net account in a fine-grained fashion.
+
+      See the README of this action for easy setup instructions.
+
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Nix for nixbuild.net
+      run: ${{ github.action_path }}/nixbuild-action.sh
+      shell: bash
+      env:
+        NIXBUILD_SSH_KEY: ${{ inputs.nixbuild_ssh_key }}
+        ACTION_LIB: ${{ github.action_path }}/lib
+
+
+branding:
+  icon: zap
+  color: gray-dark

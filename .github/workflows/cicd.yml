@@ -1,0 +1,58 @@
+on: push
+
+name: CI/CD
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    needs:
+      - test-install-nix-action
+      - test-macos
+    steps:
+      - uses: actions/checkout@v2
+      - uses: nixbuild/nix-quick-install-action@v2
+        with:
+          nix_version: 3.0pre20200829_f156513
+          nix_conf: experimental-features = nix-command flakes
+      - uses: ./
+        with:
+          nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
+      - name: Build release script
+        run: nix build .#packages.x86_64-linux.release
+      - name: Verify build signature
+        run: test "$(nix path-info ./result --json | jq -r '.[].signatures[0]' | sed 's/:.*//')" = "nixbuild.net/rickard-1"
+      - name: Release if needed
+        if: github.ref == 'refs/heads/master'
+        run: ./result ${{steps.nix-archives.outputs.download-path}} ./RELEASE
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  test-install-nix-action:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: cachix/install-nix-action@v11
+        with:
+          install_url: https://github.com/numtide/nix-flakes-installer/releases/download/nix-3.0pre20200820_4d77513/install
+          extra_nix_config: experimental-features = nix-command flakes
+      - uses: ./
+        with:
+          nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
+      - name: Build release script
+        run: nix build .#packages.x86_64-linux.release
+      - name: Verify build signature
+        run: test "$(nix path-info ./result --json | jq -r '.[].signatures[0]' | sed 's/:.*//')" = "nixbuild.net/rickard-1"
+
+  test-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: cachix/install-nix-action@v11
+        with:
+          install_url: https://releases.nixos.org/nix/nix-2.3.7/install
+      - uses: ./
+        with:
+          nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
