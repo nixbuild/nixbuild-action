@@ -69,8 +69,9 @@ about the nixbuild.net service.
      minimal:
        runs-on: ubuntu-latest
        steps:
+         - uses: actions/checkout@v2
          - uses: nixbuild/nix-quick-install-action@v2
-         - uses: nixbuild/nixbuild@v1
+         - uses: nixbuild/nixbuild-action@v1
            with:
              nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
          - run: nix-build
