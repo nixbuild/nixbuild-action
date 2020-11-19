@@ -1,3 +1,7 @@
-v1
+v2
 
-Initial release
+## Changes
+
+* Add support for nixbuild.net [settings](https://docs.nixbuild.net/settings/)
+
+* Minimum required Linux platform bumped to ubuntu-20.04
