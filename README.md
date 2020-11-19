@@ -1,7 +1,8 @@
 # nixbuild.net Action
 
-This GitHub Action sets up [Nix](https://nixos.org/nix/) to use
-the [nixbuild.net](https://nixbuild.net) service.
+This GitHub Action sets up [Nix](https://nixos.org/nix/) to use the
+[nixbuild.net](https://nixbuild.net) service. It supports the **ubuntu-20.04**
+and **macos-latest** platforms.
 
 You need a [nixbuild.net](https://nixbuild.net) account to make use of this
 action.
@@ -58,20 +59,19 @@ about the nixbuild.net service.
 
 3. Configure your secret ssh key as a [GitHub Secret](https://docs.github.com/en/actions/reference/encrypted-secrets)
 
-4. Use `nixbuild/nixbuild-action` in your workflows. There is nothing else than
-   the ssh key to configure:
+4. Use `nixbuild/nixbuild-action` in your workflows. You don't need to configure
+   anything else than your ssh key:
 
    ```yaml
-   name:
    name: Examples
    on: push
    jobs:
      minimal:
-       runs-on: ubuntu-latest
+       runs-on: ubuntu-20.04
        steps:
          - uses: actions/checkout@v2
          - uses: nixbuild/nix-quick-install-action@v4
-         - uses: nixbuild/nixbuild-action@v1
+         - uses: nixbuild/nixbuild-action@v2
            with:
              nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
          - run: nix-build
@@ -85,3 +85,29 @@ about the nixbuild.net service.
    [cachix/install-nix-action](https://github.com/marketplace/actions/install-nix)
    to install Nix, just make sure that you put the Nix installer action before
    this action.
+
+### nixbuild.net Settings
+
+Optionally, you can configure [nixbuild.net
+settings](https://docs.nixbuild.net/settings/) that you want your builds to
+use. All settings are available directly as [inputs](action.yml) of this action.
+
+An example workflow that turns on the
+[cache-build-timeouts](https://docs.nixbuild.net/settings/#cache-build-timeouts)
+setting:
+
+```yaml
+name: Examples
+on: push
+jobs:
+  minimal:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: nixbuild/nix-quick-install-action@v4
+      - uses: nixbuild/nixbuild-action@v2
+        with:
+          nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
+          cache-build-timeouts: true
+      - run: nix-build
+```

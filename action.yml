@@ -21,23 +21,38 @@ inputs:
 
   cache-build-failures:
     required: false
-    description:
+    description: |
+      Set the cache-build-failures setting in nixbuild.net. For documentation
+      see https://docs.nixbuild.net/settings/#cache-build-failures.
 
   cache-build-timeouts:
     required: false
-    description:
+    description: |
+      Set the cache-build-timeouts setting in nixbuild.net. For documentation
+      see https://docs.nixbuild.net/settings/#cache-build-timeouts.
 
   keep-builds-running:
     required: false
-    description:
+    description: |
+      Set the keep-builds-running setting in nixbuild.net. For documentation
+      see https://docs.nixbuild.net/settings/#keep-builds-running.
 
   always-substitute:
     required: false
-    description:
+    description: |
+      Set the always-substitute setting in nixbuild.net. For documentation
+      see https://docs.nixbuild.net/settings/#always-substitute.
+
+      Note that this setting is actually ignored for builds performed by this
+      GitHub Action, because the action enables the Nix setting
+      builders-use-substitutes so substitution will always be used anyway
+      (unless the never-substitute setting is active).
 
   never-substitute:
     required: false
-    description:
+    description: |
+      Set the never-substitute setting in nixbuild.net. For documentation
+      see https://docs.nixbuild.net/settings/#never-substitute.
 
 
 runs:
