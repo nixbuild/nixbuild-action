@@ -19,6 +19,26 @@ inputs:
 
       See the README of this action for easy setup instructions.
 
+  cache-build-failures:
+    required: false
+    description:
+
+  cache-build-timeouts:
+    required: false
+    description:
+
+  keep-builds-running:
+    required: false
+    description:
+
+  always-substitute:
+    required: false
+    description:
+
+  never-substitute:
+    required: false
+    description:
+
 
 runs:
   using: "composite"
@@ -27,6 +47,7 @@ runs:
       run: ${{ github.action_path }}/nixbuild-action.sh
       shell: bash
       env:
+        INPUTS_JSON: ${{ toJSON(inputs) }}
         NIXBUILD_SSH_KEY: ${{ inputs.nixbuild_ssh_key }}
         ACTION_LIB: ${{ github.action_path }}/lib
 

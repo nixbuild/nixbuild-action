@@ -31,7 +31,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest ]
+        os: [ ubuntu-20.04 ]
     steps:
       - uses: actions/checkout@v2
       - uses: cachix/install-nix-action@v12
@@ -41,6 +41,7 @@ jobs:
       - uses: ./
         with:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
+          keep-builds-running: true # test that we can set a setting
       - name: Build release script
         run: nix build .#packages.x86_64-linux.release
       - name: Verify build signature
@@ -56,3 +57,4 @@ jobs:
       - uses: ./
         with:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
+          keep-builds-running: true # test that we can set a setting

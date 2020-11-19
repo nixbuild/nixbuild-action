@@ -36,6 +36,23 @@ Host eu.nixbuild.net
 EOF
 
 
+# nixbuild.net settings
+for setting in \
+  cache-build-failures \
+  cache-build-timeouts \
+  keep-builds-running \
+  always-substitute \
+  never-substitute
+do
+  val="$(printenv INPUTS_JSON | jq -r ".\"$setting\"")"
+  if [ -n "$val" ]; then
+    env_var="${setting^^}"
+    env_var="NIXBUILDNET_${env_var//-/_}"
+    echo "  SetEnv $env_var=$val" >> "$SSH_CONFIG_FILE"
+  fi
+done
+
+
 # Append ssh config to system config
 sudo mkdir -p /etc/ssh
 sudo touch /etc/ssh/ssh_config
