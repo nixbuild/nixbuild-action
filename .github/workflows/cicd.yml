@@ -6,9 +6,9 @@ jobs:
   release:
     runs-on: ubuntu-latest
     needs:
-      - test-install-nix-action
-      - test-macos
-      - test-with-nix-quick-install
+      - install-with-nix-quick-install-action
+      - install-with-install-nix-action
+      - test-build
     steps:
       - uses: actions/checkout@v2
       - uses: nixbuild/nix-quick-install-action@v4
@@ -28,11 +28,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  test-with-nix-quick-install:
+  test-build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ ubuntu-20.04, macos-latest ]
+        system: [ x86_64-linux ]
     steps:
       - uses: actions/checkout@v2
       - uses: nixbuild/nix-quick-install-action@v4
@@ -44,37 +45,36 @@ jobs:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
           keep-builds-running: true # test that we can set a setting
       - name: Run a test build
-        run: nix build .#simple-test-build
+        run: nix build --system ${{ matrix.system }} .#simple-test-build
       - name: Verify build signature
         run: test "$(nix path-info ./result --json | jq -r '.[].signatures[0]' | sed 's/:.*//')" = "nixbuild.net/rickard-1"
 
-  test-install-nix-action:
+
+  install-with-nix-quick-install-action:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-20.04 ]
+        os: [ ubuntu-20.04, macos-latest ]
+        nix_version: [ 2.3.7, 3.0pre20200829_f156513 ]
     steps:
       - uses: actions/checkout@v2
-      - uses: cachix/install-nix-action@v12
+      - uses: nixbuild/nix-quick-install-action@v4
         with:
-          install_url: https://github.com/numtide/nix-flakes-installer/releases/download/nix-3.0pre20200820_4d77513/install
-          extra_nix_config: experimental-features = nix-command flakes
+          nix_version: ${{ matrix.nix_version }}
       - uses: ./
         with:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
           keep-builds-running: true # test that we can set a setting
-      - name: Build release script
-        run: nix build .#packages.x86_64-linux.release
-      - name: Verify build signature
-        run: test "$(nix path-info ./result --json | jq -r '.[].signatures[0]' | sed 's/:.*//')" = "nixbuild.net/rickard-1"
 
-  test-macos:
-    runs-on: macos-latest
+
+  install-with-install-nix-action:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-20.04, macos-latest ]
     steps:
       - uses: actions/checkout@v2
       - uses: cachix/install-nix-action@v12
-        with:
-          install_url: https://releases.nixos.org/nix/nix-2.3.7/install
       - uses: ./
         with:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}

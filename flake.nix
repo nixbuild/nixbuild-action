@@ -33,7 +33,7 @@
 
       packages = {
         simple-test-build = preferRemoteBuild (
-          pkgs.runCommand "simple-test-build" ''
+          pkgs.runCommand "simple-test-build" {} ''
             mkdir $out
             echo done > $out/done
           ''
