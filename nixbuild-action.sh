@@ -46,9 +46,7 @@ for setting in \
 do
   val="$(printenv INPUTS_JSON | jq -r ".\"$setting\"")"
   if [ -n "$val" ]; then
-    env_var="${setting^^}"
-    env_var="NIXBUILDNET_${env_var//-/_}"
-    echo "  SetEnv $env_var=$val" >> "$SSH_CONFIG_FILE"
+    echo "  SetEnv $(printenv setting | tr a-z- A-Z_)=$val" >> "$SSH_CONFIG_FILE"
   fi
 done
 
