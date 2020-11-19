@@ -8,6 +8,7 @@ jobs:
     needs:
       - test-install-nix-action
       - test-macos
+      - test-with-nix-quick-install
     steps:
       - uses: actions/checkout@v2
       - uses: nixbuild/nix-quick-install-action@v4
@@ -26,6 +27,26 @@ jobs:
         run: ./result ${{steps.nix-archives.outputs.download-path}} ./RELEASE
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  test-with-nix-quick-install:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-20.04 macos-latest ]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: nixbuild/nix-quick-install-action@v4
+        with:
+          nix_version: 3.0pre20200829_f156513
+          nix_conf: experimental-features = nix-command flakes
+      - uses: ./
+        with:
+          nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
+          keep-builds-running: true # test that we can set a setting
+      - name: Run a test build
+        run: nix build .#simple-test-build
+      - name: Verify build signature
+        run: test "$(nix path-info ./result --json | jq -r '.[].signatures[0]' | sed 's/:.*//')" = "nixbuild.net/rickard-1"
 
   test-install-nix-action:
     runs-on: ${{ matrix.os }}

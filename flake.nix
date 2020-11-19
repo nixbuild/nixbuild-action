@@ -32,6 +32,13 @@
       apps.release = flake-utils.lib.mkApp { drv = packages.release; };
 
       packages = {
+        simple-test-build = preferRemoteBuild (
+          pkgs.runCommand "simple-test-build" ''
+            mkdir $out
+            echo done > $out/done
+          ''
+        );
+
         release = preferRemoteBuild (pkgs.writeShellScript "release" ''
           PATH="${lib.makeBinPath (with pkgs; [
             coreutils gitMinimal github-cli
