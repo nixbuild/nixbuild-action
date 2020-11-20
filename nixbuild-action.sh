@@ -47,7 +47,7 @@ for setting in \
 do
   val="$(printenv INPUTS_JSON | jq -r ".\"$setting\"")"
   if [ -n "$val" ]; then
-    nixbuildnet_env="$nixbuildnet_env NIXBUILDNET_$(echo "$setting" | tr a-z- A-Z_)"
+    nixbuildnet_env="$nixbuildnet_env NIXBUILDNET_$(echo "$setting" | tr a-z- A-Z_)=$val"
   fi
 done
 if [ -n "$nixbuildnet_env" ]; then
