@@ -4,7 +4,7 @@ name: CI/CD
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs:
       - install-with-nix-quick-install-action
       - install-with-install-nix-action
