@@ -50,7 +50,7 @@ do
     nixbuildnet_env="$nixbuildnet_env NIXBUILDNET_$(echo "$setting" | tr a-z- A-Z_)"
   fi
 done
-if [ -n "$nixbuildnet_env" ]
+if [ -n "$nixbuildnet_env" ]; then
   echo "  SetEnv$nixbuildnet_env" >> "$SSH_CONFIG_FILE"
 fi
 
