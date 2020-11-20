@@ -1,7 +1,6 @@
-v2
+v3
 
 ## Changes
 
-* Add support for nixbuild.net [settings](https://docs.nixbuild.net/settings/)
-
-* Minimum required Linux platform bumped to ubuntu-20.04
+* Fixed a bug that caused nixbuild.net settings to be dropped if more than one
+  setting was assigned.
