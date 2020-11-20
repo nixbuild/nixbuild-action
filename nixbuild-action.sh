@@ -37,6 +37,7 @@ EOF
 
 
 # nixbuild.net settings
+nixbuildnet_env=""
 for setting in \
   cache-build-failures \
   cache-build-timeouts \
@@ -46,10 +47,12 @@ for setting in \
 do
   val="$(printenv INPUTS_JSON | jq -r ".\"$setting\"")"
   if [ -n "$val" ]; then
-    env_var="NIXBUILDNET_$(echo "$setting" | tr a-z- A-Z_)"
-    echo "  SetEnv $env_var=$val" >> "$SSH_CONFIG_FILE"
+    nixbuildnet_env="$nixbuildnet_env NIXBUILDNET_$(echo "$setting" | tr a-z- A-Z_)"
   fi
 done
+if [ -n "$nixbuildnet_env" ]
+  echo "  SetEnv$nixbuildnet_env" >> "$SSH_CONFIG_FILE"
+fi
 
 
 # Append ssh config to system config
