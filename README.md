@@ -59,7 +59,7 @@ about the nixbuild.net service.
 
    If there is any chance that less trusted users can submit commits or PRs that
    are able to change your GitHub Actions workflow, it is **strongly recommended**
-   that you [lock down your nixbuild.net settings](/#nixbuildnet-settings). Users
+   that you [lock down your nixbuild.net settings](#nixbuildnet-settings). Users
    might otherwise be able to change settings, possibly incurring unexpected
    nixbuild.net charges.
 
