@@ -72,7 +72,7 @@ EOF
 NIXOS_CACHE="http://cache.nixos.org"
 NIXOS_CACHE_PUBKEY="cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
 NIXBUILD_CACHE="ssh://eu.nixbuild.net?priority=100"
-NIXBUILD_CACHE_PUBKEY="$("$ACTION_LIB/fetch-public-signing-key.sh")"
+NIXBUILD_CACHE_PUBKEY="$(ssh eu.nixbuild.net api show public-signing-key | jq -r '"\(.keyName):\(.publicKey)"')"
 
 NIX_CONF_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/nix/nix.conf"
 mkdir -p "$(dirname "$NIX_CONF_FILE")"
