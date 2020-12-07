@@ -77,7 +77,7 @@ about the nixbuild.net service.
        steps:
          - uses: actions/checkout@v2
          - uses: nixbuild/nix-quick-install-action@v4
-         - uses: nixbuild/nixbuild-action@v2
+         - uses: nixbuild/nixbuild-action@v4
            with:
              nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
          - run: nix-build
@@ -135,7 +135,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: nixbuild/nix-quick-install-action@v4
-      - uses: nixbuild/nixbuild-action@v2
+      - uses: nixbuild/nixbuild-action@v4
         with:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
           cache-build-timeouts: true

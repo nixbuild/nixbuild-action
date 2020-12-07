@@ -1,6 +1,7 @@
-v3
+v4
 
 ## Changes
 
-* Fixed a bug that caused nixbuild.net settings to be dropped if more than one
-  setting was assigned.
+* Update to support changes in the nixbuild.net interface.
+
+* Add support for the `allow-override` nixbuild.net setting.
