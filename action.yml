@@ -19,6 +19,29 @@ inputs:
 
       See the README of this action for easy setup instructions.
 
+
+  allow-override:
+    required: false
+    description: |
+      Set the allow-override setting in nixbuild.net. For documentation
+      see https://docs.nixbuild.net/settings/#allow-override.
+
+      Note, all inputs to this action is communicated to nixbuild.net through
+      the SSH environment. That means disabling allow-override here can only
+      stop settings overrides from Nix derivations, no other levels. See the
+      nixbuild.net settings documentation for more info on this.
+
+  always-substitute:
+    required: false
+    description: |
+      Set the always-substitute setting in nixbuild.net. For documentation
+      see https://docs.nixbuild.net/settings/#always-substitute.
+
+      Note that this setting is actually ignored for builds performed by this
+      GitHub Action, because the action enables the Nix setting
+      builders-use-substitutes so substitution will always be used anyway
+      (unless the never-substitute setting is active).
+
   cache-build-failures:
     required: false
     description: |
@@ -36,17 +59,6 @@ inputs:
     description: |
       Set the keep-builds-running setting in nixbuild.net. For documentation
       see https://docs.nixbuild.net/settings/#keep-builds-running.
-
-  always-substitute:
-    required: false
-    description: |
-      Set the always-substitute setting in nixbuild.net. For documentation
-      see https://docs.nixbuild.net/settings/#always-substitute.
-
-      Note that this setting is actually ignored for builds performed by this
-      GitHub Action, because the action enables the Nix setting
-      builders-use-substitutes so substitution will always be used anyway
-      (unless the never-substitute setting is active).
 
   never-substitute:
     required: false

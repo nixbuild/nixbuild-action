@@ -39,10 +39,11 @@ EOF
 # nixbuild.net settings
 nixbuildnet_env=""
 for setting in \
+  allow-override \
+  always-substitute \
   cache-build-failures \
   cache-build-timeouts \
   keep-builds-running \
-  always-substitute \
   never-substitute
 do
   val="$(printenv INPUTS_JSON | jq -r ".\"$setting\"")"

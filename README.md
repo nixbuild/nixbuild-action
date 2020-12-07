@@ -44,7 +44,7 @@ about the nixbuild.net service.
    access to your nixbuild.net account. That way you can revoke GitHub's access
    at any time while still being able to manage your account with your main ssh
    key. You can add and remove ssh keys to your nixbuild.net account with the
-   [admin shell](https://docs.nixbuild.net/nixbuild-shell/#manage-ssh-keys).
+   [nixbuild.net shell](https://docs.nixbuild.net/getting-started/#add-an-ssh-key).
 
    ```text
    $ ssh-keygen -t ed25519 -N "" -C "github" -f github-nixbuild-key
@@ -56,6 +56,12 @@ about the nixbuild.net service.
    nixbuild.net> ssh-keys add ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMTOsCkG3Y/zZjSDPKflA5opCHEDBrGySTxK9SqbU979 github
    Key added to account
    ```
+
+   If there is any chance that less trusted users can submit commits or PRs that
+   are able to change your GitHub Actions workflow, it is **strongly recommended**
+   that you [lock down your nixbuild.net settings](/#nixbuildnet-settings). Users
+   might otherwise be able to change settings, possibly incurring unexpected
+   nixbuild.net charges.
 
 3. Configure your secret ssh key as a [GitHub Secret](https://docs.github.com/en/actions/reference/encrypted-secrets)
 
@@ -90,7 +96,31 @@ about the nixbuild.net service.
 
 Optionally, you can configure [nixbuild.net
 settings](https://docs.nixbuild.net/settings/) that you want your builds to
-use. All settings are available directly as [inputs](action.yml) of this action.
+use. Most settings are available directly as [inputs](action.yml) of this
+action. Some settings, like
+[max-cpu-hours-per-month](https://docs.nixbuild.net/settings/#max-cpu-hours-per-month),
+can only be configured through the [nixbuild.net
+shell](http://docs.nixbuild.net/nixbuild-shell/#configure-settings).
+
+The settings configured for this action is communicated to nixbuild.net through
+the [SSH environment](https://docs.nixbuild.net/settings/#ssh-environment).
+This means that any setting you set here will override your
+[account](https://docs.nixbuild.net/settings/#account) and [SSH
+key](https://docs.nixbuild.net/settings/#ssh-key) settings.
+
+If you want to disable the possibility to change any nixbuild.net settings
+through GitHub Actions, you can set the
+[allow-override](https://docs.nixbuild.net/settings/#allow-override) setting to
+`false`, either on the account level or the SSH key level. You need to change
+this setting from within the [nixbuild.net
+shell](http://docs.nixbuild.net/nixbuild-shell/#configure-settings). If you do
+that, any nixbuild.net setting configured for the action will be ignored. Only
+settings condfigured for your account or the specific SSH key used by your
+GitHub Actions workflow will then be used.
+
+If there is any chance that less trusted users can submit commits or PRs that
+are able to change your GitHub Actions workflow, it is **strongly recommended**
+that you lock down the nixbuild.net settings as described above.
 
 An example workflow that turns on the
 [cache-build-timeouts](https://docs.nixbuild.net/settings/#cache-build-timeouts)
