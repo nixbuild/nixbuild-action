@@ -57,6 +57,16 @@ about the nixbuild.net service.
    Key added to account
    ```
 
+   If you don't have a specific reason no to, you should disable access to
+   the [nixbuild.net shell](http://docs.nixbuild.net/nixbuild-shell/#configure-settings).
+   for your new shell, using the
+   [allow-shell](https://docs.nixbuild.net/settings/#allow-shell) setting:
+
+   ```
+   $ ssh eu.nixbuild.net shell
+   nixbuild.net> ssh-keys set github allow-shell false
+   ```
+
    If there is any chance that less trusted users can submit commits or PRs that
    are able to change your GitHub Actions workflow, it is **strongly recommended**
    that you [lock down your nixbuild.net settings](#nixbuildnet-settings). Users
@@ -115,7 +125,7 @@ through GitHub Actions, you can set the
 this setting from within the [nixbuild.net
 shell](http://docs.nixbuild.net/nixbuild-shell/#configure-settings). If you do
 that, any nixbuild.net setting configured for the action will be ignored. Only
-settings condfigured for your account or the specific SSH key used by your
+settings configured for your account or the specific SSH key used by your
 GitHub Actions workflow will then be used.
 
 If there is any chance that less trusted users can submit commits or PRs that
