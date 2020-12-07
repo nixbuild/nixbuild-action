@@ -44,7 +44,7 @@ about the nixbuild.net service.
    access to your nixbuild.net account. That way you can revoke GitHub's access
    at any time while still being able to manage your account with your main ssh
    key. You can add and remove ssh keys to your nixbuild.net account with the
-   [nixbuild.net shell](https://docs.nixbuild.net/getting-started/#add-an-ssh-key).
+   [nixbuild.net shell](https://docs.nixbuild.net/getting-started/#adding-an-ssh-key).
 
    ```text
    $ ssh-keygen -t ed25519 -N "" -C "github" -f github-nixbuild-key
@@ -57,8 +57,8 @@ about the nixbuild.net service.
    Key added to account
    ```
 
-   If you don't have a specific reason no to, you should disable access to
-   the [nixbuild.net shell](http://docs.nixbuild.net/nixbuild-shell/#configure-settings).
+   If you don't have a specific reason not to, you should disable access to
+   the [nixbuild.net shell](http://docs.nixbuild.net/nixbuild-shell/#nixbuild-shell)
    for your new shell, using the
    [allow-shell](https://docs.nixbuild.net/settings/#allow-shell) setting:
 
