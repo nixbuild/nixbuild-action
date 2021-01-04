@@ -3,6 +3,8 @@
 set -eu
 set -o pipefail
 
+set -x
+
 
 # Setup known_hosts
 SSH_KNOWN_HOSTS_FILE="$(mktemp)"
