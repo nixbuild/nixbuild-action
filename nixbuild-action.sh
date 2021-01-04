@@ -97,3 +97,6 @@ require-sigs = true
 EOF
 
 mv "$NIX_CONF_FILE.tmp" "$NIX_CONF_FILE"
+
+echo "$NIX_CONF_FILE"
+cat "$NIX_CONF_FILE"
