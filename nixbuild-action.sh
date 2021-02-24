@@ -30,9 +30,7 @@ Host eu.nixbuild.net
   LogLevel ERROR
   StrictHostKeyChecking yes
   UserKnownHostsFile $SSH_KNOWN_HOSTS_FILE
-  ControlMaster auto
-  ControlPersist 300
-  ControlPath ~/.ssh/nixbuild_socket
+  ControlPath none
 EOF
 
 
