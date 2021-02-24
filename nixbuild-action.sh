@@ -34,8 +34,10 @@ Host eu.nixbuild.net
 EOF
 
 
-# nixbuild.net settings
+# Setup nixbuild.net environment
+
 nixbuildnet_env=""
+
 for setting in \
   allow-override \
   always-substitute \
@@ -49,9 +51,22 @@ do
     nixbuildnet_env="$nixbuildnet_env NIXBUILDNET_$(echo "$setting" | tr a-z- A-Z_)=$val"
   fi
 done
-if [ -n "$nixbuildnet_env" ]; then
-  echo "  SetEnv$nixbuildnet_env" >> "$SSH_CONFIG_FILE"
-fi
+
+# Propagate selected GitHub Actions environment variables as nixbuild.net tags
+# https://docs.github.com/en/actions/reference/environment-variables#default-environment-variables
+for tag in \
+  GITHUB_WORKFLOW \
+  GITHUB_RUN_ID \
+  GITHUB_RUN_NUMBER \
+  GITHUB_ACTION \
+  GITHUB_ACTIONS \
+  GITHUB_REPOSITORY \
+  GITHUB_SHA
+do
+  nixbuildnet_env="$nixbuildnet_env NIXBUILDNET_TAG_$tag=$(printenv $tag)"
+done
+
+echo "  SetEnv$nixbuildnet_env" >> "$SSH_CONFIG_FILE"
 
 
 # Append ssh config to system config
