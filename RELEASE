@@ -1,7 +1,6 @@
-v4
+v5
 
 ## Changes
 
-* Update to support changes in the nixbuild.net interface.
-
-* Add support for the `allow-override` nixbuild.net setting.
+* [Disable SSH connection sharing](https://github.com/nixbuild/nixbuild-action/commit/e69f6d78eb3a516264ce4cdf79751851ffc57579),
+  since it hurts performance for really large number of concurrent builds.
