@@ -79,6 +79,7 @@ sudo tee -a /etc/ssh/ssh_config < "$SSH_CONFIG_FILE" >/dev/null
 NIX_BUILDERS_FILE="$(mktemp)"
 cat >"$NIX_BUILDERS_FILE" <<EOF
 eu.nixbuild.net x86_64-linux - 200 1 big-parallel,benchmark
+eu.nixbuild.net aarch64-linux - 200 1 big-parallel,benchmark
 EOF
 
 
