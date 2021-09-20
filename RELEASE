@@ -1,6 +1,8 @@
-v5
+v6
 
 ## Changes
 
-* [Disable SSH connection sharing](https://github.com/nixbuild/nixbuild-action/commit/e69f6d78eb3a516264ce4cdf79751851ffc57579),
-  since it hurts performance for really large number of concurrent builds.
+* Add support for `aarch64-linux` builds. To use it, your nixbuild.net account
+  must have been approved for
+  [Early Access](https://blog.nixbuild.net/posts/2021-09-20-nixbuild-net-now-supports-arm-builds.html)
+  to ARM builds.

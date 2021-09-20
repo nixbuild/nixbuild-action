@@ -2,7 +2,10 @@
 
 This GitHub Action sets up [Nix](https://nixos.org/nix/) to use the
 [nixbuild.net](https://nixbuild.net) service. It supports the **ubuntu-20.04**
-and **macos-latest** platforms.
+and **macos-latest** GitHub platforms. From either of those platforms, it can
+run **x86_64-linux** and **aarch64-linux** [(Early
+Access)](https://blog.nixbuild.net/posts/2021-09-20-nixbuild-net-now-supports-arm-builds.html)
+Nix builds.
 
 You need a [nixbuild.net](https://nixbuild.net) account to make use of this
 action.
@@ -86,8 +89,8 @@ about the nixbuild.net service.
        runs-on: ubuntu-20.04
        steps:
          - uses: actions/checkout@v2
-         - uses: nixbuild/nix-quick-install-action@v4
-         - uses: nixbuild/nixbuild-action@v4
+         - uses: nixbuild/nix-quick-install-action@v6
+         - uses: nixbuild/nixbuild-action@v6
            with:
              nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
          - run: nix-build
@@ -144,8 +147,8 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-      - uses: nixbuild/nix-quick-install-action@v4
-      - uses: nixbuild/nixbuild-action@v4
+      - uses: nixbuild/nix-quick-install-action@v6
+      - uses: nixbuild/nixbuild-action@v6
         with:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
           cache-build-timeouts: true
