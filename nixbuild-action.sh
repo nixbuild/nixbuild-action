@@ -17,7 +17,7 @@ eval $(ssh-agent)
 
 
 # Add ssh key
-printenv NIXBUILD_SSH_KEY | ssh-add -
+printenv NIXBUILD_SSH_KEY | ssh-add -q -
 
 
 # Write ssh config
