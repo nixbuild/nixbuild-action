@@ -11,28 +11,28 @@ You need a [nixbuild.net](https://nixbuild.net) account to make use of this
 action.
 
 The configuration needed for this action is simple &ndash; you only need to
-specify the ssh key used to authenticate your nixbuild.net account. You will
+specify the SSH key used to authenticate your nixbuild.net account. You will
 then automatically reap the benefits that nixbuild.net provides:
 
 * Instead of having all Nix builds for a single GitHub job share the same two
-  vCPUs, every Nix build will _each_ get [up to 16 vCPUs](https://blog.nixbuild.net/posts/2020-06-25-automatic-resource-optimization.html).
+  vCPUs, _each_ Nix build will get [up to 16 vCPUs](https://blog.nixbuild.net/posts/2020-06-25-automatic-resource-optimization.html).
   It doesn't matter how many concurrent Nix builds a job triggers, nixbuild.net
   will scale up automatically to avoid any slowdown.
 
-* Every Nix build that is built for your nixbuild.net account shares all
-  build results with each other. So, if you have multiple workflows triggering
-  the same builds, each derivation will only be built once on nixbuild.net.
-  This works automatically, there is no need for configuring any binary caches,
-  and you save time by not having to upload build results.
+* All Nix builds triggered from your nixbuild.net account can share their build
+  results with each other. So, if you have multiple workflows triggering the
+  same builds, each derivation will only be built once on nixbuild.net.  This
+  works automatically, there is no need for configuring any binary caches, and
+  you save time by not having to upload build results.
 
 * Build result sharing also works outside GitHub Actions. You can use
-  nixbuild.net from your development machine so that builds performed by your
-  GitHub workflows is fetched locally, or the other way around. Again, no extra
-  configuration or binary caches are needed for this, just a
+  nixbuild.net from your development machine so that builds already performed
+  by your GitHub workflows become available locally, or the other way around.
+  Again, no extra configuration or binary caches are needed for this, just a
   [nixbuild.net account](https://docs.nixbuild.net/getting-started/)
 
-* Builds that runs on nixbuild.net works just as ordinary Nix builds, so you
-  can still do whatever you want with the build results, like uploading to a
+* Builds that run on nixbuild.net work just as ordinary Nix builds, so you can
+  still do whatever you want with the build results, like uploading to a
   separate binary cache.
 
 See the nixbuild.net [FAQ](https://nixbuild.net/#faq) for more information
@@ -43,10 +43,10 @@ about the nixbuild.net service.
 1. Register for a [nixbuild.net account](https://nixbuild.net/#register). Every
    account includes free build hours, so you can try this action out for free.
 
-2. It is highly advisable to create a new ssh key specifically for GitHub's
+2. It is highly advisable to create a new SSH key specifically for GitHub's
    access to your nixbuild.net account. That way you can revoke GitHub's access
-   at any time while still being able to manage your account with your main ssh
-   key. You can add and remove ssh keys to your nixbuild.net account with the
+   at any time and still manage your account with your main SSH key. You can
+   add and remove SSH keys to your nixbuild.net account with the
    [nixbuild.net shell](https://docs.nixbuild.net/getting-started/#adding-an-ssh-key).
 
    ```text
@@ -76,10 +76,10 @@ about the nixbuild.net service.
    might otherwise be able to change settings, possibly incurring unexpected
    nixbuild.net charges.
 
-3. Configure your secret ssh key as a [GitHub Secret](https://docs.github.com/en/actions/reference/encrypted-secrets)
+3. Configure your secret SSH key as a [GitHub Secret](https://docs.github.com/en/actions/reference/encrypted-secrets)
 
 4. Use `nixbuild/nixbuild-action` in your workflows. You don't need to configure
-   anything else than your ssh key:
+   anything else than your SSH key:
 
    ```yaml
    name: Examples
