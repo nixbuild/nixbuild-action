@@ -47,8 +47,9 @@ for setting in \
   never-substitute
 do
   val="$(printenv INPUTS_JSON | jq -r ".\"$setting\"")"
+  val="${val/\'/\\\'}"
   if [ -n "$val" ]; then
-    nixbuildnet_env="$nixbuildnet_env NIXBUILDNET_$(echo "$setting" | tr a-z- A-Z_)=$val"
+    nixbuildnet_env="$nixbuildnet_env NIXBUILDNET_$(echo "$setting" | tr a-z- A-Z_)='$val'"
   fi
 done
 
@@ -63,7 +64,9 @@ for tag in \
   GITHUB_REPOSITORY \
   GITHUB_SHA
 do
-  nixbuildnet_env="$nixbuildnet_env NIXBUILDNET_TAG_$tag=$(printenv $tag)"
+  val="$(printenv $tag)"
+  val="${val/\'/\\\'}"
+  nixbuildnet_env="$nixbuildnet_env NIXBUILDNET_TAG_$tag='$val'"
 done
 
 echo "  SetEnv$nixbuildnet_env" >> "$SSH_CONFIG_FILE"
