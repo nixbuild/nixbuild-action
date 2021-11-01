@@ -89,8 +89,8 @@ about the nixbuild.net service.
        runs-on: ubuntu-20.04
        steps:
          - uses: actions/checkout@v2
-         - uses: nixbuild/nix-quick-install-action@v6
-         - uses: nixbuild/nixbuild-action@v6
+         - uses: nixbuild/nix-quick-install-action@v7
+         - uses: nixbuild/nixbuild-action@v8
            with:
              nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
          - run: nix-build
@@ -147,8 +147,8 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-      - uses: nixbuild/nix-quick-install-action@v6
-      - uses: nixbuild/nixbuild-action@v6
+      - uses: nixbuild/nix-quick-install-action@v7
+      - uses: nixbuild/nixbuild-action@v8
         with:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
           cache-build-timeouts: true
