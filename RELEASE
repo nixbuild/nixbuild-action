@@ -1,6 +1,5 @@
-v7
+v8
 
 ## Changes
 
-* Add support for [KVM](https://en.wikipedia.org/wiki/Kernel-based_Virtual_Machine) builds and [NixOS integration tests](https://nixos.org/manual/nixos/stable/index.html#sec-nixos-tests).
-  To use it, your nixbuild.net account must have been approved for [Early Access](https://blog.nixbuild.net/posts/2021-10-01-kvm-builds-supported-on-nixbuild-net.html) to KVM builds.
+* Fix quoting of environment variables sent by ssh (https://github.com/nixbuild/nixbuild-action/pull/3).
