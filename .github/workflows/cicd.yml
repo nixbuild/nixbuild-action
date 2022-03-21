@@ -32,7 +32,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-20.04, macos-latest ]
+        os: [ ubuntu-20.04, macos-10.15 ]
         system: [ x86_64-linux ]
     steps:
       - uses: actions/checkout@v2
@@ -54,7 +54,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-20.04, macos-latest ]
+        os: [ ubuntu-20.04, macos-10.15 ]
         nix_version:
           - 2.4pre20210908_3c56f62
           - 2.4pre20210601_5985b8b
