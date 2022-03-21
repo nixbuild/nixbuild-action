@@ -38,6 +38,17 @@ EOF
 
 nixbuildnet_env=""
 
+function add_env() {
+  local tag="$1"
+  local val="$2"
+  # Trim existing " or ' quotes
+  val="${val%\"}"
+  val="${val#\"}"
+  val="${val%\'}"
+  val="${val#\'}"
+  nixbuildnet_env="$nixbuildnet_env NIXBUILDNET_$tag=\"$val\""
+}
+
 for setting in \
   allow-override \
   always-substitute \
@@ -47,9 +58,8 @@ for setting in \
   never-substitute
 do
   val="$(printenv INPUTS_JSON | jq -r ".\"$setting\"")"
-  val="${val/\'/\\\'}"
   if [ -n "$val" ]; then
-    nixbuildnet_env="$nixbuildnet_env NIXBUILDNET_$(echo "$setting" | tr a-z- A-Z_)='$val'"
+    add_env "$(echo "$setting" | tr a-z- A-Z_)" "$val"
   fi
 done
 
@@ -64,9 +74,7 @@ for tag in \
   GITHUB_REPOSITORY \
   GITHUB_SHA
 do
-  val="$(printenv $tag)"
-  val="${val/\'/\\\'}"
-  nixbuildnet_env="$nixbuildnet_env NIXBUILDNET_TAG_$tag='$val'"
+  add_env "$tag" "$(printenv $tag)"
 done
 
 echo "  SetEnv$nixbuildnet_env" >> "$SSH_CONFIG_FILE"
