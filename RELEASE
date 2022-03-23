@@ -1,7 +1,5 @@
-v8
+v9
 
 ## Changes
 
-* Fix quoting of environment variables sent by ssh (https://github.com/nixbuild/nixbuild-action/pull/3).
-
-* Less verbose output during installation phase.
+* Fix more issues with quoting of environment variables sent by ssh (https://github.com/nixbuild/nixbuild-action/pull/8).
