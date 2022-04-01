@@ -59,6 +59,24 @@ on:
         required: false
         default: ''
 
+      cache-build-failures:
+        type: boolean
+        default: true
+        required: false
+        description: |
+          Set the cache-build-failures setting in nixbuild.net. For
+          documentation see
+          https://docs.nixbuild.net/settings/#cache-build-failures.
+
+      cache-build-timeouts:
+        type: boolean
+        default: false
+        required: false
+        description: |
+          Set the cache-build-timeouts setting in nixbuild.net. For
+          documentation see
+          https://docs.nixbuild.net/settings/#cache-build-timeouts.
+
 
 jobs:
 
@@ -102,6 +120,8 @@ jobs:
       - uses: nixbuild/nixbuild-action@v9
         with:
           nixbuild_ssh_key: ${{secrets.nixbuild_ssh_key}}
+          cache-build-failures: ${{inputs.cache-build-failures}}
+          cache-build-timeouts: ${{inputs.cache-build-timeouts}}
 
       - name: Pre-build script
         run: ${{inputs.pre_build_script}}
