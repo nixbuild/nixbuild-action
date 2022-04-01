@@ -29,6 +29,11 @@ on:
         required: false
         default: false
 
+      fail_fast:
+        type: boolean
+        required: false
+        default: false
+
       filter_builds:
         type: string
         required: false
@@ -85,7 +90,7 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: ${{ inputs.ignore_build_failures }}
     strategy:
-      fail-fast: false
+      fail-fast: ${{ inputs.fail_fast }}
       matrix:
         build: ${{fromJSON(needs.eval-flake.outputs.builds)}}
     steps:
