@@ -17,10 +17,18 @@ on:
           revoke access to your nixbuild.net account in a fine-grained fashion.
 
     outputs:
+      success:
+        value: ${{ jobs.collect-results.outputs.results }}
+
       results:
         value: ${{ jobs.collect-results.outputs.results }}
 
     inputs:
+      ignore_build_failures:
+        type: boolean
+        required: false
+        default: false
+
       filter_builds:
         type: string
         required: false
@@ -75,6 +83,7 @@ jobs:
     name: ${{matrix.build.label}}
     needs: eval-flake
     runs-on: ubuntu-latest
+    continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
@@ -129,8 +138,10 @@ jobs:
   collect-results:
     name: "collect results"
     needs: build
+    continue-on-error: ${{ inputs.ignore_build_failures == 'true' }}
     runs-on: ubuntu-latest
     outputs:
+      success: ${{ steps.merge.outputs.success }}
       results: ${{ steps.merge.outputs.results }}
     steps:
       - id: download
@@ -141,3 +152,13 @@ jobs:
         run: |
           jq -rcs 'reduce .[] as $x ({}; . * $x)|"::set-output name=results::\(.)"' \
             "${{steps.download.outputs.download-path}}"/*/result.json
+          if jq -s '..|.success?|select(if . == false then ""|halt_error(1) else false end)' "${{steps.download.outputs.download-path}}"/*/result.json; then
+            echo "::set-output name=success::true"
+          else
+            echo "::set-output name=success::false"
+          fi
+      - name: Fail on build error
+        if: ${{ steps.merge.outputs.success != 'true' }}
+        run: |
+          echo >&2 "One or more builds failed"
+          exit 1
