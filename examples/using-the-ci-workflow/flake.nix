@@ -35,6 +35,10 @@
     checks = genAttrs systems (system: with pkgsForSystem system;
       {
         inherit firefox hello;
+
+        hello-fail = hello.overrideAttrs (_: {
+          postInstall = "exit 1";
+        });
       }
       // optionalAttrs stdenv.isx86_64
       {
