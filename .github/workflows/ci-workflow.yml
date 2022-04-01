@@ -16,6 +16,10 @@ on:
           use within GitHub (or even per repository or workflow). That way you can
           revoke access to your nixbuild.net account in a fine-grained fashion.
 
+    outputs:
+      results:
+        value: ${{ jobs.collect-results.outputs.results }}
+
     inputs:
       filter_builds:
         type: string
@@ -70,11 +74,11 @@ jobs:
   build:
     name: ${{matrix.build.label}}
     needs: eval-flake
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         build: ${{fromJSON(needs.eval-flake.outputs.builds)}}
-    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: nixbuild/nix-quick-install-action@v12
@@ -90,7 +94,33 @@ jobs:
 
       - name: "Build ${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}"
         run: |
+          touch build.json
           nix build "./${{inputs.flake_directory}}#${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}" \
             --print-build-logs \
             --eval-store auto \
-            --store ssh-ng://eu.nixbuild.net
+            --store ssh-ng://eu.nixbuild.net \
+            --json > build.json || true
+          test -s build.json || echo '[{"failed":true}]' > build.json
+          jq -c '. + {label: "${{matrix.build.label}"}} | {"${{matrix.build.top_attr}}": {"${{matrix.build.system}}": {"${{matrix.build.attr}}": .}}}' build.json > result.json
+
+      - name: Upload result
+        uses: actions/upload-artifact@v3
+        with:
+          name: "${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}"
+          path: result.json
+
+  collect-results:
+    name: "collect results"
+    needs: build
+    runs-on: ubuntu-latest
+    outputs:
+      results: ${{ steps.merge.outputs.results }}
+    steps:
+      - id: download
+        uses: actions/download-artifact@v3
+        with:
+          path: ~/results
+      - id: merge
+        run: |
+          jq -rcs 'reduce .[] as $x ({}; . * $x)|"set-output name=results::\(.)"' \
+            "${{steps.download.outputs.download-path}}"/*.json

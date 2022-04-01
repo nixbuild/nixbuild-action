@@ -28,3 +28,9 @@ jobs:
       # expression that the CI Workflow uses by default here (build everything
       # in the flake's `checks` attribute).
       filter_builds: '.top_attr == "checks"'
+
+  results:
+    runs-on: ubuntu-latest
+    needs: checks
+    steps:
+      - run: echo "${{ needs.checks.outputs.results }}" | jq .
