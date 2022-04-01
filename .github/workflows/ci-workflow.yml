@@ -122,5 +122,5 @@ jobs:
           path: ~/results
       - id: merge
         run: |
-          jq -rcs 'reduce .[] as $x ({}; . * $x)|"set-output name=results::\(.)"' \
+          jq -rcs 'reduce .[] as $x ({}; . * $x)|"::set-output name=results::\(.)"' \
             "${{steps.download.outputs.download-path}}"/*/result.json
