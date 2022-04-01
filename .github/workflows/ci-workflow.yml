@@ -112,15 +112,14 @@ jobs:
             --store ssh-ng://eu.nixbuild.net \
             --json > build.json || true
 
-          status=0
           if ! [ -s build.json ]; then
             echo '[{"success":false}]' > build.json
-            status=1
+            echo "::set-output name=success::false"
+          else
+            echo "::set-output name=success::true"
           fi
 
           jq -c '{success: true, name: "${{matrix.build.name}}", description: "${{matrix.build.description}}", label: "${{matrix.build.label}}"} + .[0] | {"${{matrix.build.top_attr}}": {"${{matrix.build.system}}": {"${{matrix.build.attr}}": .}}}' build.json > result.json
-
-          exit "$status"
 
       - name: Upload result
         uses: actions/upload-artifact@v3
@@ -129,9 +128,9 @@ jobs:
           path: result.json
 
       - name: Fail on build error
-        if: ${{ steps.build.outcome != 'success' }}
+        if: ${{ steps.build.outputs.success != 'true' }}
         run: |
-          echo >&2 "Build failed"
+          echo "::error title=${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}::Build failed"
           exit 1
 
 
@@ -160,4 +159,5 @@ jobs:
       - name: Fail on build error
         if: ${{ steps.merge.outputs.success != 'true' }}
         run: |
-          echo "::error file=${{inputs.flake_directory}}/flake.nix,title=Build Failures::One or more builds failed"
+          echo "::error title=Workflow Failed::One or more builds failed"
+          exit 1
