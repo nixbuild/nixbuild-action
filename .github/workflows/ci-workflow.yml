@@ -137,7 +137,7 @@ jobs:
   collect-results:
     name: "collect results"
     needs: build
-    continue-on-error: ${{ inputs.ignore_build_failures == 'true' }}
+    continue-on-error: ${{ inputs.ignore_build_failures }}
     runs-on: ubuntu-latest
     outputs:
       success: ${{ steps.merge.outputs.success }}
