@@ -29,6 +29,13 @@ jobs:
       # in the flake's `checks` attribute).
       filter_builds: '.top_attr == "checks"'
 
+      # If ignore_build_errors is set to true, the workflow will not be stopped
+      # on build errors, giving us the chance to process the build results in
+      # a dependant job. Defaults to false.
+      ignore_build_errors: true
+
+  # We create a job that depends on the the ci-workflow and processes the build
+  # results (just printing them to the console in this case)
   results:
     runs-on: ubuntu-latest
     needs: checks
