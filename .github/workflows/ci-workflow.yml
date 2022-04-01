@@ -83,7 +83,7 @@ jobs:
     name: ${{matrix.build.label}}
     needs: eval-flake
     runs-on: ubuntu-latest
-    continue-on-error: true
+    continue-on-error: ${{ inputs.ignore_build_failures }}
     strategy:
       fail-fast: false
       matrix:
@@ -103,7 +103,6 @@ jobs:
 
       - name: "Build ${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}"
         id: build
-        continue-on-error: true
         run: |
           touch build.json
           nix build "./${{inputs.flake_directory}}#${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}" \
@@ -112,32 +111,28 @@ jobs:
             --store ssh-ng://eu.nixbuild.net \
             --json > build.json || true
 
+          status=0
           if ! [ -s build.json ]; then
             echo '[{"success":false}]' > build.json
-            echo "::set-output name=success::false"
-          else
-            echo "::set-output name=success::true"
+            echo "::error title=${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}::Build failed"
+            status=1
           fi
 
           jq -c '{success: true, name: "${{matrix.build.name}}", description: "${{matrix.build.description}}", label: "${{matrix.build.label}}"} + .[0] | {"${{matrix.build.top_attr}}": {"${{matrix.build.system}}": {"${{matrix.build.attr}}": .}}}' build.json > result.json
 
+          exit "$status"
+
       - name: Upload result
+        if: always()
         uses: actions/upload-artifact@v3
         with:
           name: "${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}"
           path: result.json
 
-      - name: Fail on build error
-        if: ${{ steps.build.outputs.success != 'true' }}
-        run: |
-          echo "::error title=${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}::Build failed"
-          exit 1
-
 
   collect-results:
     name: "collect results"
     needs: build
-    continue-on-error: ${{ inputs.ignore_build_failures }}
     runs-on: ubuntu-latest
     outputs:
       success: ${{ steps.merge.outputs.success }}
@@ -156,8 +151,3 @@ jobs:
           else
             echo "::set-output name=success::false"
           fi
-      - name: Fail on build error
-        if: ${{ steps.merge.outputs.success != 'true' }}
-        run: |
-          echo "::error title=Workflow Failed::One or more builds failed"
-          exit 1
