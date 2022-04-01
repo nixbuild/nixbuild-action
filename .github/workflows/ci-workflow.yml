@@ -160,5 +160,4 @@ jobs:
       - name: Fail on build error
         if: ${{ steps.merge.outputs.success != 'true' }}
         run: |
-          echo >&2 "One or more builds failed"
-          exit 1
+          echo "::error file=${{inputs.flake_directory}}/flake.nix,title=Build Failures::One or more builds failed"
