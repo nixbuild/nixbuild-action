@@ -32,7 +32,7 @@ jobs:
       # If ignore_build_failures is set to true, the workflow will not be stopped
       # on build errors, giving us the chance to process the build results in
       # a dependant job. Defaults to false.
-      #ignore_build_failures: true
+      ignore_build_failures: true
 
   # We create a job that depends on the the ci-workflow and processes the build
   # results (just printing them to the console in this case)
