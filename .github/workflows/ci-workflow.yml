@@ -94,6 +94,7 @@ jobs:
 
       - name: "Build ${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}"
         id: build
+        continue-on-error: true
         run: |
           touch build.json
           nix build "./${{inputs.flake_directory}}#${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}" \
@@ -102,14 +103,15 @@ jobs:
             --store ssh-ng://eu.nixbuild.net \
             --json > build.json || true
 
-          if [ -s build.json ]; then
-            echo '::set-output name=success::true'
-          else
+          status=0
+          if ! [ -s build.json ]; then
             echo '[{"success":false}]' > build.json
-            echo '::set-output name=success::false'
+            status=1
           fi
 
           jq -c '{success: true, name: "${{matrix.build.name}}", description: "${{matrix.build.description}}", label: "${{matrix.build.label}}"} + .[0] | {"${{matrix.build.top_attr}}": {"${{matrix.build.system}}": {"${{matrix.build.attr}}": .}}}' build.json > result.json
+
+          exit "$status"
 
       - name: Upload result
         uses: actions/upload-artifact@v3
@@ -117,8 +119,8 @@ jobs:
           name: "${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}"
           path: result.json
 
-      - name: Check for failure
-        if: ${{ steps.build.outputs.success == 'false' }}
+      - name: Fail on build error
+        if: ${{ steps.build.outcome != 'success' }}
         run: |
           echo >&2 "Build failed"
           exit 1
