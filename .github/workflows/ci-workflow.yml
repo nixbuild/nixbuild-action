@@ -103,10 +103,10 @@ jobs:
             --json > build.json || true
 
           if [ -s build.json ]; then
+            echo '::set-output name=success::true'
+          else
             echo '[{"success":false}]' > build.json
             echo '::set-output name=success::false'
-          else
-            echo '::set-output name=success::true'
           fi
 
           jq -c '{success: true, name: "${{matrix.build.name}}", description: "${{matrix.build.description}}", label: "${{matrix.build.label}}"} + .[0] | {"${{matrix.build.top_attr}}": {"${{matrix.build.system}}": {"${{matrix.build.attr}}": .}}}' build.json > result.json
