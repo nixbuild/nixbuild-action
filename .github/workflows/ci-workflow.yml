@@ -101,7 +101,7 @@ jobs:
             --store ssh-ng://eu.nixbuild.net \
             --json > build.json || true
           test -s build.json || echo '[{"failed":true}]' > build.json
-          jq -c '. + {label: "${{matrix.build.label}}"} | {"${{matrix.build.top_attr}}": {"${{matrix.build.system}}": {"${{matrix.build.attr}}": .}}}' build.json > result.json
+          jq -c '.[0] + {label: "${{matrix.build.label}}"} | {"${{matrix.build.top_attr}}": {"${{matrix.build.system}}": {"${{matrix.build.attr}}": .}}}' build.json > result.json
 
       - name: Upload result
         uses: actions/upload-artifact@v3
