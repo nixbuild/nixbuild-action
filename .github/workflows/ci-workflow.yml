@@ -114,7 +114,6 @@ jobs:
           status=0
           if ! [ -s build.json ]; then
             echo '[{"success":false}]' > build.json
-            echo "::error title=${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}::Build failed"
             status=1
           fi
 
