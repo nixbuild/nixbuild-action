@@ -118,7 +118,7 @@ jobs:
           path: result.json
 
       - name: Check for failure
-        if: ${{ steps.build.outputs.success == "false" }}
+        if: ${{ steps.build.outputs.success == 'false' }}
         run: |
           echo >&2 "Build failed"
           exit 1
