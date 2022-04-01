@@ -134,7 +134,8 @@ jobs:
             --print-build-logs \
             --eval-store auto \
             --store ssh-ng://eu.nixbuild.net \
-            --json > build.json || true
+            --json > build.json \
+            2> >(tee -a build.log >&2) || true
 
           status=0
           if ! [ -s build.json ]; then
@@ -151,7 +152,9 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: "${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}"
-          path: result.json
+          path: |
+            result.json
+            build.log
 
 
   collect-results:
