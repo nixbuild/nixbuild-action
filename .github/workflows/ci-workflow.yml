@@ -93,6 +93,7 @@ jobs:
         run: ${{inputs.pre_build_script}}
 
       - name: "Build ${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}"
+        id: build
         run: |
           touch build.json
           nix build "./${{inputs.flake_directory}}#${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}" \
@@ -100,14 +101,28 @@ jobs:
             --eval-store auto \
             --store ssh-ng://eu.nixbuild.net \
             --json > build.json || true
-          test -s build.json || echo '[{"failed":true}]' > build.json
-          jq -c '.[0] + {name: "${{matrix.build.name}}", description: "${{matrix.build.description}}", label: "${{matrix.build.label}}"} | {"${{matrix.build.top_attr}}": {"${{matrix.build.system}}": {"${{matrix.build.attr}}": .}}}' build.json > result.json
+
+          if [ -s build.json ]; then
+            echo '[{"success":false}]' > build.json
+            echo '::set-output name=success::false'
+          else
+            echo '::set-output name=success::true'
+          fi
+
+          jq -c '{success: true, name: "${{matrix.build.name}}", description: "${{matrix.build.description}}", label: "${{matrix.build.label}}"} + .[0] | {"${{matrix.build.top_attr}}": {"${{matrix.build.system}}": {"${{matrix.build.attr}}": .}}}' build.json > result.json
 
       - name: Upload result
         uses: actions/upload-artifact@v3
         with:
           name: "${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}"
           path: result.json
+
+      - name: Check for failure
+        if: ${{ steps.build.outputs.success == "false" }}
+        run: |
+          echo >&2 "Build failed"
+          exit 1
+
 
   collect-results:
     name: "collect results"
