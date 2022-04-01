@@ -33,4 +33,4 @@ jobs:
     runs-on: ubuntu-latest
     needs: checks
     steps:
-      - run: echo "${{ needs.checks.outputs.results }}" | jq .
+      - run: echo '${{ needs.checks.outputs.results }}' | jq .
