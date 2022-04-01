@@ -106,7 +106,7 @@ jobs:
       - name: Upload result
         uses: actions/upload-artifact@v3
         with:
-          name: "${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}"
+          name: "${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}.json"
           path: result.json
 
   collect-results:
