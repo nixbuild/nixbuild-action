@@ -180,7 +180,7 @@ jobs:
 
       - name: "Build ${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}"
         id: build
-        continue-on-error: '${{ inputs.ignore_build_failures }}'
+        continue-on-error: ${{ '${{ inputs.ignore_build_failures }}' }}
         run: |
           touch build.json
           nix build "./${{inputs.flake_directory}}#${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}" \
