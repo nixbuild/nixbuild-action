@@ -1,5 +1,19 @@
-v9
+v10
 
 ## Changes
 
-* Fix more issues with quoting of environment variables sent by ssh (https://github.com/nixbuild/nixbuild-action/pull/8).
+* Add a reusable [CI Workflow](https://github.com/nixbuild/nixbuild-action/tree/v10#using-the-ci-workflow).
+
+  This workflow automatically evaluates your Nix Flake and build checks and/or packages. Each build runs as a separate job in GitHub Actions and therefore provides you with a simple CI [dashboard](https://github.com/nixbuild/nixbuild-action/actions/workflows/ci-example.yml) in the GitHub Actions UI.
+
+  The reusable workflow takes care of setting up Nix and nixbuild.net inside your workflow, making the required configuration truly minimal:
+
+  ```
+  name: Examples
+  on: push
+  jobs:
+    my-nix-builds:
+      uses: nixbuild/nixbuild-action/.github/workflows/ci-workflow.yml@v10
+      secrets:
+        nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
+  ```
