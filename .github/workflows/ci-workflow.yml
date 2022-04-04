@@ -171,7 +171,7 @@ jobs:
         with:
           nix_on_tmpfs: true
           nix_conf: experimental-features = nix-command flakes
-      - uses: nixbuild/nixbuild-action@v9
+      - uses: nixbuild/nixbuild-action@v10
         with:
           nixbuild_ssh_key: ${{secrets.nixbuild_ssh_key}}
           cache-build-failures: ${{inputs.cache-build-failures}}
