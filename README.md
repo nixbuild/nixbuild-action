@@ -108,7 +108,7 @@ Nix expressions, use `nixbuild-action`.
 
 ### Using the CI workflow
 
-Just call the reusable workflow like this:
+Call the reusable workflow like this:
 
 ```yaml
 name: Examples
