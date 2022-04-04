@@ -9,55 +9,108 @@ on:
           The private ssh key used to authenticate with nixbuild.net
 
           You should not add your private key directly to the workflow file but
-          instead define a GitHub Secret for it, to avoid mistakenly sharing your
-          key with others.
+          instead define a GitHub Secret for it, to avoid mistakenly sharing
+          your key with others.
 
           It is advisable to create a new nixbuild.net ssh key specifically for
-          use within GitHub (or even per repository or workflow). That way you can
-          revoke access to your nixbuild.net account in a fine-grained fashion.
+          use within GitHub (or even per repository or workflow). That way you
+          can revoke access to your nixbuild.net account in a fine-grained
+          fashion.
 
     outputs:
       success:
         value: ${{ jobs.collect-results.outputs.results }}
+        description: |
+          Outputs the string 'true' if all builds succeeded, otherwise 'false'.
+          You need to set `ignore_build_failures` to `true` in order to get the
+          'false' result, otherwise your workflow will be terminated before
+          you can use this output.
 
       results:
         value: ${{ jobs.collect-results.outputs.results }}
+        description: |
+          Contains a JSON object that maps each build to its result. Look at the
+          file `examples/using-the-ci-workflow/expected-result.json` to see an
+          example.
 
     inputs:
       ignore_build_failures:
         type: boolean
         required: false
         default: false
+        description: |
+          If true, the workflow will not fail even if one or more builds fail.
+          This is useful if you want to process the build results in a
+          subsequent job. For an example of this, see the workflow in
+          `.github/workflows/ci-example.yml`.
 
       fail_fast:
         type: boolean
         required: false
         default: false
+        description: |
+          If true, any remaining builds will be cancelled once the when the
+          first build failure is found. If false, all builds will be attempted
+          no matter how many builds fail.
 
       filter_builds:
         type: string
         required: false
         default: '.top_attr == "checks"'
+        description: |
+          A `jq` boolean expression that decides which builds from `flake.nix`
+          to build. See the `jq` documentation for info on how to write boolean
+          expressions: https://stedolan.github.io/jq/manual/.
+
+          When evaluating the expression, the following fields will be
+          available:
+
+          .top_attr : Either "checks" or "packages"
+          .system   : The build's system ("x86_64-linux", "aarch64-linux" etc)
+          .attr     : The build's attribute name, as defined in your flake
+          .name     : The build's derivation name
 
       label_builds:
         type: string
         required: false
         default: '"\(.attr) [\(.system)]"'
+        description: |
+          A `jq` string expression that defines the label of the build. The
+          label is visible in the GitHub Actions UI.
+          See the `jq` documentation for info on how to write string
+          expressions: https://stedolan.github.io/jq/manual/.
+
+          When evaluating the expression, the following fields will be
+          available:
+
+          .top_attr : Either "checks" or "packages"
+          .system   : The build's system ("x86_64-linux", "aarch64-linux" etc)
+          .attr     : The build's attribute name, as defined in your flake
+          .name     : The build's derivation name
 
       flake_directory:
         type: string
         required: false
         default: '.'
+        description: |
+          The path to the directory in your repository that contains the
+          `flake.nix` file you want the workflow to build.
 
       pre_evaluation_script:
         type: string
         required: false
         default: ''
+        description: |
+          Bash script that should be executed before evaluating the flake.
 
       pre_build_script:
         type: string
         required: false
         default: ''
+        description: |
+          Bash script that should be executed before running each build. Note,
+          every build runs as a separate job so this script (and all builds)
+          will be executed in parallel.
 
       cache-build-failures:
         type: boolean

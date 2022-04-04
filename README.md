@@ -120,10 +120,23 @@ jobs:
       nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
 ```
 
-You can also configure the location of your `flake.nix` file, filter the
-derivations to build and set nixbuild.net [settings](./#nixbuildnet-settings).
-Look at the [workflow definition](.github/workflows/ci-workflow.yml) to see
-how.
+You can configure the location of your `flake.nix` file, filter which
+derivations to build, set nixbuild.net [settings](./#nixbuildnet-settings) and
+more. Look at the [workflow definition](.github/workflows/ci-workflow.yml#L36)
+to see how.
+
+There is an [example workflow](.github/workflows/ci-example.yml) that uses the
+CI workflow. You can see how the workflow runs look in the GitHub Actions UI
+[here](https://github.com/nixbuild/nixbuild-action/actions/workflows/ci-example.yml).
+
+The reusable CI workflow provides
+[outputs](.github/workflows/ci-workflow.yml#L20) that lets you
+[process](.github/workflows/ci-example.yml#L50) build results in a subsequent
+job.
+
+All build logs are automatically stored as workflow artifacts so you can
+download them if needed. You can also see the build logs in the GitHub Actions
+console UI.
 
 ### Using `nixbuild-action`
 
