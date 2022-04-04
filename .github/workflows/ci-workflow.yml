@@ -203,13 +203,17 @@ jobs:
 
           jq -c '{success: true, name: "${{matrix.build.name}}", description: "${{matrix.build.description}}", label: "${{matrix.build.label}}"} + .[0] | {"${{matrix.build.top_attr}}": {"${{matrix.build.system}}": {"${{matrix.build.attr}}": .}}}' build.json > result.json
 
+          # Generate a valid artifact name
+          ARTIFACT_NAME="$(echo "${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}" | tr '":<>|*?\\/' '_')"
+          echo "ARTIFACT_NAME=$ARTIFACT_NAME" >> "$GITHUB_ENV"
+
           exit "$status"
 
       - name: Upload result
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: "${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}"
+          name: "${{ env.ARTIFACT_NAME }}"
           path: |
             result.json
             build.log
