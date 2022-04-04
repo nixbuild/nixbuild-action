@@ -40,6 +40,34 @@ about the nixbuild.net service.
 
 ## Usage
 
+This repository offers two different ways of running Nix builds with
+nixbuild.net. You can use this repository as a normal GitHub Action, which lets
+you use Nix in any way you like inside your workflow while all builds that Nix
+runs are automatically offloaded to nixbuild.net. You need to install Nix in
+some way (we'll get to this below), and then explicitly call `nix build` or
+similar inside your workflow.
+
+An even more convenient way is by using the [CI
+Workflow](.github/workflows/ci-workflow.yml), which is a [reusable
+workflow](https://docs.github.com/en/actions/using-workflows/reusing-workflows).
+This workflow installs Nix, checks out your repository and evaluates a
+`flake.nix` file found in it. It then automatically builds the derivations
+found in `checks` or `packages` (or both). You can configure exactly which
+derivations that should be built; by default all derivations in `checks` are
+built. The individual derivations will be built by separate (concurrent) GitHub
+Jobs which will give you a very nice overview over successful and failed builds
+on GitHub's workflow result page. Care has been taken to run your builds in the
+[most
+performant](https://blog.nixbuild.net/posts/2022-03-16-lightning-fast-ci-with-nixbuild-net.html)
+way possible.
+
+If your project has a `flake.nix` file and you simply want to build your checks
+or packages, we highly recommend you to use the CI Workflow. If you don't use
+flakes or have more complex needs when it comes to evaluating and building
+Nix expressions, use `nixbuild-action`.
+
+### Prerequisites
+
 1. Register for a [nixbuild.net account](https://nixbuild.net/#register). Every
    account includes free build hours, so you can try this action out for free.
 
@@ -78,32 +106,65 @@ about the nixbuild.net service.
 
 3. Configure your secret SSH key as a [GitHub Secret](https://docs.github.com/en/actions/reference/encrypted-secrets)
 
-4. Use `nixbuild/nixbuild-action` in your workflows. You don't need to configure
-   anything else than your SSH key:
+### Using the CI workflow
 
-   ```yaml
-   name: Examples
-   on: push
-   jobs:
-     minimal:
-       runs-on: ubuntu-20.04
-       steps:
-         - uses: actions/checkout@v3
-         - uses: nixbuild/nix-quick-install-action@v12
-         - uses: nixbuild/nixbuild-action@v9
-           with:
-             nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
-         - run: nix-build
-   ```
+Call the reusable workflow like this:
 
-   All builds performed by Nix will now run in nixbuild.net.
+```yaml
+name: Examples
+on: push
+jobs:
+  checks:
+    uses: nixbuild/nixbuild-action/.github/workflows/ci-workflow.yml@v10
+    secrets:
+      nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
+```
 
-   Note that you can use either
-   [nixbuild/nix-quick-install-action](https://github.com/marketplace/actions/nix-quick-install)
-   or
-   [cachix/install-nix-action](https://github.com/marketplace/actions/install-nix)
-   to install Nix, just make sure that you put the Nix installer action before
-   this action.
+You can configure the location of your `flake.nix` file, filter which
+derivations to build, set nixbuild.net [settings](./#nixbuildnet-settings) and
+more. Look at the [workflow definition](.github/workflows/ci-workflow.yml#L36)
+to see how.
+
+There is an [example workflow](.github/workflows/ci-example.yml) that uses the
+CI workflow. You can see how the workflow runs look in the GitHub Actions UI
+[here](https://github.com/nixbuild/nixbuild-action/actions/workflows/ci-example.yml).
+
+The reusable CI workflow provides
+[outputs](.github/workflows/ci-workflow.yml#L20) that lets you
+[process](.github/workflows/ci-example.yml#L50) build results in a subsequent
+job.
+
+All build logs are automatically stored as workflow artifacts so you can
+download them if needed. You can also see the build logs in the GitHub Actions
+console UI.
+
+### Using `nixbuild-action`
+
+1. Install Nix with either [nixbuild/nix-quick-install-action](https://github.com/marketplace/actions/nix-quick-install) or [cachix/install-nix-action](https://github.com/marketplace/actions/install-nix).
+
+2. Use `nixbuild/nixbuild-action` in your workflows. You don't need to configure
+   anything else than your SSH key.
+
+3. Use Nix as usual. All builds will automatically be sent to nixbuild.net.
+   For optimal build performance, you should look into how to use
+   [remote store building](https://blog.nixbuild.net/posts/2022-03-16-lightning-fast-ci-with-nixbuild-net.html).
+
+Here is a complete minimal workflow example:
+
+```yaml
+name: Examples
+on: push
+jobs:
+  minimal:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: nixbuild/nix-quick-install-action@v12
+      - uses: nixbuild/nixbuild-action@v9
+        with:
+          nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
+      - run: nix-build
+```
 
 ### nixbuild.net Settings
 

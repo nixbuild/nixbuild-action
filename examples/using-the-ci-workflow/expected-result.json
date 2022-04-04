@@ -1,0 +1,70 @@
+{
+  "checks": {
+    "aarch64-linux": {
+      "firefox": {
+        "success": true,
+        "name": "firefox-98.0.1",
+        "description": "A web browser built from Firefox source tree",
+        "label": "firefox.aarch64-linux",
+        "drvPath": "/nix/store/bv78cfck05q4a1aky2j7gprgsrd4g3bf-firefox-98.0.1.drv",
+        "outputs": {
+          "out": "/nix/store/hw8x8kb8lxbh6fpq7rx250da80bcrxy7-firefox-98.0.1"
+        }
+      },
+      "hello-fail": {
+        "success": false,
+        "name": "hello-2.12",
+        "description": "A program that produces a familiar, friendly greeting",
+        "label": "hello-fail.aarch64-linux"
+      },
+      "hello": {
+        "success": true,
+        "name": "hello-2.12",
+        "description": "A program that produces a familiar, friendly greeting",
+        "label": "hello.aarch64-linux",
+        "drvPath": "/nix/store/2a60nfmxaj5160i9g2j2pygz5rjdlpnf-hello-2.12.drv",
+        "outputs": {
+          "out": "/nix/store/q6y2d4vikjj8ahvjlikn95rhw53rc69s-hello-2.12"
+        }
+      }
+    },
+    "x86_64-linux": {
+      "firefox": {
+        "success": true,
+        "name": "firefox-98.0.1",
+        "description": "A web browser built from Firefox source tree",
+        "label": "firefox.x86_64-linux",
+        "drvPath": "/nix/store/xvjxd6npymq3crbq36kn3ys6fd0qswiq-firefox-98.0.1.drv",
+        "outputs": {
+          "out": "/nix/store/w8k24v6yf0wkyyfwbdd9dqpnc6f7p9hm-firefox-98.0.1"
+        }
+      },
+      "hello-fail": {
+        "success": false,
+        "name": "hello-2.12",
+        "description": "A program that produces a familiar, friendly greeting",
+        "label": "hello-fail.x86_64-linux"
+      },
+      "hello": {
+        "success": true,
+        "name": "hello-2.12",
+        "description": "A program that produces a familiar, friendly greeting",
+        "label": "hello.x86_64-linux",
+        "drvPath": "/nix/store/zcjpms9gf4rjnakn7x0kx218cx84108f-hello-2.12.drv",
+        "outputs": {
+          "out": "/nix/store/g124820p9hlv4lj8qplzxw1c44dxaw1k-hello-2.12"
+        }
+      },
+      "minecraft": {
+        "success": true,
+        "name": "minecraft-launcher-2.2.1441",
+        "description": "Official launcher for Minecraft, a sandbox-building game",
+        "label": "minecraft.x86_64-linux",
+        "drvPath": "/nix/store/8n9qddv8g6vwvsdrd6hwbx8az3ax44gr-minecraft-launcher-2.2.1441.drv",
+        "outputs": {
+          "out": "/nix/store/dpslzb8grmx3c6xnzkm7w2vqyzac6s9n-minecraft-launcher-2.2.1441"
+        }
+      }
+    }
+  }
+}
