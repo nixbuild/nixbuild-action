@@ -98,6 +98,15 @@ on:
           The path to the directory in your repository that contains the
           `flake.nix` file you want the workflow to build.
 
+      use_remote_store_building:
+        type: boolean
+        required: false
+        default: true
+        description: |
+          Use remote store building to achieve optimal performance. When
+          working with Nix code which uses import-from-derivation, you might
+          need to turn this off to avoid errors.
+
       pre_evaluation_script:
         type: string
         required: false
@@ -187,7 +196,7 @@ jobs:
           nix build "./${{inputs.flake_directory}}#${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}" \
             --print-build-logs \
             --eval-store auto \
-            --store ssh-ng://eu.nixbuild.net \
+            --store ${{ inputs.use_remote_store_building && 'ssh-ng://eu.nixbuild.net' || 'auto' }} \
             --json > build.json \
             2> >(tee -a build.log >&2) || true
 
