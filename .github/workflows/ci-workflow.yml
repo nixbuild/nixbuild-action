@@ -198,6 +198,7 @@ jobs:
             --print-build-logs \
             --eval-store auto \
             --store ssh-ng://eu.nixbuild.net \
+            --builders "" --max-jobs 2 \
             --json > build.json \
             2> >(tee -a build.log >&2) || true
 
