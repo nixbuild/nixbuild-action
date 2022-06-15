@@ -34,6 +34,15 @@ on:
           example.
 
     inputs:
+      nix_version:
+        type: string
+        default: '2.9.0'
+        required: false
+        description: |
+          The version of Nix that should be used.
+          See available versions at
+          https://github.com/nixbuild/nix-quick-install-action/releases/tag/v15.
+
       ignore_build_failures:
         type: boolean
         required: false
@@ -146,6 +155,7 @@ jobs:
         with:
           nix_on_tmpfs: true
           nix_conf: experimental-features = nix-command flakes
+          nix_version: ${{inputs.nix_version}}
       - name: Pre-evaluation script
         run: ${{inputs.pre_evaluation_script}}
       - name: Find builds
