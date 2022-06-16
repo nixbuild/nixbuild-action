@@ -1,7 +1,9 @@
-v11
+v12
 
 ## Changes
 
-* ci-workflow: Clean up uploaded artifact names, so characters in attribute names can't cause upload failures.
+* ci-workflow: Fix building of builds using import-from-derivation.
 
-* ci-workflow: Bump the version of [nix-quick-install-action](https://github.com/marketplace/actions/nix-quick-install) from [v12](https://github.com/nixbuild/nix-quick-install-action/releases/tag/v12) to [v14](https://github.com/nixbuild/nix-quick-install-action/releases/tag/v14). This changes the used Nix version from 2.7.0 to 2.8.1.
+* ci-workflow: Add a setting `nix_version` that can be used to select which Nix version should be used to perform builds.
+
+* ci-workflow: Bump the version of [nix-quick-install-action](https://github.com/marketplace/actions/nix-quick-install) from [v14](https://github.com/nixbuild/nix-quick-install-action/releases/tag/v14) to [v16](https://github.com/nixbuild/nix-quick-install-action/releases/tag/v16). This changes the default Nix version from 2.8.1 to 2.9.1.
