@@ -115,7 +115,7 @@ name: Examples
 on: push
 jobs:
   checks:
-    uses: nixbuild/nixbuild-action/.github/workflows/ci-workflow.yml@v10
+    uses: nixbuild/nixbuild-action/.github/workflows/ci-workflow.yml@v12
     secrets:
       nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
 ```
@@ -159,8 +159,8 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
-      - uses: nixbuild/nix-quick-install-action@v12
-      - uses: nixbuild/nixbuild-action@v9
+      - uses: nixbuild/nix-quick-install-action@v16
+      - uses: nixbuild/nixbuild-action@v12
         with:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
       - run: nix-build
@@ -208,8 +208,8 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
-      - uses: nixbuild/nix-quick-install-action@v12
-      - uses: nixbuild/nixbuild-action@v9
+      - uses: nixbuild/nix-quick-install-action@v16
+      - uses: nixbuild/nixbuild-action@v12
         with:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
           cache-build-timeouts: true
