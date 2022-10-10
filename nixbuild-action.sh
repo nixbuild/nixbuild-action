@@ -17,7 +17,18 @@ eval $(ssh-agent)
 
 
 # Add ssh key
-printenv NIXBUILD_SSH_KEY | ssh-add -q -
+if ssh-keygen -y -f <(printenv NIXBUILD_SSH_KEY) &>/dev/null; then
+  printenv NIXBUILD_SSH_KEY | ssh-add -q -
+else
+echo -e >&2 \
+"Your SSH key is not a valid OpenSSH private key\n"\
+"This is likely caused by one of these issues:\n"\
+"* The key has been configured incorrectly in your workflow file.\n"\
+"* The workflow was triggered by an actor that has no access to\n"\
+"  the GitHub Action secret used for storing your SSH key.\n"\
+"  For example, Pull Requests originating from a fork of your\n"\
+"  repository can't access secrets."
+fi
 
 
 # Write ssh config
