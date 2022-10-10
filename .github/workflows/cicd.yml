@@ -15,7 +15,7 @@ jobs:
       - test-build
     steps:
       - uses: actions/checkout@v3
-      - uses: nixbuild/nix-quick-install-action@v17
+      - uses: nixbuild/nix-quick-install-action@v18
         with:
           nix_conf: experimental-features = nix-command flakes
       - uses: ./
@@ -39,7 +39,7 @@ jobs:
         system: [ x86_64-linux ]
     steps:
       - uses: actions/checkout@v3
-      - uses: nixbuild/nix-quick-install-action@v17
+      - uses: nixbuild/nix-quick-install-action@v18
         with:
           nix_conf: experimental-features = nix-command flakes
       - uses: ./
@@ -58,6 +58,7 @@ jobs:
       matrix:
         os: [ ubuntu-20.04, macos-10.15 ]
         nix_version:
+          - 2.11.0
           - 2.10.3
           - 2.9.2
           - 2.9.1
@@ -80,7 +81,7 @@ jobs:
             nix_version: 2.0.4
     steps:
       - uses: actions/checkout@v3
-      - uses: nixbuild/nix-quick-install-action@v17
+      - uses: nixbuild/nix-quick-install-action@v18
         with:
           nix_version: ${{ matrix.nix_version }}
       - uses: ./
@@ -96,7 +97,7 @@ jobs:
         os: [ ubuntu-20.04, macos-latest ]
     steps:
       - uses: actions/checkout@v3
-      - uses: cachix/install-nix-action@v17
+      - uses: cachix/install-nix-action@v18
       - uses: ./
         with:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
