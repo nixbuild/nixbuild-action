@@ -42,6 +42,13 @@ on:
           The version of Nix that should be used.
           See available versions at
           https://github.com/nixbuild/nix-quick-install-action/releases/tag/v16.
+          
+      nix_conf:
+        type: string
+        default: ''
+        required: false
+        description: |
+          Nix configuration passed to `nix-quick-install-action`.
 
       ignore_build_failures:
         type: boolean
@@ -154,7 +161,9 @@ jobs:
       - uses: nixbuild/nix-quick-install-action@v17
         with:
           nix_on_tmpfs: true
-          nix_conf: experimental-features = nix-command flakes
+          nix_conf: |
+            experimental-features = nix-command flakes
+            ${{inputs.nix_conf}}
           nix_version: ${{inputs.nix_version}}
       - name: Pre-evaluation script
         run: ${{inputs.pre_evaluation_script}}
