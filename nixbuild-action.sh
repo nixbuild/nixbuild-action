@@ -17,8 +17,11 @@ eval $(ssh-agent)
 
 
 # Add ssh key
-if ssh-keygen -y -f <(printenv NIXBUILD_SSH_KEY) &>/dev/null; then
-  printenv NIXBUILD_SSH_KEY | ssh-add -q -
+keyfile="$(mktemp)"
+printenv NIXBUILD_SSH_KEY > "$keyfile"
+if ssh-keygen -y -f "$keyfile" &>/dev/null; then
+  ssh-add -q "$keyfile"
+  rm "$keyfile"
 else
 echo -e >&2 \
 "Your SSH key is not a valid OpenSSH private key\n"\
@@ -28,6 +31,7 @@ echo -e >&2 \
 "  the GitHub Action secret used for storing your SSH key.\n"\
 "  For example, Pull Requests originating from a fork of your\n"\
 "  repository can't access secrets."
+exit 1
 fi
 
 
