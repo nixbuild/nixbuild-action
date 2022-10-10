@@ -42,7 +42,7 @@ on:
           The version of Nix that should be used.
           See available versions at
           https://github.com/nixbuild/nix-quick-install-action/releases/tag/v18.
-          
+
       nix_conf:
         type: string
         default: ''
