@@ -1,9 +1,11 @@
-v12
+v13
 
 ## Changes
 
-* ci-workflow: Fix building of builds using import-from-derivation.
+* Improves error message when SSH key is invalid or inaccessible
 
-* ci-workflow: Add a setting `nix_version` that can be used to select which Nix version should be used to perform builds.
+* ci-workflow: Added a setting `nix_conf` that allows for adjusting the Nix configuration used. Contributed by [@kfollesdal](https://github.com/kfollesdal) in [PR 18](https://github.com/nixbuild/nixbuild-action/pull/18).
 
-* ci-workflow: Bump the version of [nix-quick-install-action](https://github.com/marketplace/actions/nix-quick-install) from [v14](https://github.com/nixbuild/nix-quick-install-action/releases/tag/v14) to [v16](https://github.com/nixbuild/nix-quick-install-action/releases/tag/v16). This changes the default Nix version from 2.8.1 to 2.9.1.
+* ci-workflow: Bump the version of [nix-quick-install-action](https://github.com/marketplace/actions/nix-quick-install) from [v16](https://github.com/nixbuild/nix-quick-install-action/releases/tag/v16) to [v18](https://github.com/nixbuild/nix-quick-install-action/releases/tag/v18).
+
+* ci-workflow: Changed default Nix version used from 2.9.1 to 2.11.0.
