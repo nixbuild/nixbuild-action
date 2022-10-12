@@ -1,11 +1,5 @@
-v13
+v14
 
 ## Changes
 
-* Improves error message when SSH key is invalid or inaccessible
-
-* ci-workflow: Added a setting `nix_conf` that allows for adjusting the Nix configuration used. Contributed by [@kfollesdal](https://github.com/kfollesdal) in [PR 18](https://github.com/nixbuild/nixbuild-action/pull/18).
-
-* ci-workflow: Bump the version of [nix-quick-install-action](https://github.com/marketplace/actions/nix-quick-install) from [v16](https://github.com/nixbuild/nix-quick-install-action/releases/tag/v16) to [v18](https://github.com/nixbuild/nix-quick-install-action/releases/tag/v18).
-
-* ci-workflow: Changed default Nix version used from 2.9.1 to 2.11.0.
+* ci-workflow: Corrects the reference to the nixbuild-action. In release v13, the ci-workflow would incorrectly use release v12 of nixbuild-action. A test has been added to avoid this from happening again in the future.
