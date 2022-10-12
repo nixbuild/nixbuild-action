@@ -16,6 +16,13 @@ on:
           use within GitHub (or even per repository or workflow). That way you
           can revoke access to your nixbuild.net account in a fine-grained
           fashion.
+      access-tokens:
+        required: false
+        description: |
+          Access token to token protected flakes, for example private github repos.
+          Example: github.com=23ac...b289
+          See https://nixos.org/manual/nix/unstable/command-ref/conf-file.html#conf-access-tokens
+          for more info.
 
     outputs:
       success:
@@ -163,6 +170,7 @@ jobs:
           nix_on_tmpfs: true
           nix_conf: |
             experimental-features = nix-command flakes
+            access-tokens = ${{ secrets.access-tokens }}
             ${{inputs.nix_conf}}
           nix_version: ${{inputs.nix_version}}
       - name: Pre-evaluation script
@@ -189,7 +197,10 @@ jobs:
       - uses: nixbuild/nix-quick-install-action@v18
         with:
           nix_on_tmpfs: true
-          nix_conf: experimental-features = nix-command flakes
+          nix_conf: |
+            experimental-features = nix-command flakes
+            access-tokens = ${{ secrets.access-tokens }}
+            ${{inputs.nix_conf}}
       - uses: nixbuild/nixbuild-action@v14
         with:
           nixbuild_ssh_key: ${{secrets.nixbuild_ssh_key}}
