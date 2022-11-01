@@ -13,7 +13,7 @@ function formatBytes(bytes, decimals = 2) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
 }
 
-if (core.getInput('generate_summary')) {
+if (core.getInput('generate_summary').toLowerCase() === 'true') {
 
   try {
     // If the shell command fails we will get an exception,
