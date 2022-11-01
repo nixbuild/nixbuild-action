@@ -35,6 +35,7 @@
         simple-test-build = preferRemoteBuild (
           pkgs.runCommand "simple-test-build" {} ''
             mkdir $out
+
             echo done > $out/done
           ''
         );
