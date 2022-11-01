@@ -87,6 +87,7 @@ jobs:
       - uses: ./
         with:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
+          generate_summary: false
           keep-builds-running: true # test that we can set a setting
 
 
@@ -101,4 +102,5 @@ jobs:
       - uses: ./
         with:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
+          generate_summary: false
           keep-builds-running: true # test that we can set a setting

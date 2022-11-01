@@ -19,6 +19,13 @@ inputs:
 
       See the README of this action for easy setup instructions.
 
+  generate_summary:
+    required: false
+    default: true
+    description: |
+      If set to true, a summary of all builds and their resource usage will be
+      generated as a GitHub Actions step summary.
+
 
   allow-override:
     required: false
