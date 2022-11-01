@@ -69,6 +69,7 @@ inputs:
 runs:
   using: 'node16'
   main: 'index.js'
+  post: 'summary.js'
 
 branding:
   icon: zap
