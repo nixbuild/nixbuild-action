@@ -73,7 +73,7 @@ for setting in \
   never-substitute
 do
   val="$(printenv INPUTS_JSON | jq -r ".\"$setting\"")"
-  if [ -n "$val" ]; then
+  if [ -n "$val" ] && [ "$val" != "null" ]; then
     add_env "$(echo "$setting" | tr a-z- A-Z_)" "$val"
   fi
 done
@@ -81,15 +81,17 @@ done
 # Propagate selected GitHub Actions environment variables as nixbuild.net tags
 # https://docs.github.com/en/actions/reference/environment-variables#default-environment-variables
 for tag in \
-  GITHUB_WORKFLOW \
+  GITHUB_ACTOR \
+  GITHUB_JOB \
+  GITHUB_REF \
+  GITHUB_REPOSITORY \
+  GITHUB_RUN_ATTEMPT \
   GITHUB_RUN_ID \
   GITHUB_RUN_NUMBER \
-  GITHUB_ACTION \
-  GITHUB_ACTIONS \
-  GITHUB_REPOSITORY \
-  GITHUB_SHA
+  GITHUB_SHA \
+  GITHUB_WORKFLOW
 do
-  add_env "$tag" "$(printenv $tag)"
+  add_env "TAG_$tag" "$(printenv $tag)"
 done
 
 echo "  SetEnv$nixbuildnet_env" >> "$SSH_CONFIG_FILE"
