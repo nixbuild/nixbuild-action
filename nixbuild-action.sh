@@ -3,6 +3,7 @@
 set -eu
 set -o pipefail
 
+export INPUTS_JSON="$1"
 
 # Setup known_hosts
 SSH_KNOWN_HOSTS_FILE="$(mktemp)"

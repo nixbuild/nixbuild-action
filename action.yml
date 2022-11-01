@@ -66,18 +66,9 @@ inputs:
       Set the never-substitute setting in nixbuild.net. For documentation
       see https://docs.nixbuild.net/settings/#never-substitute.
 
-
 runs:
-  using: "composite"
-  steps:
-    - name: Setup Nix for nixbuild.net
-      run: ${{ github.action_path }}/nixbuild-action.sh
-      shell: bash
-      env:
-        INPUTS_JSON: ${{ toJSON(inputs) }}
-        NIXBUILD_SSH_KEY: ${{ inputs.nixbuild_ssh_key }}
-        ACTION_LIB: ${{ github.action_path }}/lib
-
+  using: 'node16'
+  main: 'index.js'
 
 branding:
   icon: zap
