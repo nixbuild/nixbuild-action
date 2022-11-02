@@ -80,7 +80,7 @@ if (summaryFor === 'job' || summaryFor === 'workflow') {
   var token = '';
   try {
     token = JSON.parse(child_process.execSync(
-      'ssh eu.nixbuild.net api tokens create --ttl-seconds 60',
+      'ssh eu.nixbuild.net api tokens create --read-only --ttl-seconds 60',
       {encoding: 'utf-8'}
     )).token;
   } catch (error) {
