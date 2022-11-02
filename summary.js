@@ -29,6 +29,7 @@ function generateSummary(token, allJobs) {
   if (!allJobs) {
     path += `,GITHUB_JOB:${job},GITHUB_STEP_SUMMARY:${step_summary}`;
   }
+  core.info(`api query: ${path}`);
   const options = {
     host: 'api.nixbuild.net',
     path: path,
