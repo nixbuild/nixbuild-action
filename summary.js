@@ -50,14 +50,14 @@ function generateSummary(token, allJobs) {
         core.setFailed(`nixbuild.net API returned: ${body}`);
       } else {
         var summary = JSON.parse(body);
-        var heading = 'Summary of <a href="https://nixbuild.net/">nixbuild.net</a> usage for this ';
+        var heading = '';
         if (allJobs) {
-          heading += 'workflow';
+          heading = 'Total <a href="https://nixbuild.net/">nixbuild.net</a> usage';
         } else {
-          heading += 'job';
+          heading = '<a href="https://nixbuild.net/">nixbuild.net</a> usage for this job';
         }
         core.summary
-          .addHeading(heading, 2)
+          .addHeading(heading, 3)
           .addTable([
             ['&#x2714;', 'Successful builds', summary.successful_build_count.toString()],
             ['&#x274C;', 'Failed builds', summary.failed_build_count.toString()],
