@@ -1,6 +1,7 @@
 const core = require('@actions/core');
 const exec = require('@actions/exec');
 const github = require('@actions/github');
+const path = require('path');
 
 async function run() {
   try {
@@ -13,7 +14,7 @@ async function run() {
       }
     }
     core.exportVariable('NIXBUILD_SSH_KEY', core.getInput('nixbuild_ssh_key'));
-    await exec.exec('./nixbuild-action.sh', [JSON.stringify(inputs)]);
+    await exec.exec(path.resolve(__dirname, 'nixbuild-action.sh'), [JSON.stringify(inputs)]);
   } catch (error) {
     core.setFailed(error.message);
   }
