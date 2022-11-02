@@ -9,6 +9,7 @@ on:
 jobs:
   release:
     runs-on: ubuntu-20.04
+    if: always()
     needs:
       - install-with-nix-quick-install-action
       - install-with-install-nix-action
