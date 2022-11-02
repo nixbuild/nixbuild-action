@@ -13,15 +13,21 @@ function formatBytes(bytes, decimals = 2) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
 }
 
+// https://stackoverflow.com/a/15270931/410926
+function basename(path) {
+  return path.split(/[\\/]/).pop();
+}
+
 function generateSummary(token, allJobs) {
   const workflow = process.env.GITHUB_WORKFLOW;
   const repository = process.env.GITHUB_REPOSITORY;
   const run_id = process.env.GITHUB_RUN_ID;
   const run_attempt = process.env.GITHUB_RUN_ATTEMPT;
   const job = process.env.GITHUB_JOB;
+  const step_summary = basename(process.env.GITHUB_STEP_SUMMARY);
   var path = `/builds/summary?tags=GITHUB_REPOSITORY:${repository},GITHUB_RUN_ID:${run_id},GITHUB_RUN_ATTEMPT:${run_attempt}`;
   if (!allJobs) {
-    path += `,GITHUB_JOB:${job}`;
+    path += `,GITHUB_JOB:${job},GITHUB_STEP_SUMMARY:${step_summary}`;
   }
   const options = {
     host: 'api.nixbuild.net',
@@ -39,11 +45,11 @@ function generateSummary(token, allJobs) {
         core.setFailed(`nixbuild.net API returned: ${body}`);
       } else {
         var summary = JSON.parse(body);
-        var heading = 'nixbuild.net build summary';
+        var heading = '';
         if (allJobs) {
-          heading += ` for workflow ${workflow}`;
+          heading = 'nixbuild.net workflow summary';
         } else {
-          heading += ` for job ${job}`;
+          heading = 'nixbuild.net summary';
         }
         core.summary
           .addHeading(heading)

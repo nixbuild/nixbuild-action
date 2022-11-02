@@ -3,8 +3,6 @@
 set -eu
 set -o pipefail
 
-echo >&2 "$GITHUB_STEP_SUMMARY"
-
 export INPUTS_JSON="$1"
 
 # Setup known_hosts
@@ -96,6 +94,8 @@ for tag in \
 do
   add_env "TAG_$tag" "$(printenv $tag)"
 done
+
+add_env "TAG_GITHUB_STEP_SUMMARY" "$(basename "$GITHUB_STEP_SUMMARY")"
 
 echo "  SetEnv$nixbuildnet_env" >> "$SSH_CONFIG_FILE"
 
