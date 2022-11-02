@@ -159,7 +159,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
-      - uses: nixbuild/nix-quick-install-action@v18
+      - uses: nixbuild/nix-quick-install-action@v19
       - uses: nixbuild/nixbuild-action@v14
         with:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
@@ -208,7 +208,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
-      - uses: nixbuild/nix-quick-install-action@v18
+      - uses: nixbuild/nix-quick-install-action@v19
       - uses: nixbuild/nixbuild-action@v14
         with:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}

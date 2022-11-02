@@ -41,7 +41,7 @@ on:
         description: |
           The version of Nix that should be used.
           See available versions at
-          https://github.com/nixbuild/nix-quick-install-action/releases/tag/v18.
+          https://github.com/nixbuild/nix-quick-install-action/releases/tag/v19.
 
       nix_conf:
         type: string
@@ -158,7 +158,7 @@ jobs:
       builds: ${{ steps.find-builds.outputs.builds }}
     steps:
       - uses: actions/checkout@v3
-      - uses: nixbuild/nix-quick-install-action@v18
+      - uses: nixbuild/nix-quick-install-action@v19
         with:
           nix_on_tmpfs: true
           nix_conf: |
@@ -185,7 +185,7 @@ jobs:
         build: ${{fromJSON(needs.eval-flake.outputs.builds)}}
     steps:
       - uses: actions/checkout@v3
-      - uses: nixbuild/nix-quick-install-action@v18
+      - uses: nixbuild/nix-quick-install-action@v19
         with:
           nix_on_tmpfs: true
           nix_conf: experimental-features = nix-command flakes
@@ -260,7 +260,7 @@ jobs:
           else
             echo "success=false" >> "$GITHUB_OUTPUT"
           fi
-      - uses: nixbuild/nixbuild-action@build-report
+      - uses: nixbuild/nixbuild-action@master
         with:
           nixbuild_ssh_key: ${{secrets.nixbuild_ssh_key}}
           generate-summary-for: 'workflow'
