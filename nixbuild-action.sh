@@ -3,6 +3,8 @@
 set -eu
 set -o pipefail
 
+echo >&2 "$GITHUB_STEP_SUMMARY"
+
 export INPUTS_JSON="$1"
 
 # Setup known_hosts
