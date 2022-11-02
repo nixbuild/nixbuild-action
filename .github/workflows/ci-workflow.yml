@@ -260,3 +260,7 @@ jobs:
           else
             echo "success=false" >> "$GITHUB_OUTPUT"
           fi
+      - uses: nixbuild/nixbuild-action@build-report
+        with:
+          nixbuild_ssh_key: ${{secrets.nixbuild_ssh_key}}
+          generate-summary-for: 'workflow'
