@@ -5,6 +5,12 @@ set -o pipefail
 
 export INPUTS_JSON="$1"
 
+# Create a unique invocation id, since there is no way to separate different
+# instances of the same job (created with a build matrix). GitHub should really
+# expose a "step id" in addition to their run id.
+export INVOCATION_ID="$(od -x /dev/urandom | head -1 | awk '{OFS="-"; srand($6); sub(/./,"4",$5); sub(/./,substr("89ab",rand()*4,1),$6); print $2$3,$4,$5,$6,$7$8$9}')"
+echo -n "$INVOCATION_ID" > "$HOME/__nixbuildnet_invocation_id"
+
 # Setup known_hosts
 SSH_KNOWN_HOSTS_FILE="$(mktemp)"
 echo >"$SSH_KNOWN_HOSTS_FILE" \
@@ -95,7 +101,7 @@ do
   add_env "TAG_$tag" "$(printenv $tag)"
 done
 
-add_env "TAG_GITHUB_STEP_SUMMARY" "$(basename "$GITHUB_STEP_SUMMARY")"
+add_env "TAG_GITHUB_INVOCATION_ID" "$(basename "$INVOCATION_ID")"
 
 echo "  SetEnv$nixbuildnet_env" >> "$SSH_CONFIG_FILE"
 

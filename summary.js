@@ -2,6 +2,7 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const child_process = require('child_process');
 const https = require('https');
+const fs = require('fs');
 
 // https://stackoverflow.com/a/18650828
 function formatBytes(bytes, decimals = 2) {
@@ -24,10 +25,12 @@ function generateSummary(token, allJobs) {
   const run_id = process.env.GITHUB_RUN_ID;
   const run_attempt = process.env.GITHUB_RUN_ATTEMPT;
   const job = process.env.GITHUB_JOB;
-  const step_summary = basename(process.env.GITHUB_STEP_SUMMARY);
-  var path = `/builds/summary?tags=GITHUB_REPOSITORY:${repository},GITHUB_RUN_ID:${run_id},GITHUB_RUN_ATTEMPT:${run_attempt}`;
-  if (!allJobs) {
-    path += `,GITHUB_JOB:${job},GITHUB_STEP_SUMMARY:${step_summary}`;
+  const invocation_id = fs.readFileSync(process.env.HOME + '/__nixbuildnet_invocation_id');
+  var path = `/builds/summary?tags=GITHUB_REPOSITORY:${repository}`;
+  if (allJobs) {
+    path += `,GITHUB_RUN_ID:${run_id},GITHUB_RUN_ATTEMPT:${run_attempt}`;
+  } else {
+    path += `,GITHUB_INVOCATION_ID:${invocation_id}`;
   }
   core.info(`api query: ${path}`);
   const options = {
