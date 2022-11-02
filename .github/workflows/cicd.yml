@@ -9,6 +9,7 @@ on:
 jobs:
   release:
     runs-on: ubuntu-20.04
+    if: always()
     needs:
       - install-with-nix-quick-install-action
       - install-with-install-nix-action
@@ -21,6 +22,7 @@ jobs:
       - uses: ./
         with:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
+          generate-summary-for: 'workflow'
       - name: Build release script
         run: nix build .#packages.x86_64-linux.release
       - name: Verify build signature
@@ -45,9 +47,13 @@ jobs:
       - uses: ./
         with:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
+          generate-summary-for: 'job'
           keep-builds-running: true # test that we can set a setting
       - name: Run a test build
-        run: nix build --system ${{ matrix.system }} .#simple-test-build
+        run: |
+          cat flake.nix | sed "s/__SIMPLE_TEST_BUILD__/$RANDOM$RANDOM$RANDOM$RANDOM/" > flake.nix.new
+          mv flake.nix.new flake.nix
+          nix build --system ${{ matrix.system }} .#simple-test-build
       - name: Verify build signature
         run: test "$(nix path-info ./result --json | jq -r '.[].signatures[0]' | sed 's/:.*//')" = "nixbuild.net/rickard-1"
 

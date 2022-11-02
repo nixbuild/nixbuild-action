@@ -3,6 +3,13 @@
 set -eu
 set -o pipefail
 
+export INPUTS_JSON="$1"
+
+# Create a unique invocation id, since there is no way to separate different
+# instances of the same job (created with a build matrix). GitHub should really
+# expose a "step id" in addition to their run id.
+export INVOCATION_ID="$(od -x /dev/urandom | head -1 | awk '{OFS="-"; srand($6); sub(/./,"4",$5); sub(/./,substr("89ab",rand()*4,1),$6); print $2$3,$4,$5,$6,$7$8$9}')"
+echo -n "$INVOCATION_ID" > "$HOME/__nixbuildnet_invocation_id"
 
 # Setup known_hosts
 SSH_KNOWN_HOSTS_FILE="$(mktemp)"
@@ -73,7 +80,7 @@ for setting in \
   never-substitute
 do
   val="$(printenv INPUTS_JSON | jq -r ".\"$setting\"")"
-  if [ -n "$val" ]; then
+  if [ -n "$val" ] && [ "$val" != "null" ]; then
     add_env "$(echo "$setting" | tr a-z- A-Z_)" "$val"
   fi
 done
@@ -81,16 +88,20 @@ done
 # Propagate selected GitHub Actions environment variables as nixbuild.net tags
 # https://docs.github.com/en/actions/reference/environment-variables#default-environment-variables
 for tag in \
-  GITHUB_WORKFLOW \
+  GITHUB_ACTOR \
+  GITHUB_JOB \
+  GITHUB_REF \
+  GITHUB_REPOSITORY \
+  GITHUB_RUN_ATTEMPT \
   GITHUB_RUN_ID \
   GITHUB_RUN_NUMBER \
-  GITHUB_ACTION \
-  GITHUB_ACTIONS \
-  GITHUB_REPOSITORY \
-  GITHUB_SHA
+  GITHUB_SHA \
+  GITHUB_WORKFLOW
 do
-  add_env "$tag" "$(printenv $tag)"
+  add_env "TAG_$tag" "$(printenv $tag)"
 done
+
+add_env "TAG_GITHUB_INVOCATION_ID" "$(basename "$INVOCATION_ID")"
 
 echo "  SetEnv$nixbuildnet_env" >> "$SSH_CONFIG_FILE"
 

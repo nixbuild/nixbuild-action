@@ -20,6 +20,22 @@ inputs:
       See the README of this action for easy setup instructions.
 
 
+  generate-summary-for:
+    required: false
+    default: ''
+    description: |
+      If set to 'job', a summary of all builds and their resource usage will be
+      generated as a GitHub Actions step summary for the job that used
+      nixbuild-action.
+
+      If set to 'workflow', the summary will instead include builds from all
+      jobs executed so far during the workflow run. A workflow summary makes
+      most sense for the very last job in your workflow (since it can be
+      incomplete otherwise).
+
+      If set to '', no summary will be generated.
+
+
   allow-override:
     required: false
     description: |
@@ -66,18 +82,10 @@ inputs:
       Set the never-substitute setting in nixbuild.net. For documentation
       see https://docs.nixbuild.net/settings/#never-substitute.
 
-
 runs:
-  using: "composite"
-  steps:
-    - name: Setup Nix for nixbuild.net
-      run: ${{ github.action_path }}/nixbuild-action.sh
-      shell: bash
-      env:
-        INPUTS_JSON: ${{ toJSON(inputs) }}
-        NIXBUILD_SSH_KEY: ${{ inputs.nixbuild_ssh_key }}
-        ACTION_LIB: ${{ github.action_path }}/lib
-
+  using: 'node16'
+  main: 'index.js'
+  post: 'summary.js'
 
 branding:
   icon: zap
