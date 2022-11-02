@@ -13,56 +13,70 @@ function formatBytes(bytes, decimals = 2) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
 }
 
-if (core.getInput('generate_summary').toLowerCase() === 'true') {
+function generateSummary(token, allJobs) {
+  const workflow = process.env.GITHUB_WORKFLOW;
+  const repository = process.env.GITHUB_REPOSITORY;
+  const run_id = process.env.GITHUB_RUN_ID;
+  const run_attempt = process.env.GITHUB_RUN_ATTEMPT;
+  const job = process.env.GITHUB_JOB;
+  var path = `/builds/summary?tags=GITHUB_REPOSITORY:${repository},GITHUB_RUN_ID:${run_id},GITHUB_RUN_ATTEMPT:${run_attempt}`;
+  if (!allJobs) {
+    path += `,GITHUB_JOB:${job}`;
+  }
+  const options = {
+    host: 'api.nixbuild.net',
+    path: path,
+    method: 'GET',
+    headers: {'Authorization': 'Bearer ' + token}
+  };
+  const request = https.request(options, function (response) {
+    var body = '';
+    response.on('data', function (chunk) {
+      body += chunk;
+    });
+    response.on('end', function () {
+      if (response.statusCode != 200) {
+        core.setFailed(`nixbuild.net API returned: ${body}`);
+      } else {
+        var summary = JSON.parse(body);
+        var heading = 'nixbuild.net build summary';
+        if (allJobs) {
+          heading += ` for workflow ${workflow}`;
+        } else {
+          heading += ` for job ${job}`;
+        }
+        core.summary
+          .addHeading(heading)
+          .addTable([
+            ['&#x2714;', 'Successful builds', summary.successful_build_count.toString()],
+            ['&#x274C;', 'Failed builds', summary.failed_build_count.toString()],
+            ['&#x1F3F4;', 'Restarted builds', summary.discarded_build_count.toString()],
+            ['&#x23F1;', 'Billable CPU hours', (summary.billable_cpu_seconds / 3600.0).toFixed(2)],
+            ['&#x1F4E6;', 'Total output size', formatBytes(1024 * summary.total_output_nar_size_kilobytes)]
+          ])
+          .write()
+      }
+    });
+  });
+  request.on('error', function (err) {
+    core.warning(`Error related to HTTPS request: ${err}`);
+  });
+  request.end();
+}
 
+const summaryFor = core.getInput('generate-summary-for').toLowerCase();
+
+if (summaryFor === 'job' || summaryFor === 'workflow') {
+  var token = '';
   try {
-    // If the shell command fails we will get an exception,
-    // causing the post step to fail
-    const token = JSON.parse(child_process.execSync(
+    token = JSON.parse(child_process.execSync(
       'ssh eu.nixbuild.net api tokens create --ttl-seconds 60',
       {encoding: 'utf-8'}
     )).token;
-
-    const repository = process.env.GITHUB_REPOSITORY;
-    const run_id = process.env.GITHUB_RUN_ID;
-    const run_attempt = process.env.GITHUB_RUN_ATTEMPT;
-    const job = process.env.GITHUB_JOB;
-    const path = `/builds/summary?tags=GITHUB_REPOSITORY:${repository},GITHUB_RUN_ID:${run_id},GITHUB_RUN_ATTEMPT:${run_attempt},GITHUB_JOB:${job}`;
-    const options = {
-      host: 'api.nixbuild.net',
-      path: path,
-      method: 'GET',
-      headers: {'Authorization': 'Bearer ' + token}
-    };
-    const request = https.request(options, function (response) {
-      var body = '';
-      response.on('data', function (chunk) {
-        body += chunk;
-      });
-      response.on('end', function () {
-        if (response.statusCode != 200) {
-          core.setFailed(`nixbuild.net API returned: ${body}`);
-        } else {
-          var summary = JSON.parse(body);
-          core.summary
-            .addHeading('nixbuild.net build summary')
-            .addTable([
-              ['&#x2714;', 'Successful builds', summary.successful_build_count.toString()],
-              ['&#x274C;', 'Failed builds', summary.failed_build_count.toString()],
-              ['&#x1F3F4;', 'Restarted builds', summary.discarded_build_count.toString()],
-              ['&#x23F1;', 'Billable CPU hours', (summary.billable_cpu_seconds / 3600.0).toFixed(2)],
-              ['&#x1F4E6;', 'Total output size', formatBytes(1024 * summary.total_output_nar_size_kilobytes)]
-            ])
-            .write()
-        }
-      });
-    });
-    request.on('error', function (err) {
-      core.warning(`Error related to HTTPS request: ${err}`);
-    });
-    request.end();
   } catch (error) {
-    core.setFailed(error.message);
+    core.warning('Failed fetching auth token for nixbuild.net, skipping summary generation.');
   }
-
+  if (token) {
+    generateSummary(token, summaryFor === 'workflow');
+  }
 }

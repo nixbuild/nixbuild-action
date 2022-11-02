@@ -19,12 +19,21 @@ inputs:
 
       See the README of this action for easy setup instructions.
 
-  generate_summary:
+
+  generate-summary-for:
     required: false
-    default: true
+    default: ''
     description: |
-      If set to true, a summary of all builds and their resource usage will be
-      generated as a GitHub Actions step summary.
+      If set to 'job', a summary of all builds and their resource usage will be
+      generated as a GitHub Actions step summary for the job that used
+      nixbuild-action.
+
+      If set to 'workflow', the summary will instead include builds from all
+      jobs executed so far during the workflow run. A workflow summary makes
+      most sense for the very last job in your workflow (since it can be
+      incomplete otherwise).
+
+      If set to '', no summary will be generated.
 
 
   allow-override:
