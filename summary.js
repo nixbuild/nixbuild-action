@@ -115,13 +115,13 @@ function writeSummary(allJobs, s, builds) {
     ]);
   if (s.build_count > 0) {
     const headers = [
-      ([ 'Job', 'Derivation path', 'System', 'Status', 'Duration', 'CPU'
+      ([ 'Derivation path', 'System', 'Status', 'Duration', 'CPU'
        , 'Peak memory', 'Peak storage' ]
       ).map(h => ({data: h, header: true}))
     ];
     summary.addHeading('Builds', 4);
     summary.addTable(headers.concat(builds.map(b =>
-      [ b.tags.GITHUB_JOB, b.derivation_path, b.system, b.status
+      [ b.derivation_path, b.system, b.status
       , toHHMMSS(b.duration_seconds), b.cpu_count.toString()
       , formatBytes(1024 * b.peak_memory_use_kilobytes)
       , formatBytes(1024 * b.peak_storage_use_kilobytes)
