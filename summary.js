@@ -103,11 +103,15 @@ function writeSummary(allJobs, s, builds) {
   const summary = core.summary
     .addHeading(heading, 3)
     .addTable([
-      ['&#x2714;', 'Successful builds', s.successful_build_count.toString()],
-      ['&#x274C;', 'Failed builds', s.failed_build_count.toString()],
-      ['&#x1F3F4;', 'Restarted builds', s.discarded_build_count.toString()],
-      ['&#x23F1;', 'Billable CPU hours', (s.billable_cpu_seconds / 3600.0).toFixed(2)],
-      ['&#x1F4E6;', 'Total output size', formatBytes(1024 * s.total_output_nar_size_kilobytes)]
+      [ '&#x2714;', 'Successful builds', s.successful_build_count.toString()
+      , '&#x23F1;', 'Billable CPU hours', (s.billable_cpu_seconds / 3600.0).toFixed(2)
+      ],
+      [ '&#x274C;', 'Failed builds', s.failed_build_count.toString(),
+      , '&#x1F4E6;', 'Total output size', formatBytes(1024 * s.total_output_nar_size_kilobytes)
+      ],
+      [ '&#x1F3F4;', 'Restarted builds', s.discarded_build_count.toString()
+      , '', '', ''
+      ]
     ]);
   if (s.build_count > 0) {
     const headers = [
