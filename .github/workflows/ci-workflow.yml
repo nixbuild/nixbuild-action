@@ -19,7 +19,7 @@ on:
 
     outputs:
       success:
-        value: ${{ jobs.collect-results.outputs.results }}
+        value: ${{ jobs.summary.outputs.results }}
         description: |
           Outputs the string 'true' if all builds succeeded, otherwise 'false'.
           You need to set `ignore_build_failures` to `true` in order to get the
@@ -27,7 +27,7 @@ on:
           you can use this output.
 
       results:
-        value: ${{ jobs.collect-results.outputs.results }}
+        value: ${{ jobs.summary.outputs.results }}
         description: |
           Contains a JSON object that maps each build to its result. Look at the
           file `examples/using-the-ci-workflow/expected-result.json` to see an
@@ -152,7 +152,7 @@ on:
 jobs:
 
   eval-flake:
-    name: "evaluate flake"
+    name: "Evaluate flake"
     runs-on: ubuntu-latest
     outputs:
       builds: ${{ steps.find-builds.outputs.builds }}
@@ -238,8 +238,8 @@ jobs:
             build.log
 
 
-  collect-results:
-    name: "collect results"
+  summary:
+    name: "Summary"
     needs: build
     runs-on: ubuntu-latest
     outputs:
