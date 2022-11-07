@@ -130,6 +130,17 @@ on:
           every build runs as a separate job so this script (and all builds)
           will be executed in parallel.
 
+      generate_build_summary:
+        type: boolean
+        default: true
+        description: |
+          Generate a summary of all builds that has been running during the
+          workflow. If you are using ci-workflow.yml multiple times in your
+          workflow, it can make sense to disable this summary since otherwise
+          you will get the same summary generated multiple times. In such cases,
+          you add an explicit summary job that runs after all other workflow
+          jobs and uses nixbuild-action to generate the summary only one time.
+
       cache-build-failures:
         type: boolean
         default: true
@@ -260,7 +271,9 @@ jobs:
           else
             echo "success=false" >> "$GITHUB_OUTPUT"
           fi
-      - uses: nixbuild/nixbuild-action@master
+      - name: Generate nixbuild.net summary
+        if: ${{ inputs.generate_build_summary }}
+        uses: nixbuild/nixbuild-action@master
         with:
           nixbuild_ssh_key: ${{secrets.nixbuild_ssh_key}}
           generate-summary-for: 'workflow'
