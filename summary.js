@@ -6,13 +6,32 @@ const fs = require('fs');
 const path = require('path');
 
 // https://stackoverflow.com/a/18650828
-function formatBytes(bytes, decimals = 2) {
+function formatBytes(bytes, decimals = 0) {
   if (!+bytes) return '0 KB'
   const k = 1024
   const dm = decimals < 0 ? 0 : decimals
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
+}
+
+function toHHMMSS(sec_num) {
+  var hours   = Math.floor(sec_num / 3600);
+  var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+  var seconds = sec_num - (hours * 3600) - (minutes * 60);
+  if (hours <= 0 && minutes <= 0) {
+    return seconds.toFixed(2)+' s';
+  } else {
+    const secStr = seconds.toFixed(0);
+    if (seconds < 10) { secStr = "0"+secStr; }
+    if (minutes < 10) { minutes = "0"+minutes; }
+    if (hours <= 0) {
+      return minutes+':'+secStr;
+    } else {
+      if (hours < 10) { hours = "0"+hours; }
+      return hours+':'+minutes+':'+secStr;
+    }
+  }
 }
 
 // https://stackoverflow.com/a/15270931/410926
@@ -91,8 +110,18 @@ function writeSummary(allJobs, s, builds) {
       ['&#x1F4E6;', 'Total output size', formatBytes(1024 * s.total_output_nar_size_kilobytes)]
     ]);
   if (s.build_count > 0) {
+    const headers = [
+      [ 'Job', 'Derivation path', 'System', 'Status', 'Duration', 'CPUs'
+      , 'Peak memory', 'Peak storage' ]
+    ];
     summary.addHeading('Builds', 4);
-    summary.addTable(builds.map(b => [b.derivation_path]));
+    summary.addTable(headers.concat(builds.map(b =>
+      [ b.tags.GITHUB_JOB, b.derivation_path, b.system, b.status
+      , toHHMMSS(b.duration_seconds), b.cpu_count.toString()
+      , formatBytes(1024 * b.peak_memory_use_kilobytes)
+      , formatBytes(1024 * b.peak_storage_use_kilobytes)
+      ]
+    )));
   };
   summary.write();
 }
