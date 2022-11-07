@@ -115,8 +115,9 @@ function writeSummary(allJobs, s, builds) {
     ]);
   if (s.build_count > 0) {
     const headers = [
-      [ 'Job', 'Derivation path', 'System', 'Status', 'Duration', 'CPUs'
-      , 'Peak memory', 'Peak storage' ]
+      ([ 'Job', 'Derivation path', 'System', 'Status', 'Duration', 'CPU'
+       , 'Peak memory', 'Peak storage' ]
+      ).map(h => ({data: h, header: true}))
     ];
     summary.addHeading('Builds', 4);
     summary.addTable(headers.concat(builds.map(b =>
