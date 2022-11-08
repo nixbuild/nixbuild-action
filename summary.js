@@ -39,6 +39,26 @@ function basename(p) {
   return p.split(/[\\/]/).pop();
 }
 
+function statusToColumn(b) {
+  var emoji = '&#x2714;'
+  switch (b.status) {
+    case 'build_failed':
+    case 'cancelled':
+    case 'timeout':
+    case 'max_memory_exceeded':
+    case 'client_disconnect':
+    case 'client_error':
+      emoji = '&#x274C;';
+      break;
+    case 'internal_error':
+    case 'out_of_memory':
+      emoji = '&#x1F3F4;';
+      break;
+    default:
+  }
+  return `<span title="${b.status}${b.status_message ? `: ${b.status_message}` : ''}">${emoji}</span>`;
+}
+
 function generateSummary(token, allJobs) {
   const workflow = process.env.GITHUB_WORKFLOW;
   const repository = process.env.GITHUB_REPOSITORY;
@@ -115,7 +135,7 @@ function writeSummary(allJobs, s, builds) {
     ]);
   if (s.build_count > 0) {
     const headers = [
-      ([ 'Derivation path', 'Status', 'Duration', 'CPUs', 'Peak memory'
+      ([ '', 'Derivation path', 'Duration', 'CPUs', 'Peak memory'
        , 'Peak storage' ]
       ).map(h => ({data: h, header: true}))
     ];
@@ -133,7 +153,7 @@ function writeSummary(allJobs, s, builds) {
     systemBuilds.forEach((bs, system) => {
       summary.addHeading(system + ' builds', 4);
       summary.addTable(headers.concat(builds.map(b =>
-        [ b.derivation_path, b.status
+        [ statusToColumn(b), b.derivation_path,
         , toHHMMSS(b.duration_seconds), b.cpu_count.toString()
         , formatBytes(1024 * b.peak_memory_use_kilobytes)
         , formatBytes(1024 * b.peak_storage_use_kilobytes)
