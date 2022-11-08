@@ -65,7 +65,7 @@ function derivationToColumn(b) {
   for (const o of b.outputs) {
     outputs = `${outputs}<br/>- ${o.name}: ${o.path} (${formatBytes(o.nar_size_bytes)})`
   }
-  return `<details style="margin:0"><summary>${drvName}</summary><pre>deriver: ${b.derivation_path}<br/>outputs:${outputs}</pre></details>`;
+  return `<details style="margin:0"><summary>${drvName}</summary><pre>build id: ${b.build_id.toString()}<br/>deriver: ${b.derivation_path}<br/>outputs:${outputs}</pre></details>`;
 }
 
 function generateSummary(token, allJobs) {
