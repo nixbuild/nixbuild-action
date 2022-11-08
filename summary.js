@@ -59,6 +59,15 @@ function statusToColumn(b) {
   return `<span title="${b.status}${b.status_message ? `: ${b.status_message}` : ''}">${emoji}</span>`;
 }
 
+function derivationToColumn(b) {
+  const drvName = path.basename(b.derivation_path, '.drv').substring(33);
+  var outputs = '';
+  for (const o of b.outputs) {
+    outputs = `${outputs}<br/>- ${o.name}: ${o.path} (${formatBytes(o.nar_size_bytes)})`
+  }
+  return `<details style="margin:0"><summary>${drvName}</summary><pre>path: ${b.derivation_path}<br/>outputs:${outputs}</pre></details>`;
+}
+
 function generateSummary(token, allJobs) {
   const workflow = process.env.GITHUB_WORKFLOW;
   const repository = process.env.GITHUB_REPOSITORY;
@@ -135,7 +144,7 @@ function writeSummary(allJobs, s, builds) {
     ]);
   if (s.build_count > 0) {
     const headers = [
-      ([ '', 'Derivation path', 'Duration', 'CPUs', 'Peak memory'
+      ([ '', 'Derivation', 'Duration', 'CPUs', 'Peak memory'
        , 'Peak storage' ]
       ).map(h => ({data: h, header: true}))
     ];
@@ -153,7 +162,7 @@ function writeSummary(allJobs, s, builds) {
     systemBuilds.forEach((bs, system) => {
       summary.addHeading(`${system} builds (${bs.length.toString()})`, 4);
       summary.addTable(headers.concat(bs.map(b =>
-        [ statusToColumn(b), b.derivation_path,
+        [ statusToColumn(b), derivationToColumn(b),
         , toHHMMSS(b.duration_seconds), b.cpu_count.toString()
         , formatBytes(1024 * b.peak_memory_use_kilobytes)
         , formatBytes(1024 * b.peak_storage_use_kilobytes)
