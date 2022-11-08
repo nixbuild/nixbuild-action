@@ -115,18 +115,31 @@ function writeSummary(allJobs, s, builds) {
     ]);
   if (s.build_count > 0) {
     const headers = [
-      ([ 'Derivation path', 'System', 'Status', 'Duration', 'CPUs'
-       , 'Peak memory', 'Peak storage' ]
+      ([ 'Derivation path', 'Status', 'Duration', 'CPUs', 'Peak memory'
+       , 'Peak storage' ]
       ).map(h => ({data: h, header: true}))
     ];
-    summary.addHeading('Builds', 4);
-    summary.addTable(headers.concat(builds.map(b =>
-      [ b.derivation_path, b.system, b.status
-      , toHHMMSS(b.duration_seconds), b.cpu_count.toString()
-      , formatBytes(1024 * b.peak_memory_use_kilobytes)
-      , formatBytes(1024 * b.peak_storage_use_kilobytes)
-      ]
-    )));
+    // Group builds on system
+    const systemBuilds = new Map();
+    for (const b of builds) {
+      var bs = systemBuilds.get(b.system);
+      if (bs === undefined) {
+        bs = [b];
+      } else {
+        bs.push(b);
+      }
+      systemBuilds.set(b.system, bs);
+    }
+    systemBuilds.forEach((bs, system) => {
+      summary.addHeading(system + ' builds', 4);
+      summary.addTable(headers.concat(builds.map(b =>
+        [ b.derivation_path, b.status
+        , toHHMMSS(b.duration_seconds), b.cpu_count.toString()
+        , formatBytes(1024 * b.peak_memory_use_kilobytes)
+        , formatBytes(1024 * b.peak_storage_use_kilobytes)
+        ]
+      )));
+    })
   };
   summary.write();
 }
