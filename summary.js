@@ -65,7 +65,7 @@ function derivationToColumn(b) {
   for (const o of b.outputs) {
     outputs = `${outputs}<br/>- ${o.name}: ${o.path} (${formatBytes(o.nar_size_bytes)})`
   }
-  return `<details style="margin:0"><summary>${drvName}</summary><pre>path: ${b.derivation_path}<br/>outputs:${outputs}</pre></details>`;
+  return `<details style="margin:0"><summary>${drvName}</summary><pre>deriver: ${b.derivation_path}<br/>outputs:${outputs}</pre></details>`;
 }
 
 function generateSummary(token, allJobs) {
@@ -161,13 +161,15 @@ function writeSummary(allJobs, s, builds) {
     }
     systemBuilds.forEach((bs, system) => {
       summary.addHeading(`${system} builds (${bs.length.toString()})`, 4);
-      summary.addTable(headers.concat(bs.map(b =>
-        [ statusToColumn(b), derivationToColumn(b),
-        , toHHMMSS(b.duration_seconds), b.cpu_count.toString()
-        , formatBytes(1024 * b.peak_memory_use_kilobytes)
-        , formatBytes(1024 * b.peak_storage_use_kilobytes)
-        ]
-      )));
+      summary.addTable(headers.concat(
+        bs.sort((x,y) => y.duration_seconds - x.duration_seconds).map(b =>
+          [ statusToColumn(b), derivationToColumn(b),
+          , toHHMMSS(b.duration_seconds), b.cpu_count.toString()
+          , formatBytes(1024 * b.peak_memory_use_kilobytes)
+          , formatBytes(1024 * b.peak_storage_use_kilobytes)
+          ]
+        )
+      ));
     })
   };
   summary.write();
