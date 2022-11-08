@@ -151,8 +151,8 @@ function writeSummary(allJobs, s, builds) {
       systemBuilds.set(b.system, bs);
     }
     systemBuilds.forEach((bs, system) => {
-      summary.addHeading(system + ' builds', 4);
-      summary.addTable(headers.concat(builds.map(b =>
+      summary.addHeading(`${system} builds (${bs.length.toString()})`, 4);
+      summary.addTable(headers.concat(bs.map(b =>
         [ statusToColumn(b), b.derivation_path,
         , toHHMMSS(b.duration_seconds), b.cpu_count.toString()
         , formatBytes(1024 * b.peak_memory_use_kilobytes)
