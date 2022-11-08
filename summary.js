@@ -115,7 +115,7 @@ function writeSummary(allJobs, s, builds) {
     ]);
   if (s.build_count > 0) {
     const headers = [
-      ([ 'Derivation path', 'System', 'Status', 'Duration', 'CPU'
+      ([ 'Derivation path', 'System', 'Status', 'Duration', 'CPUs'
        , 'Peak memory', 'Peak storage' ]
       ).map(h => ({data: h, header: true}))
     ];
