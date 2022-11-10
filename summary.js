@@ -6,13 +6,13 @@ const fs = require('fs');
 const path = require('path');
 
 // https://stackoverflow.com/a/18650828
-function formatBytes(bytes, decimals = 0) {
+function formatBytes(bytes, decimals = 3) {
   if (!+bytes) return '0 KB'
   const k = 1024
   const dm = decimals < 0 ? 0 : decimals
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
+  return `${parseFloat((bytes / Math.pow(k, i)).toPrecision(dm))} ${sizes[i]}`
 }
 
 function toHHMMSS(sec_num) {
@@ -20,7 +20,7 @@ function toHHMMSS(sec_num) {
   var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
   const seconds = sec_num - (hours * 3600) - (minutes * 60);
   if (hours <= 0 && minutes <= 0) {
-    return seconds.toFixed(2)+' s';
+    return seconds.toPrecision(3)+' s';
   } else {
     var secStr = seconds.toFixed(0);
     if (seconds < 10) { secStr = "0"+secStr; }
@@ -133,10 +133,10 @@ function writeSummary(allJobs, s, builds) {
     .addHeading(heading, 3)
     .addTable([
       [ '&#x2714;', 'Successful builds', s.successful_build_count.toString()
-      , '&#x23F1;', 'Billable CPU hours', (s.billable_cpu_seconds / 3600.0).toFixed(2)
+      , '&#x23F1;', 'Billable CPU hours', (s.billable_cpu_seconds / 3600.0).toPrecision(3)
       ],
       [ '&#x274C;', 'Failed builds', s.failed_build_count.toString(),
-      , '&#x1F4E6;', 'Total output size', formatBytes(1024 * s.total_output_nar_size_kilobytes, 2)
+      , '&#x1F4E6;', 'Total output size', formatBytes(1024 * s.total_output_nar_size_kilobytes)
       ],
       [ '&#x1F3F4;', 'Restarted builds', s.discarded_build_count.toString()
       , '', '', ''
