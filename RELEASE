@@ -1,5 +1,9 @@
-v14
+v15
 
 ## Changes
 
-* ci-workflow: Corrects the reference to the nixbuild-action. In release v13, the ci-workflow would incorrectly use release v12 of nixbuild-action. A test has been added to avoid this from happening again in the future.
+* Add support for generating [GitHub Actions Job Summaries](https://github.blog/2022-05-09-supercharging-github-actions-with-job-summaries/), that show a summary of how many CPU hours a workflow consumed, and lists details about each build that ran on nixbuild.net during the workflow. The summary can be turned on by configuring the [generate_summary_for](https://github.com/nixbuild/nixbuild-action/blob/v15/action.yml#L23-L36) option. By default, summary generation is turned off.
+
+  The build summaries are generated using the nixbuild.net [HTTP API](https://docs.nixbuild.net/api-usage/).
+
+* ci-workflow: Generate a build summary at the end of the workflow. The summary is turned on by default, but can be turned off using the ci-workflow option [generate_build_summary](https://github.com/nixbuild/nixbuild-action/blob/v15/action.yml#L133-L142).
