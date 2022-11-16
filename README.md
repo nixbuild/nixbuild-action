@@ -115,7 +115,7 @@ name: Examples
 on: push
 jobs:
   checks:
-    uses: nixbuild/nixbuild-action/.github/workflows/ci-workflow.yml@v14
+    uses: nixbuild/nixbuild-action/.github/workflows/ci-workflow.yml@v15
     secrets:
       nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
 ```
@@ -160,11 +160,40 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: nixbuild/nix-quick-install-action@v19
-      - uses: nixbuild/nixbuild-action@v14
+      - uses: nixbuild/nixbuild-action@v15
         with:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
       - run: nix-build
 ```
+
+### Generating Build Summaries
+
+`nixbuild-action` can generate a summary of all builds that ran on nixbuild.net,
+including information on how much CPU time that was consumed. You can generate
+summaries for an individual job, or for the complete workflow. To generate a
+summary for the job that uses `nixbuild-action`, configure it like this:
+
+```yaml
+- uses: nixbuild/nixbuild-action@v15
+  with:
+    nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
+    generate-summary-for: 'job'
+```
+
+To generate a summary for all builds that was executed during a complete
+workflow, add a job that runs on the very end of the workflow, and configure
+it like this:
+
+```yaml
+- uses: nixbuild/nixbuild-action@v15
+  with:
+    nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
+    generate-summary-for: 'workflow'
+```
+
+The build summaries look like this:
+
+![summary](examples/summary.png)
 
 ### nixbuild.net Settings
 
@@ -209,7 +238,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: nixbuild/nix-quick-install-action@v19
-      - uses: nixbuild/nixbuild-action@v14
+      - uses: nixbuild/nixbuild-action@v15
         with:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
           cache-build-timeouts: true
