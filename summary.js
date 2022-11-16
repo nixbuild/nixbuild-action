@@ -175,7 +175,7 @@ function writeSummary(allJobs, s, builds) {
   summary.write();
 }
 
-const summaryFor = core.getInput('generate-summary-for').toLowerCase();
+const summaryFor = core.getInput('generate_summary_for').toLowerCase();
 
 if (summaryFor === 'job' || summaryFor === 'workflow') {
   var token = '';

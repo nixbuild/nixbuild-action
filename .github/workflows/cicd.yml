@@ -22,7 +22,7 @@ jobs:
       - uses: ./
         with:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
-          generate-summary-for: 'workflow'
+          generate_summary_for: 'workflow'
       - name: Build release script
         run: nix build .#packages.x86_64-linux.release
       - name: Verify build signature
@@ -47,7 +47,7 @@ jobs:
       - uses: ./
         with:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
-          generate-summary-for: 'job'
+          generate_summary_for: 'job'
           keep-builds-running: true # test that we can set a setting
       - name: Run a test build
         run: |

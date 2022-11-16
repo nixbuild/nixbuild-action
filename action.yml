@@ -20,7 +20,7 @@ inputs:
       See the README of this action for easy setup instructions.
 
 
-  generate-summary-for:
+  generate_summary_for:
     required: false
     default: ''
     description: |

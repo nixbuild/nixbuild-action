@@ -138,7 +138,7 @@ on:
           workflow. If you are using ci-workflow.yml multiple times in your
           workflow, it can make sense to disable this summary since otherwise
           you will get the same summary generated multiple times. In such cases,
-          you add an explicit summary job that runs after all other workflow
+          you can add an explicit summary job that runs after all other workflow
           jobs and uses nixbuild-action to generate the summary only one time.
 
       cache-build-failures:
@@ -273,7 +273,7 @@ jobs:
           fi
       - name: Generate nixbuild.net summary
         if: ${{ inputs.generate_build_summary }}
-        uses: nixbuild/nixbuild-action@master
+        uses: nixbuild/nixbuild-action@v15
         with:
           nixbuild_ssh_key: ${{secrets.nixbuild_ssh_key}}
-          generate-summary-for: 'workflow'
+          generate_summary_for: 'workflow'
