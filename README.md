@@ -1,11 +1,9 @@
 # nixbuild.net Action
 
 This GitHub Action sets up [Nix](https://nixos.org/nix/) to use the
-[nixbuild.net](https://nixbuild.net) service. It supports the **ubuntu-20.04**
-and **macos-latest** GitHub platforms. From either of those platforms, it can
-run **x86_64-linux** and **aarch64-linux** [(Early
-Access)](https://blog.nixbuild.net/posts/2021-09-20-nixbuild-net-now-supports-arm-builds.html)
-Nix builds.
+[nixbuild.net](https://nixbuild.net) service. It supports all Linux and MacOS
+GitHub platforms. From either of those platforms, it can run **x86_64-linux**
+and **aarch64-linux** Nix builds.
 
 You need a [nixbuild.net](https://nixbuild.net) account to make use of this
 action.
