@@ -36,6 +36,11 @@ then automatically reap the benefits that nixbuild.net provides:
 See the nixbuild.net [FAQ](https://nixbuild.net/#faq) for more information
 about the nixbuild.net service.
 
+If you run into any problems using this action, or have feedback to share,
+please open an issue on this repository or drop an email to
+[support@nixbuild.net](mailto:support@nixbuild.net).
+
+
 ## Usage
 
 This repository offers two different ways of running Nix builds with
