@@ -73,11 +73,9 @@ function add_env() {
 
 for setting in \
   allow-override \
-  always-substitute \
-  cache-build-failures \
-  cache-build-timeouts \
-  keep-builds-running \
-  never-substitute
+  reuse-build-failures \
+  reuse-build-timeouts \
+  keep-builds-running
 do
   val="$(printenv INPUTS_JSON | jq -r ".\"$setting\"")"
   if [ -n "$val" ] && [ "$val" != "null" ]; then

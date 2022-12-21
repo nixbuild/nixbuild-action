@@ -47,40 +47,23 @@ inputs:
       stop settings overrides from Nix derivations, no other levels. See the
       nixbuild.net settings documentation for more info on this.
 
-  always-substitute:
+  reuse-build-failures:
     required: false
     description: |
-      Set the always-substitute setting in nixbuild.net. For documentation
-      see https://docs.nixbuild.net/settings/#always-substitute.
+      Set the reuse-build-failures setting in nixbuild.net. For documentation
+      see https://docs.nixbuild.net/settings/#reuse-build-failures.
 
-      Note that this setting is actually ignored for builds performed by this
-      GitHub Action, because the action enables the Nix setting
-      builders-use-substitutes so substitution will always be used anyway
-      (unless the never-substitute setting is active).
-
-  cache-build-failures:
+  reuse-build-timeouts:
     required: false
     description: |
-      Set the cache-build-failures setting in nixbuild.net. For documentation
-      see https://docs.nixbuild.net/settings/#cache-build-failures.
-
-  cache-build-timeouts:
-    required: false
-    description: |
-      Set the cache-build-timeouts setting in nixbuild.net. For documentation
-      see https://docs.nixbuild.net/settings/#cache-build-timeouts.
+      Set the reuse-build-timeouts setting in nixbuild.net. For documentation
+      see https://docs.nixbuild.net/settings/#reuse-build-timeouts.
 
   keep-builds-running:
     required: false
     description: |
       Set the keep-builds-running setting in nixbuild.net. For documentation
       see https://docs.nixbuild.net/settings/#keep-builds-running.
-
-  never-substitute:
-    required: false
-    description: |
-      Set the never-substitute setting in nixbuild.net. For documentation
-      see https://docs.nixbuild.net/settings/#never-substitute.
 
 runs:
   using: 'node16'
