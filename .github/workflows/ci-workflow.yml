@@ -169,7 +169,7 @@ jobs:
       builds: ${{ steps.find-builds.outputs.builds }}
     steps:
       - uses: actions/checkout@v3
-      - uses: nixbuild/nix-quick-install-action@v19
+      - uses: nixbuild/nix-quick-install-action@v20
         with:
           nix_on_tmpfs: true
           nix_conf: |
@@ -196,7 +196,7 @@ jobs:
         build: ${{fromJSON(needs.eval-flake.outputs.builds)}}
     steps:
       - uses: actions/checkout@v3
-      - uses: nixbuild/nix-quick-install-action@v19
+      - uses: nixbuild/nix-quick-install-action@v20
         with:
           nix_on_tmpfs: true
           nix_conf: experimental-features = nix-command flakes
