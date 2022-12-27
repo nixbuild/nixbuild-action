@@ -8,7 +8,7 @@ on:
 
 jobs:
   release:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     if: always()
     needs:
       - install-with-nix-quick-install-action
@@ -37,7 +37,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-20.04, macos-10.15 ]
+        os: [ ubuntu-latest, macos-latest ]
         system: [ x86_64-linux ]
     steps:
       - uses: actions/checkout@v3
@@ -62,28 +62,23 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-20.04, macos-10.15 ]
+        os: [ ubuntu-latest, macos-latest ]
         nix_version:
-          - 2.11.0
+          - 2.12.0
+          - 2.11.1
           - 2.10.3
           - 2.9.2
-          - 2.9.1
           - 2.8.1
           - 2.7.0
           - 2.6.1
-          - 2.6.0
           - 2.5.1
           - 2.4
-          - 2.3.15
-          - 2.3.14
-          - 2.3.12
-          - 2.3.10
-          - 2.3.7
+          - 2.3.16
           - 2.2.2
           - 2.1.3
           - 2.0.4
         exclude:
-          - os: macos-10.15
+          - os: macos-latest
             nix_version: 2.0.4
     steps:
       - uses: actions/checkout@v3
@@ -100,7 +95,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-20.04, macos-12 ]
+        os: [ ubuntu-latest, macos-latest ]
     steps:
       - uses: actions/checkout@v3
       - uses: cachix/install-nix-action@v18
