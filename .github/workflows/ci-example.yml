@@ -34,10 +34,6 @@ jobs:
       # a dependant job. Defaults to false.
       ignore_build_failures: true
 
-      # Lock down the nix version to make sure our 'expected-result.json' still
-      # match
-      nix_version: '2.11.1'
-
 
   # We create a job that depends on the the ci-workflow and verifies that the
   # build results are what we expected.
