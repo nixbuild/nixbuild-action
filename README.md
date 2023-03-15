@@ -229,7 +229,7 @@ are able to change your GitHub Actions workflow, it is **strongly recommended**
 that you lock down the nixbuild.net settings as described above.
 
 An example workflow that turns on the
-[cache-build-timeouts](https://docs.nixbuild.net/settings/#cache-build-timeouts)
+[reuse-build-timeouts](https://docs.nixbuild.net/settings/#reuse-build-timeouts)
 setting:
 
 ```yaml
@@ -244,6 +244,6 @@ jobs:
       - uses: nixbuild/nixbuild-action@v15
         with:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
-          cache-build-timeouts: true
+          reuse-build-timeouts: true
       - run: nix-build
 ```
