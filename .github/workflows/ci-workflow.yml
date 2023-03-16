@@ -200,7 +200,7 @@ jobs:
         with:
           nix_on_tmpfs: true
           nix_conf: experimental-features = nix-command flakes
-      - uses: nixbuild/nixbuild-action@v15
+      - uses: nixbuild/nixbuild-action@master
         with:
           nixbuild_ssh_key: ${{secrets.nixbuild_ssh_key}}
           reuse-build-failures: ${{inputs.reuse-build-failures}}
@@ -273,7 +273,7 @@ jobs:
           fi
       - name: Generate nixbuild.net summary
         if: ${{ always() && inputs.generate_build_summary }}
-        uses: nixbuild/nixbuild-action@v15
+        uses: nixbuild/nixbuild-action@master
         with:
           nixbuild_ssh_key: ${{secrets.nixbuild_ssh_key}}
           generate_summary_for: 'workflow'
