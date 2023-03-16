@@ -71,10 +71,21 @@ Nix expressions, use `nixbuild-action`.
 
 ### Prerequisites
 
-1. Register for a [nixbuild.net account](https://nixbuild.net/#register). Every
-   account includes free build hours, so you can try this action out for free.
+First, register for a [nixbuild.net account](https://nixbuild.net/#register).
+Every account includes free build hours, so you can try this action out for
+free.
 
-2. It is highly advisable to create a new SSH key specifically for GitHub's
+Then, decide on using an **SSH key** or an **auth token** for authenticating
+with nixbuild.net. Currently, it is recommended to use SSH keys, since token
+authentication is a new, not fully developed feature of nixbuild.net. The
+workflow examples in this README all uses SSH key authentication, but they
+should also work with auth tokens.
+
+You should follow the instructions in one of the two sections below, not both.
+
+#### SSH Key Authentication
+
+1. It is highly advisable to create a new SSH key specifically for GitHub's
    access to your nixbuild.net account. That way you can revoke GitHub's access
    at any time and still manage your account with your main SSH key. You can
    add and remove SSH keys to your nixbuild.net account with the
@@ -107,7 +118,55 @@ Nix expressions, use `nixbuild-action`.
    might otherwise be able to change settings, possibly incurring unexpected
    nixbuild.net charges.
 
-3. Configure your secret SSH key as a [GitHub Secret](https://docs.github.com/en/actions/reference/encrypted-secrets)
+2. Configure your secret SSH key as a [GitHub Secret](https://docs.github.com/en/actions/reference/encrypted-secrets)
+
+3. Configure `nixbuild-action` to use the SSH key secret like this:
+
+   ```yaml
+   uses: nixbuild/nixbuild-action@v15
+   with:
+     nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
+   ```
+
+#### Token Authentication
+
+nixbuild.net has support for authenticating using
+[Biscuit](https://www.biscuitsec.org/) tokens. This is what is used for
+authenticating in nixbuild.net's [HTTP
+API](https://docs.nixbuild.net/api-usage/index.html#authorization), but it can
+also be used when interacting with nixbuild.net using Nix.
+
+Currently, the auth tokens serves the same purpose as the SSH keys; to
+authenticate nixbuild.net users. In the future, however, it will be possible
+to embed authorization policies in the Biscuit tokens, using a [policy
+language](https://www.biscuitsec.org/docs/getting-started/policies/). That way,
+you can create locked-down tokens that only have access to specific parts or
+functions of nixbuild.net.
+
+To use token-based authentication in `nixbuild-action`, follow these steps:
+
+1. Generate a token using the nixbuild.net shell:
+
+   ```
+   $ ssh eu.nixbuild.net shell
+   nixbuild.net> tokens create --ttl-seconds 525600
+   ```
+
+   The `--ttl-seconds` option specifies the token's expiration time.
+
+   The generated token allows full access to your nixbuild.net account, and
+   should be treated as a secret.
+
+2. Configure your token as a [GitHub Secret](https://docs.github.com/en/actions/reference/encrypted-secrets)
+
+3. Configure `nixbuild-action` to use the auth token secret like this:
+
+   ```yaml
+   uses: nixbuild/nixbuild-action@v15
+   with:
+     nixbuild_token: ${{ secrets.nixbuild_token }}
+   ```
+
 
 ### Using the CI workflow
 
@@ -122,6 +181,9 @@ jobs:
     secrets:
       nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
 ```
+
+You can also use [token-based authentication](/#token-authentication) if you
+like.
 
 You can configure the location of your `flake.nix` file, filter which
 derivations to build, set nixbuild.net [settings](./#nixbuildnet-settings) and
