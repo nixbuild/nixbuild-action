@@ -149,8 +149,15 @@ console UI.
    anything else than your SSH key.
 
 3. Use Nix as usual. All builds will automatically be sent to nixbuild.net.
+
    For optimal build performance, you should look into how to use
-   [remote store building](https://blog.nixbuild.net/posts/2022-03-16-lightning-fast-ci-with-nixbuild-net.html).
+   [remote store building](https://docs.nixbuild.net/remote-builds/#using-remote-stores).
+
+   **Note**, if you are using remote store building in combination with
+   [IFD](https://docs.nixbuild.net/remote-builds/#ifd-builds-import-from-derivation), you also need to pass
+   `--builders "" --max-jobs 2` to your `nix build` invocations, otherwise you
+   will see build errors.
+
 
 Here is a complete minimal workflow example:
 
