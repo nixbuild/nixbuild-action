@@ -141,23 +141,23 @@ on:
           you can add an explicit summary job that runs after all other workflow
           jobs and uses nixbuild-action to generate the summary only one time.
 
-      cache-build-failures:
+      reuse-build-failures:
         type: boolean
         default: true
         required: false
         description: |
-          Set the cache-build-failures setting in nixbuild.net. For
+          Set the reuse-build-failures setting in nixbuild.net. For
           documentation see
-          https://docs.nixbuild.net/settings/#cache-build-failures.
+          https://docs.nixbuild.net/settings/#reuse-build-failures.
 
-      cache-build-timeouts:
+      reuse-build-timeouts:
         type: boolean
         default: false
         required: false
         description: |
-          Set the cache-build-timeouts setting in nixbuild.net. For
+          Set the reuse-build-timeouts setting in nixbuild.net. For
           documentation see
-          https://docs.nixbuild.net/settings/#cache-build-timeouts.
+          https://docs.nixbuild.net/settings/#reuse-build-timeouts.
 
 
 jobs:
@@ -203,8 +203,8 @@ jobs:
       - uses: nixbuild/nixbuild-action@v15
         with:
           nixbuild_ssh_key: ${{secrets.nixbuild_ssh_key}}
-          cache-build-failures: ${{inputs.cache-build-failures}}
-          cache-build-timeouts: ${{inputs.cache-build-timeouts}}
+          reuse-build-failures: ${{inputs.reuse-build-failures}}
+          reuse-build-timeouts: ${{inputs.reuse-build-timeouts}}
 
       - name: Pre-build script
         run: ${{inputs.pre_build_script}}
