@@ -211,6 +211,11 @@ or not, so this is not an issue. However, if you actually need to use the build
 result in your workflow you need to [explicitly fetch
 it](https://docs.nixbuild.net/remote-builds/#retrieving-build-output-from-remote-stores).
 
+You might see Nix output `don't know how to build these paths` when starting
+a remote store build. You can ignore that output, as it doesn't mean anything is
+wrong. There is an open Nix [issue](https://github.com/NixOS/nix/issues/8052)
+about this.
+
 
 ### Generating Build Summaries
 
