@@ -64,7 +64,9 @@ jobs:
       matrix:
         os: [ ubuntu-latest, macos-latest ]
         nix_version:
-          - 2.12.0
+          - 2.14.1
+          - 2.13.3
+          - 2.12.1
           - 2.11.1
           - 2.10.3
           - 2.9.2
