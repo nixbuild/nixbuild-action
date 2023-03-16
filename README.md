@@ -143,21 +143,17 @@ console UI.
 
 ### Using `nixbuild-action`
 
-1. Install Nix with either [nixbuild/nix-quick-install-action](https://github.com/marketplace/actions/nix-quick-install) or [cachix/install-nix-action](https://github.com/marketplace/actions/install-nix).
+1. Install Nix with either
+   [nixbuild/nix-quick-install-action](https://github.com/marketplace/actions/nix-quick-install)
+   or [cachix/install-nix-action](https://github.com/marketplace/actions/install-nix).
 
 2. Use `nixbuild/nixbuild-action` in your workflows. You don't need to configure
    anything else than your SSH key.
 
-3. Use Nix as usual. All builds will automatically be sent to nixbuild.net.
-
-   For optimal build performance, you should look into how to use
-   [remote store building](https://docs.nixbuild.net/remote-builds/#using-remote-stores).
-
-   **Note**, if you are using remote store building in combination with
-   [IFD](https://docs.nixbuild.net/remote-builds/#ifd-builds-import-from-derivation), you also need to pass
-   `--builders "" --max-jobs 2` to your `nix build` invocations, otherwise you
-   will see build errors.
-
+Now you can use Nix as you would normally do. `nixbuild-action` configures
+nixbuild.net as a [remote
+builder](https://docs.nixbuild.net/remote-builds/#using-remote-builders), which
+means all builds will automatically be sent to nixbuild.net.
 
 Here is a complete minimal workflow example:
 
@@ -169,12 +165,52 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
-      - uses: nixbuild/nix-quick-install-action@v19
+      - uses: nixbuild/nix-quick-install-action@v22
       - uses: nixbuild/nixbuild-action@v15
         with:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
-      - run: nix-build
+      - run: nix-build ...
 ```
+
+#### Remote Store Building
+
+For optimal build performance, especially on ephemeral instances like the GHA
+runners, you should look into how to use [remote store
+building](https://docs.nixbuild.net/remote-builds/#using-remote-stores).
+
+In short, remote store building avoids having build inputs being downloaded to
+the local machine (the GHA runner in this case). It also lets nixbuild.net make
+more decisions on how the builds are scheduled.
+
+There are a few issues around remote store building (both in Nix and in
+nixbuild.net), which is why `nixbuild-action` doesn't default to it. However,
+the [CI Workflow](/#using-the-ci-workflow) is using it successfully to get the
+best build performance. If you want to try it out, you should use the following
+options when invoking Nix:
+
+```
+nix build \
+  --print-build-logs \
+  --builders "" \
+  --max-jobs 2 \
+  --eval-store auto \
+  --store ssh-ng://eu.nixbuild.net \
+  ...
+```
+
+The above options works around issues with
+[IFD](https://docs.nixbuild.net/remote-builds/#ifd-builds-import-from-derivation)
+and missing build logs. Remote store building with nixbuild.net is only
+possible using `nix build`, not `nix-build`, and you need to make sure you
+specify the store URI using `ssh-ng://`, not `ssh://`.
+
+When using remote store building, the final build result is not automatically
+downloaded to the GHA runner (it will only exist in the remote store in
+nixbuild.net). Often, you are mostly interested in seeing if the build succeeds
+or not, so this is not an issue. However, if you actually need to use the build
+result in your workflow you need to [explicitly fetch
+it](https://docs.nixbuild.net/remote-builds/#retrieving-build-output-from-remote-stores).
+
 
 ### Generating Build Summaries
 
@@ -247,7 +283,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
-      - uses: nixbuild/nix-quick-install-action@v19
+      - uses: nixbuild/nix-quick-install-action@v22
       - uses: nixbuild/nixbuild-action@v15
         with:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
