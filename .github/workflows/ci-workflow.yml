@@ -19,7 +19,7 @@ on:
 
     outputs:
       success:
-        value: ${{ jobs.summary.outputs.results }}
+        value: ${{ jobs.summary.outputs.success }}
         description: |
           Outputs the string 'true' if all builds succeeded, otherwise 'false'.
           You need to set `ignore_build_failures` to `true` in order to get the
