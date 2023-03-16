@@ -55,16 +55,16 @@
           release="$(head -n1 "$release_file")"
           prev_release="$(gh release list -L 1 | cut -f 3)"
 
-          ci_workflow_file="$(dirname "$release_file")/.github/workflows/ci-workflow.yml"
-          if ! grep -q "nixbuild/nixbuild-action@$release" "$ci_workflow_file"; then
-            echo >&2 "ci-workflow.yml is missing correct version of nixbuild-action"
-            exit 1
-          fi
-
           if [ "$release" = "$prev_release" ]; then
             echo >&2 "Release tag not updated ($release)"
             exit
           else
+            ci_workflow_file="$(dirname "$release_file")/.github/workflows/ci-workflow.yml"
+            if ! grep -q "nixbuild/nixbuild-action@$release" "$ci_workflow_file"; then
+              echo >&2 "ci-workflow.yml is missing correct version ($release) of nixbuild-action"
+              exit 1
+            fi
+
             release_notes="$(mktemp)"
             tail -n+2 "$release_file" > "$release_notes"
 
