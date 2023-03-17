@@ -223,7 +223,7 @@ jobs:
         with:
           nix_on_tmpfs: true
           nix_conf: experimental-features = nix-command flakes
-      - uses: nixbuild/nixbuild-action@biscuit
+      - uses: nixbuild/nixbuild-action@v16
         with:
           nixbuild_ssh_key: ${{secrets.nixbuild_ssh_key}}
           nixbuild_token: ${{secrets.nixbuild_token}}
@@ -297,7 +297,7 @@ jobs:
           fi
       - name: Generate nixbuild.net summary
         if: ${{ always() && inputs.generate_build_summary }}
-        uses: nixbuild/nixbuild-action@biscuit
+        uses: nixbuild/nixbuild-action@v16
         with:
           nixbuild_ssh_key: ${{secrets.nixbuild_ssh_key}}
           nixbuild_token: ${{secrets.nixbuild_token}}
