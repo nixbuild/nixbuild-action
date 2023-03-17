@@ -4,18 +4,35 @@ on:
   workflow_call:
     secrets:
       nixbuild_ssh_key:
-        required: true
+        required: false
         description: |
-          The private ssh key used to authenticate with nixbuild.net
+          The private SSH key used to authenticate with nixbuild.net. An alternative
+          to SSH key authentication is to use token-based authentication by
+          configuring the nixbuild_token setting. If a token is configured you can
+          leave nixbuild_ssh_key unset, but one of the settings must be set in
+          order for authentication to work.
 
           You should not add your private key directly to the workflow file but
-          instead define a GitHub Secret for it, to avoid mistakenly sharing
-          your key with others.
+          instead define a GitHub Secret for it, to avoid mistakenly sharing your
+          key with others.
 
-          It is advisable to create a new nixbuild.net ssh key specifically for
-          use within GitHub (or even per repository or workflow). That way you
-          can revoke access to your nixbuild.net account in a fine-grained
-          fashion.
+          It is advisable to create a new nixbuild.net SSH key specifically for
+          use within GitHub (or even per repository or workflow). That way you can
+          revoke access to your nixbuild.net account in a fine-grained fashion.
+
+          See the README of this action for easy setup instructions.
+
+      nixbuild_token:
+        required: false
+        description: |
+          The private Biscuit token used to authenticate with nixbuild.net. If you
+          use SSH key authentication (by configuring nixbuild_ssh_key) this setting
+          can be unset, but one of the settings must be set in order for
+          authentication to work.
+
+          You should not add your private token directly to the workflow file but
+          instead define a GitHub Secret for it, to avoid mistakenly sharing your
+          token with others.
 
     outputs:
       success:
@@ -206,9 +223,10 @@ jobs:
         with:
           nix_on_tmpfs: true
           nix_conf: experimental-features = nix-command flakes
-      - uses: nixbuild/nixbuild-action@master
+      - uses: nixbuild/nixbuild-action@biscuit
         with:
           nixbuild_ssh_key: ${{secrets.nixbuild_ssh_key}}
+          nixbuild_token: ${{secrets.nixbuild_token}}
           reuse-build-failures: ${{inputs.reuse-build-failures}}
           reuse-build-timeouts: ${{inputs.reuse-build-timeouts}}
 
@@ -279,7 +297,8 @@ jobs:
           fi
       - name: Generate nixbuild.net summary
         if: ${{ always() && inputs.generate_build_summary }}
-        uses: nixbuild/nixbuild-action@master
+        uses: nixbuild/nixbuild-action@biscuit
         with:
           nixbuild_ssh_key: ${{secrets.nixbuild_ssh_key}}
+          nixbuild_token: ${{secrets.nixbuild_token}}
           generate_summary_for: 'workflow'
