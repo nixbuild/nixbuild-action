@@ -123,7 +123,7 @@ You should follow the instructions in one of the two sections below, not both.
 3. Configure `nixbuild-action` to use the SSH key secret like this:
 
    ```yaml
-   uses: nixbuild/nixbuild-action@v15
+   uses: nixbuild/nixbuild-action@v16
    with:
      nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
    ```
@@ -162,7 +162,7 @@ To use token-based authentication in `nixbuild-action`, follow these steps:
 3. Configure `nixbuild-action` to use the auth token secret like this:
 
    ```yaml
-   uses: nixbuild/nixbuild-action@v15
+   uses: nixbuild/nixbuild-action@v16
    with:
      nixbuild_token: ${{ secrets.nixbuild_token }}
    ```
@@ -177,7 +177,7 @@ name: Examples
 on: push
 jobs:
   checks:
-    uses: nixbuild/nixbuild-action/.github/workflows/ci-workflow.yml@v15
+    uses: nixbuild/nixbuild-action/.github/workflows/ci-workflow.yml@v16
     secrets:
       nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
 ```
@@ -228,7 +228,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: nixbuild/nix-quick-install-action@v22
-      - uses: nixbuild/nixbuild-action@v15
+      - uses: nixbuild/nixbuild-action@v16
         with:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
       - run: nix-build ...
@@ -287,7 +287,7 @@ summaries for an individual job, or for the complete workflow. To generate a
 summary for the job that uses `nixbuild-action`, configure it like this:
 
 ```yaml
-- uses: nixbuild/nixbuild-action@v15
+- uses: nixbuild/nixbuild-action@v16
   with:
     nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
     generate-summary-for: 'job'
@@ -298,7 +298,7 @@ workflow, add a job that runs on the very end of the workflow, and configure
 it like this:
 
 ```yaml
-- uses: nixbuild/nixbuild-action@v15
+- uses: nixbuild/nixbuild-action@v16
   with:
     nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
     generate-summary-for: 'workflow'
@@ -351,7 +351,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: nixbuild/nix-quick-install-action@v22
-      - uses: nixbuild/nixbuild-action@v15
+      - uses: nixbuild/nixbuild-action@v16
         with:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
           reuse-build-timeouts: true
