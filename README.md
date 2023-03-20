@@ -290,7 +290,7 @@ summary for the job that uses `nixbuild-action`, configure it like this:
 - uses: nixbuild/nixbuild-action@v16
   with:
     nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
-    generate-summary-for: 'job'
+    generate_summary_for: 'job'
 ```
 
 To generate a summary for all builds that was executed during a complete
@@ -301,7 +301,7 @@ it like this:
 - uses: nixbuild/nixbuild-action@v16
   with:
     nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
-    generate-summary-for: 'workflow'
+    generate_summary_for: 'workflow'
 ```
 
 The build summaries look like this:
