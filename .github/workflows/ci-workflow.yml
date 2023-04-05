@@ -176,6 +176,13 @@ on:
           documentation see
           https://docs.nixbuild.net/settings/#reuse-build-timeouts.
 
+      lfs:
+        type: boolean
+        default: false
+        required: false
+        description: |
+          Use git-lfs when checking out the repository for the build job. 
+          See: https://github.com/actions/checkout
 
 jobs:
 
@@ -219,6 +226,8 @@ jobs:
         build: ${{fromJSON(needs.eval-flake.outputs.builds)}}
     steps:
       - uses: actions/checkout@v3
+        with:
+          lfs: ${{ inputs.lfs }}
       - uses: nixbuild/nix-quick-install-action@v22
         with:
           nix_on_tmpfs: true
