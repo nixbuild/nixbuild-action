@@ -159,6 +159,8 @@ on:
           jobs and uses nixbuild-action to generate the summary only one time.
 
       caches:
+        type: string
+        default: ''
         required: false
         description: |
           Set the caches setting in nixbuild.net. For documentation
