@@ -54,17 +54,6 @@ inputs:
       If set to '', no summary will be generated.
 
 
-  allow-override:
-    required: false
-    description: |
-      Set the allow-override setting in nixbuild.net. For documentation
-      see https://docs.nixbuild.net/settings/#allow-override.
-
-      Note, all inputs to this action is communicated to nixbuild.net through
-      the SSH environment. That means disabling allow-override here can only
-      stop settings overrides from Nix derivations, no other levels. See the
-      nixbuild.net settings documentation for more info on this.
-
   caches:
     required: false
     description: |
