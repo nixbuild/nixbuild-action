@@ -123,7 +123,7 @@ You should follow the instructions in one of the two sections below, not both.
 3. Configure `nixbuild-action` to use the SSH key secret like this:
 
    ```yaml
-   uses: nixbuild/nixbuild-action@v16
+   uses: nixbuild/nixbuild-action@v17
    with:
      nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
    ```
@@ -162,7 +162,7 @@ To use token-based authentication in `nixbuild-action`, follow these steps:
 3. Configure `nixbuild-action` to use the auth token secret like this:
 
    ```yaml
-   uses: nixbuild/nixbuild-action@v16
+   uses: nixbuild/nixbuild-action@v17
    with:
      nixbuild_token: ${{ secrets.nixbuild_token }}
    ```
@@ -177,7 +177,7 @@ name: Examples
 on: push
 jobs:
   checks:
-    uses: nixbuild/nixbuild-action/.github/workflows/ci-workflow.yml@v16
+    uses: nixbuild/nixbuild-action/.github/workflows/ci-workflow.yml@v17
     secrets:
       nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
 ```
@@ -228,7 +228,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: nixbuild/nix-quick-install-action@v22
-      - uses: nixbuild/nixbuild-action@v16
+      - uses: nixbuild/nixbuild-action@v17
         with:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
       - run: nix-build ...
@@ -287,7 +287,7 @@ summaries for an individual job, or for the complete workflow. To generate a
 summary for the job that uses `nixbuild-action`, configure it like this:
 
 ```yaml
-- uses: nixbuild/nixbuild-action@v16
+- uses: nixbuild/nixbuild-action@v17
   with:
     nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
     generate_summary_for: 'job'
@@ -298,7 +298,7 @@ workflow, add a job that runs on the very end of the workflow, and configure
 it like this:
 
 ```yaml
-- uses: nixbuild/nixbuild-action@v16
+- uses: nixbuild/nixbuild-action@v17
   with:
     nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
     generate_summary_for: 'workflow'
@@ -312,8 +312,8 @@ The build summaries look like this:
 
 Optionally, you can configure [nixbuild.net
 settings](https://docs.nixbuild.net/settings/) that you want your builds to
-use. Most settings are available directly as [inputs](action.yml) of this
-action. Some settings, like
+use. Some settings are available directly as [inputs](action.yml) of this
+action. Other settings, like
 [max-cpu-hours-per-month](https://docs.nixbuild.net/settings/#max-cpu-hours-per-month),
 can only be configured through the [nixbuild.net
 shell](http://docs.nixbuild.net/nixbuild-shell/#configure-settings).
@@ -326,13 +326,13 @@ key](https://docs.nixbuild.net/settings/#ssh-key) settings.
 
 If you want to disable the possibility to change any nixbuild.net settings
 through GitHub Actions, you can set the
-[allow-override](https://docs.nixbuild.net/settings/#allow-override) setting to
-`false`, either on the account level or the SSH key level. You need to change
-this setting from within the [nixbuild.net
+[settings-from-ssh-env](https://docs.nixbuild.net/settings/#settings-from-ssh-env)
+setting to `false`, either on the account level or the SSH key level. You need
+to change this setting from within the [nixbuild.net
 shell](http://docs.nixbuild.net/nixbuild-shell/#configure-settings). If you do
-that, any nixbuild.net setting configured for the action will be ignored. Only
-settings configured for your account or the specific SSH key used by your
-GitHub Actions workflow will then be used.
+that, any nixbuild.net setting configured for the action will be **ignored**.
+Only settings configured for your nixbuild.net account or the specific SSH key
+used by your GitHub Actions workflow will then be used.
 
 If there is any chance that less trusted users can submit commits or PRs that
 are able to change your GitHub Actions workflow, it is **strongly recommended**
@@ -351,7 +351,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: nixbuild/nix-quick-install-action@v22
-      - uses: nixbuild/nixbuild-action@v16
+      - uses: nixbuild/nixbuild-action@v17
         with:
           nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
           reuse-build-timeouts: true

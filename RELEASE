@@ -1,11 +1,9 @@
-v16
+v17
 
 ## Changes
 
-* Support authenticating against nixbuild.net using [auth tokens](https://github.com/nixbuild/nixbuild-action/tree/v16#token-authentication) instead of SSH keys. The auth tokens are based on [Biscuit](https://www.biscuitsec.org/) and will in the future enable users to define authorization policies. Currently, they can only be used for authentication.
+* ci-workflow: Allow setting the `lfs` option when checking out the repository for the build job. Contributed by @KaiserKarel.
 
-* ci-workflow: Update nix-quick-install-action to v22, which means the default Nix version used is bumped to 2.14.1.
+* Make it possible to configure the nixbuild.net setting [caches](https://docs.nixbuild.net/settings/#caches). Fixes [#36](https://github.com/nixbuild/nixbuild-action/issues/36).
 
-* Document [remote store building](https://github.com/nixbuild/nixbuild-action/tree/v16#remote-store-building).
-
-* Update inputs to match changes in nixbuild.net settings.
+* Removes the obsolete `allow-override` nixbuild.net setting. By default, using settings from derivation environments is disabled in nixbuild.net, so this action input had no affect. To lock down your your action and make it impossible to change any nixbuild.net settings (even by using the inputs of this action), set [settings-from-ssh-env](https://docs.nixbuild.net/settings/#settings-from-ssh-env) to `false` for your account or forthe SSH key used by your action. For more info, see the [README](https://github.com/nixbuild/nixbuild-action/blob/v17/README.md#nixbuildnet-settings).
