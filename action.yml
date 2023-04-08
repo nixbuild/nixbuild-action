@@ -65,6 +65,15 @@ inputs:
       stop settings overrides from Nix derivations, no other levels. See the
       nixbuild.net settings documentation for more info on this.
 
+  caches:
+    required: false
+    description: |
+      Set the caches setting in nixbuild.net. For documentation
+      see https://docs.nixbuild.net/settings/#caches.
+      Separate multiple caches with a comma.
+      You must have corresponding access tokens setup in your account on
+      nixbuild.net, see https://docs.nixbuild.net/settings/#access-tokens.
+
   reuse-build-failures:
     required: false
     description: |

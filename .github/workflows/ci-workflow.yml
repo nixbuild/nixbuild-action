@@ -158,6 +158,15 @@ on:
           you can add an explicit summary job that runs after all other workflow
           jobs and uses nixbuild-action to generate the summary only one time.
 
+      caches:
+        required: false
+        description: |
+          Set the caches setting in nixbuild.net. For documentation
+          see https://docs.nixbuild.net/settings/#caches.
+          Separate multiple caches with a comma.
+          You must have corresponding access tokens setup in your account on
+          nixbuild.net, see https://docs.nixbuild.net/settings/#access-tokens.
+
       reuse-build-failures:
         type: boolean
         default: true
@@ -236,6 +245,7 @@ jobs:
         with:
           nixbuild_ssh_key: ${{secrets.nixbuild_ssh_key}}
           nixbuild_token: ${{secrets.nixbuild_token}}
+          caches: ${{inputs.caches}}
           reuse-build-failures: ${{inputs.reuse-build-failures}}
           reuse-build-timeouts: ${{inputs.reuse-build-timeouts}}
 

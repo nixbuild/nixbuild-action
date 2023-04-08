@@ -84,6 +84,7 @@ fi
 # Setup nixbuild.net settings
 for setting in \
   allow-override \
+  caches \
   reuse-build-failures \
   reuse-build-timeouts \
   keep-builds-running
