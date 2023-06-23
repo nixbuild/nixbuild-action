@@ -16,7 +16,7 @@ jobs:
       - test-build
     steps:
       - uses: actions/checkout@v3
-      - uses: nixbuild/nix-quick-install-action@v23
+      - uses: nixbuild/nix-quick-install-action@v24
         with:
           nix_conf: experimental-features = nix-command flakes
       - uses: ./
@@ -41,7 +41,7 @@ jobs:
         system: [ x86_64-linux ]
     steps:
       - uses: actions/checkout@v3
-      - uses: nixbuild/nix-quick-install-action@v23
+      - uses: nixbuild/nix-quick-install-action@v24
         with:
           nix_conf: experimental-features = nix-command flakes
       - uses: ./
@@ -86,7 +86,7 @@ jobs:
             nix_version: 2.0.4
     steps:
       - uses: actions/checkout@v3
-      - uses: nixbuild/nix-quick-install-action@v23
+      - uses: nixbuild/nix-quick-install-action@v24
         with:
           nix_version: ${{ matrix.nix_version }}
       - uses: ./
