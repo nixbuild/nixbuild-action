@@ -10,8 +10,6 @@
         "outputs": {
           "out": "/nix/store/hw8x8kb8lxbh6fpq7rx250da80bcrxy7-firefox-98.0.1"
         },
-        "startTime": 0,
-        "stopTime": 0
       },
       "hello-fail": {
         "success": false,
@@ -28,8 +26,6 @@
         "outputs": {
           "out": "/nix/store/q6y2d4vikjj8ahvjlikn95rhw53rc69s-hello-2.12"
         },
-        "startTime": 0,
-        "stopTime": 0
       }
     },
     "x86_64-linux": {
@@ -42,8 +38,6 @@
         "outputs": {
           "out": "/nix/store/w8k24v6yf0wkyyfwbdd9dqpnc6f7p9hm-firefox-98.0.1"
         },
-        "startTime": 0,
-        "stopTime": 0
       },
       "hello-fail": {
         "success": false,
@@ -60,8 +54,6 @@
         "outputs": {
           "out": "/nix/store/g124820p9hlv4lj8qplzxw1c44dxaw1k-hello-2.12"
         },
-        "startTime": 0,
-        "stopTime": 0
       },
       "minecraft": {
         "success": true,
@@ -72,8 +64,6 @@
         "outputs": {
           "out": "/nix/store/dpslzb8grmx3c6xnzkm7w2vqyzac6s9n-minecraft-launcher-2.2.1441"
         },
-        "startTime": 0,
-        "stopTime": 0
       }
     }
   }
