@@ -1,9 +1,7 @@
-v17
+v18
 
 ## Changes
 
-* ci-workflow: Allow setting the `lfs` option when checking out the repository for the build job. Contributed by @KaiserKarel.
+* ci-workflow: Update `nix-quick-install-action` to v24.
 
-* Make it possible to configure the nixbuild.net setting [caches](https://docs.nixbuild.net/settings/#caches). Fixes [#36](https://github.com/nixbuild/nixbuild-action/issues/36).
-
-* Removes the obsolete `allow-override` nixbuild.net setting. By default, using settings from derivation environments is disabled in nixbuild.net, so this action input had no affect. To lock down your your action and make it impossible to change any nixbuild.net settings (even by using the inputs of this action), set [settings-from-ssh-env](https://docs.nixbuild.net/settings/#settings-from-ssh-env) to `false` for your account or forthe SSH key used by your action. For more info, see the [README](https://github.com/nixbuild/nixbuild-action/blob/v17/README.md#nixbuildnet-settings).
+* ci-workflow: Add a `github_access_token` setting that is forwarded to `nix-quick-install-action` and enables Nix to use a specific access token when fetching from GitHub.
