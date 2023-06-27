@@ -41,6 +41,8 @@ LogLevel ERROR
 StrictHostKeyChecking yes
 UserKnownHostsFile $SSH_KNOWN_HOSTS_FILE
 ControlPath none
+ServerAliveInterval 60
+IPQoS throughput
 EOF
 
 
