@@ -267,13 +267,11 @@ jobs:
       - name: "Build ${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}"
         id: build
         run: |
-          ARTIFACT_DIR="$(echo "${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}" | tr '":<>|*?\\/' '_')"
-          mkdir -p "$ARTIFACT_DIR"
+          ARTIFACT_PREFIX="$(echo "${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}" | tr '":<>|*?\\/' '_')"
+          echo "ARTIFACT_PREFIX=$ARTIFACT_PREFIX" >> "$GITHUB_ENV"
 
-          echo "ARTIFACT_DIR=$ARTIFACT_DIR" >> "$GITHUB_ENV"
-
-          RESULTS="$ARTIFACT_DIR/build.json"
-          LOGS="$ARTIFACT_DIR/build.log"
+          RESULTS="build.json"
+          LOGS="$ARTIFACT_PREFIX.log"
 
           touch "$RESULTS"
           nix build "./${{inputs.flake_directory}}#${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}" \
@@ -294,7 +292,7 @@ jobs:
             fi
           fi
 
-          jq -c '{success: true, name: "${{matrix.build.name}}", description: "${{matrix.build.description}}", label: "${{matrix.build.label}}"} + .[0] | {"${{matrix.build.top_attr}}": {"${{matrix.build.system}}": {"${{matrix.build.attr}}": .}}}' "$RESULTS" > "$ARTIFACT_DIR/result.json"
+          jq -c '{success: true, name: "${{matrix.build.name}}", description: "${{matrix.build.description}}", label: "${{matrix.build.label}}"} + .[0] | {"${{matrix.build.top_attr}}": {"${{matrix.build.system}}": {"${{matrix.build.attr}}": .}}}' "$RESULTS" > "$ARTIFACT_PREFIX.json"
 
           exit "$status"
 
@@ -302,10 +300,17 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: "Build logs"
+          name: build-results
           path: |
-            ${{ env.ARTIFACT_DIR }}/result.json
-            ${{ env.ARTIFACT_DIR }}/build.log
+            ${{ env.ARTIFACT_PREFIX }}.result.json
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-logs
+          path: |
+            ${{ env.ARTIFACT_PREFIX }}.log
 
 
   summary:
@@ -319,13 +324,14 @@ jobs:
       - id: download
         uses: actions/download-artifact@v3
         with:
+          name: build-results
           path: ~/results
       - id: merge
         run: |
           jq -rcs 'reduce .[] as $x ({}; . * $x)|"results=\(.)"' \
-            "${{steps.download.outputs.download-path}}"/*/*/result.json \
+            "${{steps.download.outputs.download-path}}"/*.json \
             >> "$GITHUB_OUTPUT"
-          if jq -s '..|.success?|select(if . == false then ""|halt_error(1) else false end)' "${{steps.download.outputs.download-path}}"/*/result.json; then
+          if jq -s '..|.success?|select(if . == false then ""|halt_error(1) else false end)' "${{steps.download.outputs.download-path}}"/*.json; then
             echo "success=true" >> "$GITHUB_OUTPUT"
           else
             echo "success=false" >> "$GITHUB_OUTPUT"
