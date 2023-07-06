@@ -302,7 +302,7 @@ jobs:
         with:
           name: build-results
           path: |
-            ${{ env.ARTIFACT_PREFIX }}.result.json
+            ${{ env.ARTIFACT_PREFIX }}.json
 
       - name: Upload logs
         if: always()
