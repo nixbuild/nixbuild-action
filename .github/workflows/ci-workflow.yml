@@ -253,7 +253,7 @@ jobs:
             experimental-features = nix-command flakes
             ${{inputs.nix_conf}}
           nix_version: ${{inputs.nix_version}}
-      - uses: nixbuild/nixbuild-action@v18
+      - uses: nixbuild/nixbuild-action@master
         with:
           nixbuild_ssh_key: ${{secrets.nixbuild_ssh_key}}
           nixbuild_token: ${{secrets.nixbuild_token}}
@@ -328,7 +328,7 @@ jobs:
           fi
       - name: Generate nixbuild.net summary
         if: ${{ always() && inputs.generate_build_summary }}
-        uses: nixbuild/nixbuild-action@v18
+        uses: nixbuild/nixbuild-action@master
         with:
           nixbuild_ssh_key: ${{secrets.nixbuild_ssh_key}}
           nixbuild_token: ${{secrets.nixbuild_token}}
