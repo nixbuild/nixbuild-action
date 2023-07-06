@@ -267,18 +267,26 @@ jobs:
       - name: "Build ${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}"
         id: build
         run: |
-          touch build.json
+          ARTIFACT_DIR="$(echo "${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}" | tr '":<>|*?\\/' '_')"
+          mkdir -p "$ARTIFACT_DIR"
+
+          echo "ARTIFACT_DIR=$ARTIFACT_DIR" >> "$GITHUB_ENV"
+
+          RESULTS="$ARTIFACT_DIR/build.json"
+          LOGS="$ARTIFACT_DIR/build.log"
+
+          touch "$RESULTS"
           nix build "./${{inputs.flake_directory}}#${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}" \
             --print-build-logs \
             --eval-store auto \
             --store ssh-ng://eu.nixbuild.net \
             --builders "" --max-jobs 2 \
-            --json > build.json \
-            2> >(tee -a build.log >&2) || true
+            --json > "$RESULTS" \
+            2> >(tee -a "$LOGS" >&2) || true
 
           status=0
-          if ! [ -s build.json ]; then
-            echo '[{"success":false}]' > build.json
+          if ! [ -s "$RESULTS" ]; then
+            echo '[{"success":false}]' > "$RESULTS"
             if [ "${{ inputs.ignore_build_failures }}" == "true" ]; then
               echo "::error title=${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}::Build failed"
             else
@@ -286,11 +294,7 @@ jobs:
             fi
           fi
 
-          jq -c '{success: true, name: "${{matrix.build.name}}", description: "${{matrix.build.description}}", label: "${{matrix.build.label}}"} + .[0] | {"${{matrix.build.top_attr}}": {"${{matrix.build.system}}": {"${{matrix.build.attr}}": .}}}' build.json > result.json
-
-          # Generate a valid artifact name
-          ARTIFACT_NAME="$(echo "${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}" | tr '":<>|*?\\/' '_')"
-          echo "ARTIFACT_NAME=$ARTIFACT_NAME" >> "$GITHUB_ENV"
+          jq -c '{success: true, name: "${{matrix.build.name}}", description: "${{matrix.build.description}}", label: "${{matrix.build.label}}"} + .[0] | {"${{matrix.build.top_attr}}": {"${{matrix.build.system}}": {"${{matrix.build.attr}}": .}}}' "$RESULTS" > "$ARTIFACT_DIR/result.json"
 
           exit "$status"
 
@@ -298,10 +302,10 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: "${{ env.ARTIFACT_NAME }}"
+          name: "Build logs"
           path: |
-            result.json
-            build.log
+            ${{ env.ARTIFACT_DIR }}/result.json
+            ${{ env.ARTIFACT_DIR }}/build.log
 
 
   summary:
@@ -319,7 +323,7 @@ jobs:
       - id: merge
         run: |
           jq -rcs 'reduce .[] as $x ({}; . * $x)|"results=\(.)"' \
-            "${{steps.download.outputs.download-path}}"/*/result.json \
+            "${{steps.download.outputs.download-path}}"/*/*/result.json \
             >> "$GITHUB_OUTPUT"
           if jq -s '..|.success?|select(if . == false then ""|halt_error(1) else false end)' "${{steps.download.outputs.download-path}}"/*/result.json; then
             echo "success=true" >> "$GITHUB_OUTPUT"
