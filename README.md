@@ -109,7 +109,7 @@ You should follow the instructions in one of the two sections below, not both.
 
    ```
    $ ssh eu.nixbuild.net shell
-   nixbuild.net> ssh-keys set github allow-shell false
+   nixbuild.net> settings allow-shell --ssh-key set github --set false
    ```
 
    If there is any chance that less trusted users can submit commits or PRs that
