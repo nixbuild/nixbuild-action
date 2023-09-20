@@ -111,9 +111,6 @@ jobs:
       nixbuild_token: ${{ secrets.nixbuild_token }}
 ```
 
-You can also use [token-based authentication](/#token-authentication) if you
-like.
-
 You can configure the location of your `flake.nix` file, filter which
 derivations to build, set nixbuild.net [settings](./#nixbuildnet-settings) and
 more. Look at the [workflow definition](.github/workflows/ci-workflow.yml#L36)
