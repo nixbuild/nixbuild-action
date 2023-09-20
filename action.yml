@@ -28,13 +28,16 @@ inputs:
     required: false
     default: ''
     description: |
-      The private Biscuit token used to authenticate with nixbuild.net. If you
-      use SSH key authentication (by configuring nixbuild_ssh_key) this setting
+      The private auth token used to access nixbuild.net. If you use SSH key
+      authentication (by configuring nixbuild_ssh_key) this setting
       can be unset, but one of the settings must be set in order for
       authentication to work.
 
-      The token must at least have the permissions 'build:read', 'build:write',
-      'store:read', 'store:write' and 'account:read'.
+      The token must have the permissions 'build:read', 'build:write',
+      'store:read' and 'store:write'.
+
+      See https://docs.nixbuild.net/access-control/ for more details on auth
+      tokens.
 
       You should not add your private token directly to the workflow file but
       instead define a GitHub Secret for it, to avoid mistakenly sharing your
