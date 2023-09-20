@@ -13,7 +13,6 @@ async function run() {
         }
       }
     }
-    core.exportVariable('NIXBUILD_SSH_KEY', core.getInput('nixbuild_ssh_key'));
     core.exportVariable('NIXBUILD_TOKEN', core.getInput('nixbuild_token'));
     await exec.exec(path.resolve(__dirname, 'nixbuild-action.sh'), [JSON.stringify(inputs)]);
   } catch (error) {

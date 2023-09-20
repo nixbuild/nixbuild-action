@@ -180,14 +180,7 @@ const summaryFor = core.getInput('generate_summary_for').toLowerCase();
 if (summaryFor === 'job' || summaryFor === 'workflow') {
   var token = core.getInput('nixbuild_token');
   if (!token) {
-    try {
-      token = JSON.parse(child_process.execSync(
-        'ssh eu.nixbuild.net api tokens create --read-only --ttl-seconds 60',
-        {encoding: 'utf-8'}
-      )).token;
-    } catch (error) {
-      core.warning('Failed fetching auth token for nixbuild.net, skipping summary generation.');
-    }
+    core.warning('No auth token for nixbuild.net configured, skipping summary generation.');
   }
   if (token) {
     generateSummary(token, summaryFor === 'workflow');

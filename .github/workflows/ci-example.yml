@@ -10,7 +10,7 @@ jobs:
   checks:
     uses: ./.github/workflows/ci-workflow.yml
     secrets:
-      nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
+      nixbuild_token: ${{ secrets.nixbuild_token }}
     with:
       # All settings are optional, the CI Workflow has usable defaults
       # The available settings are documented in ./ci-workflow.yml

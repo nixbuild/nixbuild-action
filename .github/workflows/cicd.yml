@@ -21,7 +21,7 @@ jobs:
           nix_conf: experimental-features = nix-command flakes
       - uses: ./
         with:
-          nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
+          nixbuild_token: ${{ secrets.nixbuild_token }}
           generate_summary_for: 'workflow'
       - name: Build release script
         run: nix build .#packages.x86_64-linux.release
@@ -46,7 +46,7 @@ jobs:
           nix_conf: experimental-features = nix-command flakes
       - uses: ./
         with:
-          nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
+          nixbuild_token: ${{ secrets.nixbuild_token }}
           generate_summary_for: 'job'
           keep-builds-running: true # test that we can set a setting
       - name: Run a test build
@@ -91,7 +91,7 @@ jobs:
           nix_version: ${{ matrix.nix_version }}
       - uses: ./
         with:
-          nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
+          nixbuild_token: ${{ secrets.nixbuild_token }}
           keep-builds-running: true # test that we can set a setting
 
 
@@ -105,5 +105,5 @@ jobs:
       - uses: cachix/install-nix-action@v22
       - uses: ./
         with:
-          nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
+          nixbuild_token: ${{ secrets.nixbuild_token }}
           keep-builds-running: true # test that we can set a setting

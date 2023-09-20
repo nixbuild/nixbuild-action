@@ -47,38 +47,14 @@ EOF
 
 
 # Setup auth
-if [ -n "$NIXBUILD_SSH_KEY" ]; then # SSH key authentication
-  ssh_key_file="$(mktemp)"
-  printenv NIXBUILD_SSH_KEY > "$ssh_key_file"
-  if ssh-keygen -y -f "$ssh_key_file" &>/dev/null; then
-    # Start ssh agent
-    eval $(ssh-agent)
-    # Add ssh key to agent
-    ssh-add -q "$ssh_key_file" && rm "$ssh_key_file"
-    # Auth agent socket to ssh config
-    echo "IdentityAgent $SSH_AUTH_SOCK" >> "$SSH_CONFIG_FILE"
-  else
-    echo -e >&2 \
-"Your SSH key is not a valid OpenSSH private key\n"\
-"This is likely caused by one of these issues:\n"\
-"* The key has been configured incorrectly in your workflow file.\n"\
-"* The workflow was triggered by an actor that has no access to\n"\
-"  the GitHub Action secret used for storing your SSH key.\n"\
-"  For example, Pull Requests originating from a fork of your\n"\
-"  repository can't access secrets."
-    exit 1
-  fi
-
-elif [ -n "$NIXBUILD_TOKEN" ]; then # Token authentication
+if [ -n "$NIXBUILD_TOKEN" ]; then # Token authentication
   echo "PreferredAuthentications none" >> "$SSH_CONFIG_FILE"
   echo "User authtoken" >> "$SSH_CONFIG_FILE"
   add_env "token" "$NIXBUILD_TOKEN"
-
 else # Invalid auth config
   echo -e >&2 \
-"You must one of the settings 'nixbuild_ssh_key' or 'nixbuild_token'\n"\
-"It seems like you have configured neither, so nixbuild.net authentication\n"\
-"is not possible."
+"It seems you have not configured the 'nixbuild_token' setting, so\n"\
+"nixbuild.net access is not possible."
   exit 1
 fi
 

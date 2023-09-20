@@ -4,44 +4,23 @@ author: Rickard Nilsson
 
 inputs:
 
-  nixbuild_ssh_key:
-    required: false
-    default: ''
-    description: |
-      The private SSH key used to authenticate with nixbuild.net. An alternative
-      to SSH key authentication is to use token-based authentication by
-      configuring the nixbuild_token setting. If a token is configured you can
-      leave nixbuild_ssh_key unset, but one of the settings must be set in
-      order for authentication to work.
-
-      You should not add your private key directly to the workflow file but
-      instead define a GitHub Secret for it, to avoid mistakenly sharing your
-      key with others.
-
-      It is advisable to create a new nixbuild.net SSH key specifically for
-      use within GitHub (or even per repository or workflow). That way you can
-      revoke access to your nixbuild.net account in a fine-grained fashion.
-
-      See the README of this action for easy setup instructions.
-
   nixbuild_token:
-    required: false
-    default: ''
+    required: true
     description: |
-      The private auth token used to access nixbuild.net. If you use SSH key
-      authentication (by configuring nixbuild_ssh_key) this setting
-      can be unset, but one of the settings must be set in order for
-      authentication to work.
+      The private auth token used to access nixbuild.net.
+
+      You should not add your private token directly to the workflow file but
+      instead define a GitHub Secret for it, to avoid mistakenly sharing your
+      token with others.
+
+      Follow the instructions in the README of this action for instructions
+      on how to create and configure your auth token.
 
       The token must have the permissions 'build:read', 'build:write',
       'store:read' and 'store:write'.
 
       See https://docs.nixbuild.net/access-control/ for more details on auth
-      tokens.
-
-      You should not add your private token directly to the workflow file but
-      instead define a GitHub Secret for it, to avoid mistakenly sharing your
-      token with others.
+      tokens and permissions.
 
 
   generate_summary_for:
