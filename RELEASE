@@ -1,7 +1,5 @@
-v18
+v19
 
 ## Changes
 
-* ci-workflow: Update `nix-quick-install-action` to v24.
-
-* ci-workflow: Add a `github_access_token` setting that is forwarded to `nix-quick-install-action` and enables Nix to use a specific access token when fetching from GitHub.
+* Support for using a public SSH key to access nixbuild.net has been removed, only auth tokens are now supported. Please see the README for instructions on how to setup auth tokens.
