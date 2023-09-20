@@ -33,6 +33,9 @@ inputs:
       can be unset, but one of the settings must be set in order for
       authentication to work.
 
+      The token must at least have the permissions 'build:read', 'build:write',
+      'store:read', 'store:write' and 'account:read'.
+
       You should not add your private token directly to the workflow file but
       instead define a GitHub Secret for it, to avoid mistakenly sharing your
       token with others.
