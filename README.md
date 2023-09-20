@@ -71,98 +71,27 @@ Nix expressions, use `nixbuild-action`.
 
 ### Prerequisites
 
-First, register for a [nixbuild.net account](https://nixbuild.net/#register).
-Every account includes free build hours, so you can try this action out for
-free.
+1. Register for a [nixbuild.net account](https://nixbuild.net/#register).
+   Every account includes free build hours, so you can try out this action
+   without paying for anything.
 
-Then, decide on using an **SSH key** or an **auth token** for authenticating
-with nixbuild.net. Currently, it is recommended to use SSH keys, since token
-authentication is a new, not fully developed feature of nixbuild.net. The
-workflow examples in this README all uses SSH key authentication, but they
-should also work with auth tokens.
-
-You should follow the instructions in one of the two sections below, not both.
-
-#### SSH Key Authentication
-
-1. It is highly advisable to create a new SSH key specifically for GitHub's
-   access to your nixbuild.net account. That way you can revoke GitHub's access
-   at any time and still manage your account with your main SSH key. You can
-   add and remove SSH keys to your nixbuild.net account with the
-   [nixbuild.net shell](https://docs.nixbuild.net/getting-started/#adding-an-ssh-key).
-
-   ```text
-   $ ssh-keygen -t ed25519 -N "" -C "github" -f github-nixbuild-key
-
-   $ cat github-nixbuild-key.pub
-   ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMTOsCkG3Y/zZjSDPKflA5opCHEDBrGySTxK9SqbU979 github
-
-   $ ssh eu.nixbuild.net shell
-   nixbuild.net> ssh-keys add ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMTOsCkG3Y/zZjSDPKflA5opCHEDBrGySTxK9SqbU979 github
-   Key added to account
-   ```
-
-   If you don't have a specific reason not to, you should disable access to
-   the [nixbuild.net shell](http://docs.nixbuild.net/nixbuild-shell/#nixbuild-shell)
-   for your new shell, using the
-   [allow-shell](https://docs.nixbuild.net/settings/#allow-shell) setting:
+2. Generate an [auth token](https://docs.nixbuild.net/access-control/#using-auth-tokens)
+   using the nixbuild.net shell:
 
    ```
    $ ssh eu.nixbuild.net shell
-   nixbuild.net> settings allow-shell --ssh-key set github --set false
+   nixbuild.net> tokens create -p build:read -p build:write -p store:read -p store:write
    ```
 
-   If there is any chance that less trusted users can submit commits or PRs that
-   are able to change your GitHub Actions workflow, it is **strongly recommended**
-   that you [lock down your nixbuild.net settings](#nixbuildnet-settings). Users
-   might otherwise be able to change settings, possibly incurring unexpected
-   nixbuild.net charges.
+   You can also provide a `--ttl-seconds` option to specify the token's expiration time.
+   If you leave it out, the token will be valid for 1000 days.
 
-2. Configure your secret SSH key as a [GitHub Secret](https://docs.github.com/en/actions/reference/encrypted-secrets)
+3. Store your token as a [GitHub Secret](https://docs.github.com/en/actions/reference/encrypted-secrets)
 
-3. Configure `nixbuild-action` to use the SSH key secret like this:
+4. Configure `nixbuild-action` to use the auth token secret like this:
 
    ```yaml
-   uses: nixbuild/nixbuild-action@v17
-   with:
-     nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
-   ```
-
-#### Token Authentication
-
-nixbuild.net has support for authenticating using
-[Biscuit](https://www.biscuitsec.org/) tokens. This is what is used for
-authenticating in nixbuild.net's [HTTP
-API](https://docs.nixbuild.net/api-usage/index.html#authorization), but it can
-also be used when interacting with nixbuild.net using Nix.
-
-Currently, the auth tokens serves the same purpose as the SSH keys; to
-authenticate nixbuild.net users. In the future, however, it will be possible
-to embed authorization policies in the Biscuit tokens, using a [policy
-language](https://www.biscuitsec.org/docs/getting-started/policies/). That way,
-you can create locked-down tokens that only have access to specific parts or
-functions of nixbuild.net.
-
-To use token-based authentication in `nixbuild-action`, follow these steps:
-
-1. Generate a token using the nixbuild.net shell:
-
-   ```
-   $ ssh eu.nixbuild.net shell
-   nixbuild.net> tokens create --ttl-seconds 525600
-   ```
-
-   The `--ttl-seconds` option specifies the token's expiration time.
-
-   The generated token allows full access to your nixbuild.net account, and
-   should be treated as a secret.
-
-2. Configure your token as a [GitHub Secret](https://docs.github.com/en/actions/reference/encrypted-secrets)
-
-3. Configure `nixbuild-action` to use the auth token secret like this:
-
-   ```yaml
-   uses: nixbuild/nixbuild-action@v17
+   uses: nixbuild/nixbuild-action@v19
    with:
      nixbuild_token: ${{ secrets.nixbuild_token }}
    ```
@@ -177,9 +106,9 @@ name: Examples
 on: push
 jobs:
   checks:
-    uses: nixbuild/nixbuild-action/.github/workflows/ci-workflow.yml@v17
+    uses: nixbuild/nixbuild-action/.github/workflows/ci-workflow.yml@v19
     secrets:
-      nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
+      nixbuild_token: ${{ secrets.nixbuild_token }}
 ```
 
 You can also use [token-based authentication](/#token-authentication) if you
@@ -228,9 +157,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: nixbuild/nix-quick-install-action@v24
-      - uses: nixbuild/nixbuild-action@v17
+      - uses: nixbuild/nixbuild-action@v19
         with:
-          nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
+          nixbuild_token: ${{ secrets.nixbuild_token }}
       - run: nix-build ...
 ```
 
@@ -287,9 +216,9 @@ summaries for an individual job, or for the complete workflow. To generate a
 summary for the job that uses `nixbuild-action`, configure it like this:
 
 ```yaml
-- uses: nixbuild/nixbuild-action@v17
+- uses: nixbuild/nixbuild-action@v19
   with:
-    nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
+    nixbuild_token: ${{ secrets.nixbuild_token }}
     generate_summary_for: 'job'
 ```
 
@@ -298,9 +227,9 @@ workflow, add a job that runs on the very end of the workflow, and configure
 it like this:
 
 ```yaml
-- uses: nixbuild/nixbuild-action@v17
+- uses: nixbuild/nixbuild-action@v19
   with:
-    nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
+    nixbuild_token: ${{ secrets.nixbuild_token }}
     generate_summary_for: 'workflow'
 ```
 
@@ -321,22 +250,15 @@ shell](http://docs.nixbuild.net/nixbuild-shell/#configure-settings).
 The settings configured for this action is communicated to nixbuild.net through
 the [SSH environment](https://docs.nixbuild.net/settings/#ssh-environment).
 This means that any setting you set here will override your
-[account](https://docs.nixbuild.net/settings/#account) and [SSH
-key](https://docs.nixbuild.net/settings/#ssh-key) settings.
+[account](https://docs.nixbuild.net/settings/#account) settings.
 
 If you want to disable the possibility to change any nixbuild.net settings
 through GitHub Actions, you can set the
 [settings-from-ssh-env](https://docs.nixbuild.net/settings/#settings-from-ssh-env)
-setting to `false`, either on the account level or the SSH key level. You need
-to change this setting from within the [nixbuild.net
+setting to `false`. You need to change this setting from within the [nixbuild.net
 shell](http://docs.nixbuild.net/nixbuild-shell/#configure-settings). If you do
 that, any nixbuild.net setting configured for the action will be **ignored**.
-Only settings configured for your nixbuild.net account or the specific SSH key
-used by your GitHub Actions workflow will then be used.
-
-If there is any chance that less trusted users can submit commits or PRs that
-are able to change your GitHub Actions workflow, it is **strongly recommended**
-that you lock down the nixbuild.net settings as described above.
+Only settings configured for your nixbuild.net account will then be used.
 
 An example workflow that turns on the
 [reuse-build-timeouts](https://docs.nixbuild.net/settings/#reuse-build-timeouts)
@@ -351,9 +273,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: nixbuild/nix-quick-install-action@v24
-      - uses: nixbuild/nixbuild-action@v17
+      - uses: nixbuild/nixbuild-action@v19
         with:
-          nixbuild_ssh_key: ${{ secrets.nixbuild_ssh_key }}
+          nixbuild_token: ${{ secrets.nixbuild_token }}
           reuse-build-timeouts: true
       - run: nix-build
 ```
