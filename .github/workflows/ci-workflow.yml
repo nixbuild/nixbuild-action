@@ -187,6 +187,16 @@ on:
           Use git-lfs when checking out the repository for the build job.
           See: https://github.com/actions/checkout
 
+      nix_on_tmpfs:
+        type: boolean
+        default: false
+        required: false
+        description: |
+          On the GitHub runner, put /nix on tmpfs to speed up evaluation. This
+          is usually fine to do, since only files used for evaluation will be
+          stored in the local Nix store. However, if you have many large
+          sources you might run out of disk space during evaluation.
+
 jobs:
 
   eval-flake:
@@ -199,7 +209,7 @@ jobs:
       - uses: nixbuild/nix-quick-install-action@v24
         with:
           github_access_token: ${{secrets.github_access_token}}
-          nix_on_tmpfs: true
+          nix_on_tmpfs: ${{inputs.nix_on_tmpfs}}
           nix_conf: |
             experimental-features = nix-command flakes
             ${{inputs.nix_conf}}
@@ -235,7 +245,7 @@ jobs:
       - uses: nixbuild/nix-quick-install-action@v24
         with:
           github_access_token: ${{secrets.github_access_token}}
-          nix_on_tmpfs: true
+          nix_on_tmpfs: ${{inputs.nix_on_tmpfs}}
           nix_conf: |
             experimental-features = nix-command flakes
             ${{inputs.nix_conf}}
