@@ -67,7 +67,7 @@ inputs:
       see https://docs.nixbuild.net/settings/#keep-builds-running.
 
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'index.js'
   post: 'summary.js'
 
