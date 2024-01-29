@@ -329,7 +329,7 @@ jobs:
         uses: actions/upload-artifact/merge@v4
         with:
           name: build-logs
-          pattern: ${{ github.job }}-build-log-*
+          pattern: build-log-*
           delete-merged: true
       - id: download
         uses: actions/download-artifact@v4
