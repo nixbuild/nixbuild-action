@@ -297,7 +297,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: |
-            build-result-${{ env.ARTIFACT_PREFIX }}
+            ${{ github.job }}-build-result-${{ env.ARTIFACT_PREFIX }}
           path: |
             ${{ env.ARTIFACT_PREFIX }}.json
 
@@ -306,7 +306,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: |
-            build-log-${{ env.ARTIFACT_PREFIX }}
+            ${{ github.job }}-build-log-${{ env.ARTIFACT_PREFIX }}
           path: |
             ${{ env.ARTIFACT_PREFIX }}.log
 
@@ -322,19 +322,19 @@ jobs:
       - id: merge-results
         uses: actions/upload-artifact/merge@v4
         with:
-          name: build-results
-          pattern: build-result-*
+          name: ${{ github.job }}-build-results
+          pattern: ${{ github.job }}-build-result-*
           delete-merged: true
       - id: merge-logs
         uses: actions/upload-artifact/merge@v4
         with:
-          name: build-logs
-          pattern: build-log-*
+          name: ${{ github.job }}-build-logs
+          pattern: ${{ github.job }}-build-log-*
           delete-merged: true
       - id: download
         uses: actions/download-artifact@v4
         with:
-          name: build-results
+          name: ${{ github.job }}-build-results
           path: ~/results
       - id: merge
         run: |
