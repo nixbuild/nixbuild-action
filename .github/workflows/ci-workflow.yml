@@ -355,7 +355,7 @@ jobs:
       - id: download
         uses: actions/download-artifact@v4
         with:
-          name: ${{ github.job }}-build-results
+          name: ${{ env.ARTIFACT_PREFIX }}-build-results
           path: ~/results
       - id: merge
         run: |
