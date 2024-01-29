@@ -197,6 +197,19 @@ on:
           stored in the local Nix store. However, if you have many large
           sources you might run out of disk space during evaluation.
 
+      artifact_prefix:
+        type: string
+        default: ''
+        required: false
+        description: |
+          The CI workflow stores two build artifacts, one for build logs and
+          one for JSON representations of the build results. To be able to
+          reuse the CI workflow multiple times inside the same workflow, a
+          unique artifact prefix is generated. If you want to set the prefix
+          yourself you can do it with this setting. Remember that you can't
+          use the same prefix for multiple invocations of the CI workflow
+          within the same workflow.
+
 jobs:
 
   eval-flake:
@@ -263,7 +276,7 @@ jobs:
       - name: "Build ${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}"
         id: build
         run: |
-          ARTIFACT_PREFIX="$(echo "${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}" | tr '":<>|*?\\/' '_')"
+          ARTIFACT_PREFIX="$(echo "${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}" | tr '":<>|*?\\/' '_')-$RANDOM$RANDOM"
           echo "ARTIFACT_PREFIX=$ARTIFACT_PREFIX" >> "$GITHUB_ENV"
 
           RESULTS="build.json"
@@ -297,7 +310,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: |
-            build-result-${{ github.job }}-${{ env.ARTIFACT_PREFIX }}
+            build-result-${{ env.ARTIFACT_PREFIX }}
           path: |
             ${{ env.ARTIFACT_PREFIX }}.json
 
@@ -306,7 +319,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: |
-            build-log-${{ github.job }}-${{ env.ARTIFACT_PREFIX }}
+            build-log-${{ env.ARTIFACT_PREFIX }}
           path: |
             ${{ env.ARTIFACT_PREFIX }}.log
 
@@ -319,16 +332,24 @@ jobs:
       success: ${{ steps.merge.outputs.success }}
       results: ${{ steps.merge.outputs.results }}
     steps:
+      - id: generate-artifact-prefix
+        run: |
+          if [ -z "${{ inputs.artifact_prefix }}" ]; then
+            ARTIFACT_PREFIX="$RANDOM$RANDOM"
+          else
+            ARTIFACT_PREFIX="${{ inputs.artifact_prefix }}"
+          fi
+          echo "ARTIFACT_PREFIX=$ARTIFACT_PREFIX" >> "$GITHUB_ENV"
       - id: merge-results
         uses: actions/upload-artifact/merge@v4
         with:
-          name: ${{ github.job }}-build-results
+          name: ${{ env.ARTIFACT_PREFIX }}-build-results
           pattern: build-result-*
           delete-merged: true
       - id: merge-logs
         uses: actions/upload-artifact/merge@v4
         with:
-          name: ${{ github.job }}-build-logs
+          name: ${{ env.ARTIFACT_PREFIX }}-build-logs
           pattern: build-log-*
           delete-merged: true
       - id: download
