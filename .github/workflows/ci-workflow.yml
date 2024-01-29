@@ -205,7 +205,7 @@ jobs:
     outputs:
       builds: ${{ steps.find-builds.outputs.builds }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: nixbuild/nix-quick-install-action@v24
         with:
           github_access_token: ${{secrets.github_access_token}}
@@ -239,7 +239,7 @@ jobs:
       matrix:
         build: ${{fromJSON(needs.eval-flake.outputs.builds)}}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           lfs: ${{ inputs.lfs }}
       - uses: nixbuild/nix-quick-install-action@v24
