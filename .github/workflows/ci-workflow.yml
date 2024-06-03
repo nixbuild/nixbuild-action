@@ -235,7 +235,9 @@ jobs:
           set -eo pipefail
           flake_json="$(mktemp)"
           # For Nix >= 2.14 we need --all-systems
-          if [[ "${{inputs.nix_version}}" =~ 2.1[456789].* ]]; then
+          if [[ "${{inputs.nix_version}}" =~ 2\.1[456789].* ]]; then
+            all_systems="--all-systems"
+          elif [[ "${{inputs.nix_version}}" =~ 2\.2.* ]]; then
             all_systems="--all-systems"
           else
             all_systems=""
