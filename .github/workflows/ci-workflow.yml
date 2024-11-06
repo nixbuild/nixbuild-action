@@ -43,6 +43,15 @@ on:
           example.
 
     inputs:
+      skip_nix_install:
+        type: boolean
+        required: false
+        default: false
+        description: |
+          If set to true, don't install Nix. This only makes sense if you use
+          a runner that already has Nix installed (most likely a self-hosted
+          runner).
+
       nix_version:
         type: string
         default: '2.24.9'
@@ -240,7 +249,8 @@ jobs:
       builds: ${{ steps.find-builds.outputs.builds }}
     steps:
       - uses: actions/checkout@v4
-      - uses: nixbuild/nix-quick-install-action@master
+      - if: ${{ ! inputs.skip_nix_install }}
+        uses: nixbuild/nix-quick-install-action@master
         with:
           github_access_token: ${{secrets.github_access_token}}
           nix_on_tmpfs: ${{inputs.nix_on_tmpfs}}
@@ -285,7 +295,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           lfs: ${{ inputs.lfs }}
-      - uses: nixbuild/nix-quick-install-action@master
+      - if: ${{ ! inputs.skip_nix_install }}
+        uses: nixbuild/nix-quick-install-action@master
         with:
           github_access_token: ${{secrets.github_access_token}}
           nix_on_tmpfs: ${{inputs.nix_on_tmpfs}}
