@@ -1,5 +1,9 @@
-v19
+v20
 
 ## Changes
 
-* Support for using a public SSH key to access nixbuild.net has been removed, only auth tokens are now supported. Please see the README for instructions on how to setup auth tokens.
+* ci-workflow: Bump `nix-quick-install-action` to the latest release ([v29](https://github.com/nixbuild/nix-quick-install-action/releases/tag/v29)).
+
+* ci-workflow: Fix artifact naming issues.
+
+* ci-workflow: Disable default usage of `tmpfs` for the Nix store (can be enabled manually).
