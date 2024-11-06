@@ -90,6 +90,13 @@ on:
           option have any effect. If `ignore_build_failures` is true, no builds
           will be cancelled.
 
+      runs_on:
+        type: string
+        default: 'ubuntu-latest'
+        required: false
+        description: |
+          The GitHub Actions runner to use.
+
       filter_builds:
         type: string
         required: false
@@ -228,7 +235,7 @@ jobs:
 
   eval-flake:
     name: "Evaluate flake"
-    runs-on: ubuntu-latest
+    runs-on: ${{inputs.runs_on}}
     outputs:
       builds: ${{ steps.find-builds.outputs.builds }}
     steps:
@@ -269,7 +276,7 @@ jobs:
   build:
     name: ${{matrix.build.label}}
     needs: eval-flake
-    runs-on: ubuntu-latest
+    runs-on: ${{inputs.runs_on}}
     strategy:
       fail-fast: ${{ inputs.fail_fast }}
       matrix:
@@ -358,7 +365,7 @@ jobs:
   summary:
     name: "Summary"
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ${{inputs.runs_on}}
     outputs:
       success: ${{ steps.merge.outputs.success }}
       results: ${{ steps.merge.outputs.results }}
