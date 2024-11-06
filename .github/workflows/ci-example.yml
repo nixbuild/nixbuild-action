@@ -17,7 +17,7 @@ jobs:
 
       # By default the CI Workflow uses flake.nix from the repository root, but
       # we want it to use our example flake here
-      flake_directory: examples/using-the-ci-workflow
+      flake: ./examples/using-the-ci-workflow
 
       # Tweak the label shown for each job. This is done with a jq expression
       # that produces a string based on the build's fields
