@@ -95,10 +95,11 @@ add_env "NIXBUILDNET_TAG_GITHUB_INVOCATION_ID" "$(basename "$INVOCATION_ID")"
 echo "SetEnv$nixbuildnet_env" >> "$SSH_CONFIG_FILE"
 
 
-# Append ssh config to system config
-sudo mkdir -p /etc/ssh
-sudo touch /etc/ssh/ssh_config
-sudo tee -a /etc/ssh/ssh_config < "$SSH_CONFIG_FILE" >/dev/null
+# Append ssh config to user config
+mkdir -p ~/.ssh
+touch ~/.ssh/config
+tee -a ~/.ssh/config < "$SSH_CONFIG_FILE" >/dev/null
+echo "NIX_SSHOPTS=-F$(echo ~)/.ssh/config" >> "$GITHUB_ENV"
 
 
 # Setup Nix builders
