@@ -107,31 +107,23 @@ eu.nixbuild.net aarch64-linux - 200 1 big-parallel,benchmark
 EOF
 
 
-# Setup nix config (TODO: proper parser)
-NIXOS_CACHE="http://cache.nixos.org"
-NIXOS_CACHE_PUBKEY="cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-NIXBUILD_CACHE="ssh://eu.nixbuild.net?priority=100"
-NIXBUILD_CACHE_PUBKEY="$(ssh -F"$SSH_CONFIG_FILE" eu.nixbuild.net api show public-signing-key | jq -r '"\(.keyName):\(.publicKey)"')"
+# Setup Nix config
+NIX_CONF_FILE="$(mktemp)"
+NIXBUILD_SUBSTITUTER="ssh://eu.nixbuild.net?priority=100"
+NIXBUILD_SUBSTITUTER_PUBKEY="$(
+  ssh -F"$SSH_CONFIG_FILE" \
+    eu.nixbuild.net api settings signing-key-for-builds --show | \
+      jq -r '"\(.keyName):\(.publicKey)"'
+)"
 
-NIX_CONF_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/nix/nix.conf"
-mkdir -p "$(dirname "$NIX_CONF_FILE")"
-touch "$NIX_CONF_FILE"
-
-prev_substituters="$(echo "substituters = $NIXOS_CACHE" | cat "$NIX_CONF_FILE" - | egrep -m1 '^substituters =')"
-substituters="$prev_substituters $NIXBUILD_CACHE"
-
-prev_public_keys="$(echo "trusted-public-keys = $NIXOS_CACHE_PUBKEY" | cat "$NIX_CONF_FILE" - | egrep -m1 '^trusted-public-keys =')"
-public_keys="$prev_public_keys $NIXBUILD_CACHE_PUBKEY"
-
-egrep -v "substituters =|trusted-public-keys =" "$NIX_CONF_FILE" >"$NIX_CONF_FILE.tmp" || true
-
-cat >>"$NIX_CONF_FILE.tmp" <<EOF
-$substituters
-$public_keys
+cat >>"$NIX_CONF_FILE" <<EOF
+${NIX_CONFIG:-}
+extra-substituters = $NIXBUILD_SUBSTITUTER
+extra-trusted-public-keys = $NIXBUILD_SUBSTITUTER_PUBKEY
 max-jobs = 0
 builders = @$NIX_BUILDERS_FILE
 builders-use-substitutes = true
 require-sigs = true
 EOF
 
-mv "$NIX_CONF_FILE.tmp" "$NIX_CONF_FILE"
+echo "NIX_CONFIG=include $NIX_CONF_FILE" >> "$GITHUB_ENV"
