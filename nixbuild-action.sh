@@ -95,10 +95,8 @@ add_env "NIXBUILDNET_TAG_GITHUB_INVOCATION_ID" "$(basename "$INVOCATION_ID")"
 echo "SetEnv$nixbuildnet_env" >> "$SSH_CONFIG_FILE"
 
 
-# Append ssh config to system config
-sudo mkdir -p /etc/ssh
-sudo touch /etc/ssh/ssh_config
-sudo tee -a /etc/ssh/ssh_config < "$SSH_CONFIG_FILE" >/dev/null
+# Instruct Nix to use our SSH config
+echo "NIX_SSHOPTS=-F$SSH_CONFIG_FILE" >> "$GITHUB_ENV"
 
 
 # Setup Nix builders
@@ -113,7 +111,7 @@ EOF
 NIXOS_CACHE="http://cache.nixos.org"
 NIXOS_CACHE_PUBKEY="cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
 NIXBUILD_CACHE="ssh://eu.nixbuild.net?priority=100"
-NIXBUILD_CACHE_PUBKEY="$(ssh eu.nixbuild.net api show public-signing-key | jq -r '"\(.keyName):\(.publicKey)"')"
+NIXBUILD_CACHE_PUBKEY="$(ssh -F"$SSH_CONFIG_FILE" eu.nixbuild.net api show public-signing-key | jq -r '"\(.keyName):\(.publicKey)"')"
 
 NIX_CONF_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/nix/nix.conf"
 mkdir -p "$(dirname "$NIX_CONF_FILE")"
