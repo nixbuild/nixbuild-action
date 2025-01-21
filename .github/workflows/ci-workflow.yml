@@ -101,7 +101,7 @@ on:
 
       runs_on:
         type: string
-        default: 'ubuntu-latest'
+        default: 'ubuntu-24.04'
         required: false
         description: |
           The GitHub Actions runner to use.

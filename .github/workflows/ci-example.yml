@@ -39,7 +39,7 @@ jobs:
   # build results are what we expected.
   results:
     name: Verify results
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: checks
     steps:
       - uses: actions/checkout@v4
