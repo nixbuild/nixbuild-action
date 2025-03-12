@@ -54,12 +54,12 @@ on:
 
       nix_version:
         type: string
-        default: '2.24.9'
+        default: '2.24.12'
         required: false
         description: |
           The version of Nix that should be used.
           See available versions at
-          https://github.com/nixbuild/nix-quick-install-action/releases/tag/v28.
+          https://github.com/nixbuild/nix-quick-install-action/releases/tag/v30.
 
       nix_conf:
         type: string
@@ -250,7 +250,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - if: ${{ ! inputs.skip_nix_install }}
-        uses: nixbuild/nix-quick-install-action@master
+        uses: nixbuild/nix-quick-install-action@v30
         with:
           github_access_token: ${{secrets.github_access_token}}
           nix_on_tmpfs: ${{inputs.nix_on_tmpfs}}
@@ -296,7 +296,7 @@ jobs:
         with:
           lfs: ${{ inputs.lfs }}
       - if: ${{ ! inputs.skip_nix_install }}
-        uses: nixbuild/nix-quick-install-action@master
+        uses: nixbuild/nix-quick-install-action@v30
         with:
           github_access_token: ${{secrets.github_access_token}}
           nix_on_tmpfs: ${{inputs.nix_on_tmpfs}}
