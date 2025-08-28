@@ -14,7 +14,7 @@ async function run() {
       }
     }
     core.exportVariable('NIXBUILD_TOKEN', core.getInput('nixbuild_token'));
-    if (core.getBooleanInput('oidc') {
+    if (core.getBooleanInput('oidc')) {
       core.exportVariable('OIDC', '1')
     } else {
       core.exportVariable('OIDC', '0')
