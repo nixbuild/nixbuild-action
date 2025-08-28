@@ -43,6 +43,7 @@ UserKnownHostsFile $SSH_KNOWN_HOSTS_FILE
 ControlPath none
 ServerAliveInterval 60
 IPQoS throughput
+SendEnv NIXBUILDNET_OIDC_ID_TOKEN_*
 EOF
 
 
