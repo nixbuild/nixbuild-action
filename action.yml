@@ -38,6 +38,21 @@ inputs:
 
       If set to '', no summary will be generated.
 
+  oidc:
+    required: false
+    default: false
+    description: |
+      If enabled, nixbuild-action will automatically fetch an OIDC ID
+      Token from GitHub and pass it on to nixbuild.net so that OIDC claims
+      can be used when authoring Biscuit policies. If this settings is enabled,
+      you must make sure your job has the 'id-token: write' permission enabled.
+
+      If you want to use OIDC, but instead want fetch the token yourself, keep
+      the 'oidc' setting off, but make sure you add the fetched token an
+      environment variable prefixed 'NIXBUILDNET_OIDC_ID_TOKEN_' before
+      installing nixbuild-action. The OIDC ID Token must have the audience
+      'nixbuild.net'.
+
 
   caches:
     required: false

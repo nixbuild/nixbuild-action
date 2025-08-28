@@ -60,6 +60,16 @@ else # Invalid auth config
 fi
 
 
+# Fetch OIDC ID Token
+if [ -n "$OIDC" ] && [ "$OIDC" = "1" ]; then
+  echo "NIXBUILDNET_OIDC_ID_TOKEN_GHA=$(curl -sSL \
+    -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+    "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=nixbuild.net" | \
+    jq -j .value
+  )" >> "$GITHUB_ENV"
+fi
+
+
 # Setup nixbuild.net settings
 for setting in \
   caches \
