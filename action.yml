@@ -44,7 +44,7 @@ inputs:
     description: |
       If enabled, nixbuild-action will automatically fetch an OIDC ID
       Token from GitHub and pass it on to nixbuild.net so that OIDC claims
-      can be used when authoring Biscuit policies. If this settings is enabled,
+      can be used when authoring Biscuit policies. If this setting is enabled,
       you must make sure your job has the 'id-token: write' permission enabled.
 
       If you want to use OIDC, but instead want fetch the token yourself, keep
