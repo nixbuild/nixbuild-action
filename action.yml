@@ -49,7 +49,7 @@ inputs:
 
       If you want to use OIDC, but instead want fetch the token yourself, keep
       the 'oidc' setting off, but make sure you add the fetched token an
-      environment variable prefixed 'NIXBUILDNET_OIDC_ID_TOKEN_' before
+      environment variable named 'NIXBUILDNET_OIDC_ID_TOKEN' before
       installing nixbuild-action. The OIDC ID Token must have the audience
       'nixbuild.net'.
 

@@ -43,7 +43,7 @@ UserKnownHostsFile $SSH_KNOWN_HOSTS_FILE
 ControlPath none
 ServerAliveInterval 60
 IPQoS throughput
-SendEnv NIXBUILDNET_OIDC_ID_TOKEN_*
+SendEnv NIXBUILDNET_OIDC_ID_TOKEN
 EOF
 
 
@@ -62,7 +62,7 @@ fi
 
 # Fetch OIDC ID Token
 if [ -n "$OIDC" ] && [ "$OIDC" = "1" ]; then
-  echo "NIXBUILDNET_OIDC_ID_TOKEN_GHA=$(curl -sSL \
+  echo "NIXBUILDNET_OIDC_ID_TOKEN=$(curl -sSL \
     -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
     "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=nixbuild.net" | \
     jq -j .value
