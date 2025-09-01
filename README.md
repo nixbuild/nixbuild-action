@@ -153,8 +153,8 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
-      - uses: nixbuild/nix-quick-install-action@v24
-      - uses: nixbuild/nixbuild-action@v19
+      - uses: nixbuild/nix-quick-install-action@v33
+      - uses: nixbuild/nixbuild-action@v20
         with:
           nixbuild_token: ${{ secrets.nixbuild_token }}
       - run: nix-build ...
@@ -269,8 +269,8 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
-      - uses: nixbuild/nix-quick-install-action@v24
-      - uses: nixbuild/nixbuild-action@v19
+      - uses: nixbuild/nix-quick-install-action@v33
+      - uses: nixbuild/nixbuild-action@v20
         with:
           nixbuild_token: ${{ secrets.nixbuild_token }}
           reuse-build-timeouts: true
