@@ -318,7 +318,7 @@ jobs:
             experimental-features = nix-command flakes
             ${{inputs.nix_conf}}
           nix_version: ${{inputs.nix_version}}
-      - uses: nixbuild/nixbuild-action@master
+      - uses: nixbuild/nixbuild-action@v21
         with:
           nixbuild_token: ${{secrets.nixbuild_token}}
           oidc: ${{inputs.oidc}}
@@ -436,7 +436,7 @@ jobs:
           fi
       - name: Generate nixbuild.net summary
         if: ${{ always() && inputs.generate_build_summary }}
-        uses: nixbuild/nixbuild-action@master
+        uses: nixbuild/nixbuild-action@v21
         with:
           nixbuild_token: ${{secrets.nixbuild_token}}
           oidc: ${{inputs.oidc}}
