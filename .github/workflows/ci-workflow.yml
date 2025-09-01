@@ -79,6 +79,7 @@ on:
           arguments.
 
       oidc:
+        type: boolean
         required: false
         default: false
         description: |
