@@ -286,6 +286,9 @@ jobs:
   build:
     name: ${{matrix.build.label}}
     needs: eval-flake
+    permissions:
+      id-token: write
+      contents: read
     runs-on: ${{inputs.runs_on}}
     strategy:
       fail-fast: ${{ inputs.fail_fast }}
@@ -307,6 +310,7 @@ jobs:
       - uses: nixbuild/nixbuild-action@master
         with:
           nixbuild_token: ${{secrets.nixbuild_token}}
+          oidc: true
           caches: ${{inputs.caches}}
           reuse-build-failures: ${{inputs.reuse-build-failures}}
           reuse-build-timeouts: ${{inputs.reuse-build-timeouts}}
@@ -376,6 +380,9 @@ jobs:
   summary:
     name: "Summary"
     needs: build
+    permissions:
+      id-token: write
+      contents: read
     runs-on: ${{inputs.runs_on}}
     outputs:
       success: ${{ steps.merge.outputs.success }}
@@ -421,4 +428,5 @@ jobs:
         uses: nixbuild/nixbuild-action@master
         with:
           nixbuild_token: ${{secrets.nixbuild_token}}
+          oidc: true
           generate_summary_for: 'workflow'
