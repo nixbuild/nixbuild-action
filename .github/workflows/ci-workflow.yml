@@ -297,9 +297,6 @@ jobs:
   build:
     name: ${{matrix.build.label}}
     needs: eval-flake
-    permissions:
-      id-token: write
-      contents: read
     runs-on: ${{inputs.runs_on}}
     strategy:
       fail-fast: ${{ inputs.fail_fast }}
@@ -391,9 +388,6 @@ jobs:
   summary:
     name: "Summary"
     needs: build
-    permissions:
-      id-token: write
-      contents: read
     runs-on: ${{inputs.runs_on}}
     outputs:
       success: ${{ steps.merge.outputs.success }}
