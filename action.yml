@@ -53,6 +53,47 @@ inputs:
       installing nixbuild-action. The OIDC ID Token must have the audience
       'nixbuild.net'.
 
+  ssh_address:
+    required: false
+    default: 'eu.nixbuild.net'
+    description: |
+      If you are running a self-hosted nixbuild.net deployment you can set
+      this option to the address of your SSH endpoint.
+
+  ssh_port:
+    required: false
+    default: 22
+    description: |
+      If you are running a self-hosted nixbuild.net deployment you can set
+      this option to the port of your SSH endpoint.
+
+  ssh_public_host_key:
+    required: false
+    default: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPIQCZc54poJ8vqawd8TraNryQeJnvH1eLpIDgbiqymM'
+    description: |
+      If you are running a self-hosted nixbuild.net deployment you can set
+      this option to the public host key of your SSH endpoint.
+
+  http_api_host:
+    required: false
+    default: 'api.nixbuild.net'
+    description: |
+      If you are running a self-hosted nixbuild.net deployment you can set
+      this option to the host address of your HTTP API endpoint.
+
+  http_api_port:
+    required: false
+    default: 443
+    description: |
+      If you are running a self-hosted nixbuild.net deployment you can set
+      this option to the port your HTTP API endpoint.
+
+  http_api_scheme:
+    required: false
+    default: 'https'
+    description: |
+      If you are running a self-hosted nixbuild.net deployment you can set
+      this option to the schema (http or https) of your HTTP API endpoint.
 
   caches:
     required: false

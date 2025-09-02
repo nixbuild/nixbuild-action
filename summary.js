@@ -1,9 +1,14 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
 const child_process = require('child_process');
+const http = require('http');
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
+
+function getHttpModule() {
+  return core.getInput('http_api_scheme').startsWith("https") ? https : http;
+}
 
 // https://stackoverflow.com/a/18650828
 function formatBytes(bytes, decimals = 3) {
@@ -79,12 +84,13 @@ function generateSummary(token, allJobs) {
     `tags=GITHUB_REPOSITORY:${repository},GITHUB_RUN_ID:${run_id},GITHUB_RUN_ATTEMPT:${run_attempt}` :
     `tags=GITHUB_REPOSITORY:${repository},GITHUB_INVOCATION_ID:${invocation_id}`;
   const summaryOpts = {
-    host: 'api.nixbuild.net',
+    host: core.getInput('http_api_host'),
+    port: Number(core.getInput('http_api_port')),
     path: '/builds/summary?' + queryParams,
     method: 'GET',
     headers: {'Authorization': 'Bearer ' + token}
   };
-  const summaryReq = https.request(summaryOpts, function (summaryRes) {
+  const summaryReq = getHttpModule().request(summaryOpts, function (summaryRes) {
     var summaryBody = '';
     summaryRes.on('data', function (chunk) {
       summaryBody += chunk;

@@ -17,6 +17,10 @@ function add_env() {
   nixbuildnet_env="$nixbuildnet_env $key=\"$val\""
 }
 
+function get_input() {
+  printenv INPUTS_JSON | jq -r ".\"$1\""
+}
+
 # Create a unique invocation id, since there is no way to separate different
 # instances of the same job (created with a build matrix). GitHub should really
 # expose a "step id" in addition to their run id.
@@ -24,22 +28,27 @@ export INVOCATION_ID="$(od -x /dev/urandom | head -1 | awk '{OFS="-"; srand($6);
 echo -n "$INVOCATION_ID" > "$HOME/__nixbuildnet_invocation_id"
 
 
+# Export the HTTP API address
+echo "NIXBUILDNET_HTTP_API_HOST=$(get_input HTTP_API_HOST)" >> "$GITHUB_ENV"
+echo "NIXBUILDNET_HTTP_API_SCHEMA=$(get_input HTTP_API_SCHEMA)" >> "$GITHUB_ENV"
+echo "NIXBUILDNET_HTTP_API_PORT=$(get_input HTTP_API_PORT)" >> "$GITHUB_ENV"
+
+
 # Setup known_hosts
 SSH_KNOWN_HOSTS_FILE="$(mktemp)"
-echo >"$SSH_KNOWN_HOSTS_FILE" \
-  eu.nixbuild.net \
-  ssh-ed25519 \
-  AAAAC3NzaC1lZDI1NTE5AAAAIPIQCZc54poJ8vqawd8TraNryQeJnvH1eLpIDgbiqymM
+echo >"$SSH_KNOWN_HOSTS_FILE" nixbuild "$(get_input SSH_PUBLIC_HOST_KEY)"
 
 
 # Create ssh config
 SSH_CONFIG_FILE="$(mktemp)"
 cat >"$SSH_CONFIG_FILE" <<EOF
-Host eu.nixbuild.net
-HostName eu.nixbuild.net
+Host nixbuild "$(get_input SSH_ADDRESS)"
+Hostname "$(get_input SSH_ADDRESS)"
+Port "$(get_input SSH_PORT)"
+HostKeyAlias nixbuild
 LogLevel ERROR
 StrictHostKeyChecking yes
-UserKnownHostsFile $SSH_KNOWN_HOSTS_FILE
+UserKnownHostsFile "$SSH_KNOWN_HOSTS_FILE"
 ControlPath none
 ServerAliveInterval 60
 IPQoS throughput
@@ -128,17 +137,17 @@ echo "NIX_SSHOPTS=-F$SSH_CONFIG_FILE" >> "$GITHUB_ENV"
 # Setup Nix builders
 NIX_BUILDERS_FILE="$(mktemp)"
 cat >"$NIX_BUILDERS_FILE" <<EOF
-eu.nixbuild.net x86_64-linux - 200 1 big-parallel,benchmark,kvm,nixos-test
-eu.nixbuild.net aarch64-linux - 200 1 big-parallel,benchmark
+nixbuild x86_64-linux - 200 1 big-parallel,benchmark,kvm,nixos-test
+nixbuild aarch64-linux - 200 1 big-parallel,benchmark
 EOF
 
 
 # Setup Nix config
 NIX_CONF_FILE="$(mktemp)"
-NIXBUILD_SUBSTITUTER="ssh://eu.nixbuild.net?priority=100"
+NIXBUILD_SUBSTITUTER="ssh://nixbuild?priority=100"
 NIXBUILD_SUBSTITUTER_PUBKEY="$(
   ssh -F"$SSH_CONFIG_FILE" \
-    eu.nixbuild.net api settings signing-key-for-builds --show | \
+    nixbuild api settings signing-key-for-builds --show | \
       jq -r '"\(.keyName):\(.publicKey)"'
 )"
 
