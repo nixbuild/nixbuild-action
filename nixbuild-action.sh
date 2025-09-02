@@ -62,11 +62,24 @@ fi
 
 # Fetch OIDC ID Token
 if [ -n "$OIDC" ] && [ "$OIDC" = "1" ]; then
-  echo "NIXBUILDNET_OIDC_ID_TOKEN=$(curl -sSL \
-    -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-    "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=nixbuild.net" | \
-    jq -j .value
-  )" >> "$GITHUB_ENV"
+  if [ -z "${ACTIONS_ID_TOKEN_REQUEST_TOKEN+x}" ]; then
+    echo >&2 \
+      "OIDC ID Token retrieval requested, but it seems your job lacks the"
+      "'id-token: write' permission."
+    exit 1
+  else
+    NIXBUILDNET_OIDC_ID_TOKEN="$(curl -sSL \
+      -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+      "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=nixbuild.net" | \
+      jq -j .value
+    )"
+    if [ -z "${NIXBUILDNET_OIDC_ID_TOKEN+x}" ]; then
+      echo >&2 "Failed retrieving OIDC ID Token from GitHub"
+      exit 1
+    else
+      echo "NIXBUILDNET_OIDC_ID_TOKEN=$NIXBUILDNET_OIDC_ID_TOKEN" >> "$GITHUB_ENV"
+    fi
+  fi
 fi
 
 
