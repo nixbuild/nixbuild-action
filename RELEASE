@@ -1,19 +1,6 @@
-v21
+v22
 
 ## Changes
 
-* Support passing along a GitHub OIDC Token ID to nixbuild.net for use in
-  [authorization policies](https://docs.nixbuild.net/access-control/#jwt_claim).
-  Enabled by setting the new option `oidc` to `true`, and ensuring your job has
-  an `id-token: write` permission.
-
-* ci-workflow: Make the GHA runner type configurable.
-
-* ci-workflow: Replace the `flake_directory` setting with `flake`. This means
-  that you can now point ci-workflow to a flake in another repository.
-
-* ci-workflow: Add a `nix_args` setting.
-
-* ci-workflow: Make it possible to skip Nix installation.
-
-* ci-workflow: Bump `nix-quick-install-action` to the latest release ([v33](https://github.com/nixbuild/nix-quick-install-action/releases/tag/v33)).
+* ci-workflow: Fix an issue causing failures due to missing `id-token: write`
+  permission even though `oidc` set to `false`.
