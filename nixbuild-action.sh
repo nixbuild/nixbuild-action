@@ -64,7 +64,7 @@ fi
 if [ -n "$OIDC" ] && [ "$OIDC" = "1" ]; then
   if [ -z "${ACTIONS_ID_TOKEN_REQUEST_TOKEN+x}" ]; then
     echo >&2 \
-      "OIDC ID Token retrieval requested, but it seems your job lacks the"
+      "OIDC ID Token retrieval requested, but it seems your job lacks the" \
       "'id-token: write' permission."
     exit 1
   else
