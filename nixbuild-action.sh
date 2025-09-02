@@ -43,25 +43,27 @@ UserKnownHostsFile $SSH_KNOWN_HOSTS_FILE
 ControlPath none
 ServerAliveInterval 60
 IPQoS throughput
+PreferredAuthentications none
+User authtoken
 SendEnv NIXBUILDNET_OIDC_ID_TOKEN
+SendEnv NIXBUILDNET_TOKEN
 EOF
 
 
-# Setup auth
-if [ -n "$NIXBUILD_TOKEN" ]; then # Token authentication
-  echo "PreferredAuthentications none" >> "$SSH_CONFIG_FILE"
-  echo "User authtoken" >> "$SSH_CONFIG_FILE"
-  add_env "token" "$NIXBUILD_TOKEN"
-else # Invalid auth config
+# Check that we have a non-empty auth token
+if [ -z "${NIXBUILDNET_TOKEN+x}" ]; then
   echo -e >&2 \
-"It seems you have not configured the 'nixbuild_token' setting, so\n"\
-"nixbuild.net access is not possible."
+    "It seems you have not configured the 'nixbuild_token' setting, so" \
+    "nixbuild.net access is not possible."
   exit 1
+else
+  # TODO Remove once NIXBUILDNET_TOKEN is properly accepted by nixbuild.net
+  add_env "token" "$NIXBUILDNET_TOKEN"
 fi
 
 
 # Fetch OIDC ID Token
-if [ -n "$OIDC" ] && [ "$OIDC" = "1" ]; then
+if [ "$(printenv INPUTS_JSON | jq -r .OIDC)" = "true" ]; then
   if [ -z "${ACTIONS_ID_TOKEN_REQUEST_TOKEN+x}" ]; then
     echo >&2 \
       "OIDC ID Token retrieval requested, but it seems your job lacks the" \
