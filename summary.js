@@ -86,7 +86,7 @@ function generateSummary(token, allJobs) {
   const summaryOpts = {
     host: core.getInput('http_api_host'),
     port: Number(core.getInput('http_api_port')),
-    path: '/builds/summary?' + queryParams,
+    path: core.getInput('http_api_subpath') + '/builds/summary?' + queryParams,
     method: 'GET',
     headers: {'Authorization': 'Bearer ' + token}
   };
@@ -101,7 +101,7 @@ function generateSummary(token, allJobs) {
       } else {
         const s = JSON.parse(summaryBody);
         if (s.build_count > 0) {
-          const buildsOpts = { ...summaryOpts, path: '/builds?' + queryParams };
+          const buildsOpts = { ...summaryOpts, path: core.getInput('http_api_subpath') + '/builds?' + queryParams };
           const buildsReq = https.request(buildsOpts, function (buildsRes) {
             var buildsBody = '';
             buildsRes.on('data', function (chunk) {

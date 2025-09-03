@@ -95,6 +95,13 @@ inputs:
       If you are running a self-hosted nixbuild.net deployment you can set
       this option to the schema (http or https) of your HTTP API endpoint.
 
+  http_api_subpath:
+    required: false
+    default: ''
+    description: |
+      If you are running a self-hosted nixbuild.net deployment you can set
+      this option to the subpath of your HTTP API endpoint.
+
   caches:
     required: false
     description: |
