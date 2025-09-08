@@ -30,7 +30,7 @@ echo -n "$INVOCATION_ID" > "$HOME/__nixbuildnet_invocation_id"
 
 # Export the HTTP API address
 echo "NIXBUILDNET_HTTP_API_HOST=$(get_input HTTP_API_HOST)" >> "$GITHUB_ENV"
-echo "NIXBUILDNET_HTTP_API_SCHEMA=$(get_input HTTP_API_SCHEMA)" >> "$GITHUB_ENV"
+echo "NIXBUILDNET_HTTP_API_SCHEME=$(get_input HTTP_API_SCHEME)" >> "$GITHUB_ENV"
 echo "NIXBUILDNET_HTTP_API_PORT=$(get_input HTTP_API_PORT)" >> "$GITHUB_ENV"
 echo "NIXBUILDNET_HTTP_API_SUBPATH=$(get_input HTTP_API_SUBPATH)" >> "$GITHUB_ENV"
 
