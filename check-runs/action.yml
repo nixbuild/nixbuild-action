@@ -219,7 +219,7 @@ runs:
       shell: bash
       run: |
         : 🏃 Collect garbage
-        nix store gc
+        nix store gc --quiet
 
 
     - name: Save nix-eval-store cache
