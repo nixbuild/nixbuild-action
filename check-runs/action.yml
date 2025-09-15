@@ -210,7 +210,7 @@ runs:
         PROCESS_DIR="$(mktemp -d)"
         jq <"$FLAKE_INSTALLABLES" -c '.[]' | \
           xargs -d '\n' -n1 -P4 \
-            check-runs/create-process.sh "$PROCESS_DIR"
+            "${{github.action_path}}/create-process.sh" "$PROCESS_DIR"
         jq -s . "$PROCESS_DIR"/*.json
 
 
