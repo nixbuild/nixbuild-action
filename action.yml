@@ -1,5 +1,5 @@
-name: nixbuild.net
-description: Run Nix builds on nixbuild.net
+name: Setup nixbuild.net
+description: Setup Nix to use nixbuild.net
 author: Rickard Nilsson
 
 inputs:
