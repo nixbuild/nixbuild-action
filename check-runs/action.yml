@@ -118,22 +118,33 @@ runs:
       run: |
         : 🏃 Find installables
 
-        set -eo pipefail
+        # Parse Nix args
         nix_args=()
+        if [ -n "${{inputs.nix_args}}" ]; then
+          IFS='\n'
+          while read l; do
+            readarray -d ' ' -O "${#nix_args[@]}" -t nix_args < <(echo -n "$l")
+          done < <(echo "${{inputs.nix_args}}")
+        fi
+
+        # Save Nix version
         nix_version="$(nix --version)"
+
+        # Create cache key
+        CACHE_KEY="${{runner.os}}-${{github.job}}-$(
+          {
+            nix flake metadata "$FLAKE_URL" "${nix_args[@]}" --json | jq -r .fingerprint
+            cat "$FLAKE_INSTALLABLES"
+            echo "$nix_version"
+          } | md5sum | cut -d' ' -f1
+        )"
+        echo "CACHE_KEY=$CACHE_KEY" >> "$GITHUB_ENV"
 
         # For Nix >= 2.14 we need --all-systems
         if [[ "$nix_version" =~ 2\.1[456789].* ]]; then
           nix_args+=("--all-systems")
         elif [[ "$nix_version" =~ 2\.[23456789].* ]]; then
           nix_args+=("--all-systems")
-        fi
-
-        if [ -n "${{inputs.nix_args}}" ]; then
-          IFS='\n'
-          while read l; do
-            readarray -d ' ' -O "${#nix_args[@]}" -t nix_args < <(echo -n "$l")
-          done < <(echo "${{inputs.nix_args}}")
         fi
 
         # Flake eval caching stops working when referring to the flake in the
@@ -147,6 +158,7 @@ runs:
         FLAKE_URL="${{inputs.flake}}"
         echo "FLAKE_URL=$FLAKE_URL" >> "$GITHUB_ENV"
 
+        # Filter flake installables
         FLAKE_INSTALLABLES="$(mktemp)"
         echo "FLAKE_INSTALLABLES=$FLAKE_INSTALLABLES" >> "$GITHUB_ENV"
         jq_expr='
@@ -178,21 +190,13 @@ runs:
         nix flake show "$FLAKE_URL" "${nix_args[@]}" --quiet --json | \
           jq -rc "$jq_expr" > "$FLAKE_INSTALLABLES"
 
-        CACHE_KEY="${{runner.os}}-${{github.job}}-$(
-          {
-            nix flake metadata "$FLAKE_URL" "${nix_args[@]}" --json | jq -r .fingerprint
-            cat "$FLAKE_INSTALLABLES"
-            echo "$nix_version"
-          } | md5sum | cut -d' ' -f1
-        )"
-        echo "CACHE_KEY=$CACHE_KEY" >> "$GITHUB_ENV"
-
 
     - name: Evaluate and upload derivations
       shell: bash
       run: |
         : 🏃 Evaluate and upload derivations
 
+        # Parse Nix args
         nix_args=()
         if [ -n "${{inputs.nix_args}}" ]; then
           IFS='\n'
@@ -215,6 +219,7 @@ runs:
         # operation to nixbuild.net's HTTP API. Then we could first do that
         # request then `nix copy` the paths that lack valid closures remotely.
 
+        # Evaluate and copy drvs in one step (this also fills the eval cache)
         jq_expr='map(. as $x | "\(env.FLAKE_URL)#\($x.top_attr).\($x.system).\($x.attr)")|.[]'
         time (jq <"$FLAKE_INSTALLABLES" -r "$jq_expr" | \
           xargs nix copy --derivation --to ssh-ng://nixbuild "${nix_args[@]}")
@@ -225,6 +230,7 @@ runs:
       run: |
         : 🏃 Create check runs
 
+        # Create a process in nixbuild.net for each flake installable
         PROCESS_DIR="$(mktemp -d)"
         jq <"$FLAKE_INSTALLABLES" -c '.[]' | \
           xargs -d '\n' -n1 -P4 \
