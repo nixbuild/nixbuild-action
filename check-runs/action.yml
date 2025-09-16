@@ -88,6 +88,8 @@ runs:
           echo "store = /run/nix-eval-store"
           echo "auto-optimise-store = false"
           echo "fsync-metadata = false"
+          echo "keep-derivations = true"
+          echo "keep-outputs = true"
           echo "EOF"
         } >> "$GITHUB_ENV"
         echo "XDG_CACHE_HOME=/run/nix-eval-store/cache" >> "$GITHUB_ENV"
