@@ -2,10 +2,24 @@
 
 set -e
 
+nix_args=()
+if [ -n "$1" ]; then
+  IFS='\n'
+  while read l; do
+    readarray -d ' ' -O "${#nix_args[@]}" -t nix_args < <(echo -n "$l")
+  done < <(echo "$1")
+fi
+shift
+
 PROCESS_DIR="$1"
-nix_installable="$(echo "$2" | \
+shift
+
+nix_installable="$(echo "$1" | \
   jq -r '. as $x | "\(env.FLAKE_URL)#\($x.top_attr).\($x.system).\($x.attr)"'
 )"
+name="$(echo "$1" | jq -r '.label')" \
+title="Build $(echo "$1" | jq -r  '. as $x | "\($x.top_attr).\($x.system).\($x.attr)"')" \
+shift
 
 # Retrieve the drv path from the attribute (evaluation has already happened,
 # this command will just read from cache)
@@ -18,13 +32,13 @@ drv="$(nix path-info --derivation "$nix_installable")"
 # Note that we are not appending '^*' or '^out' to the call below, this means
 # we just "builds" the .drv-file. Effectively, we are just registering a GC
 # root to the .drv-file.
-nix build --out-link "$(mktemp -u)" "$drv"
+nix build --out-link "$(mktemp -u)" "${nix_args[@]}" "$drv"
 
 base_url="$NIXBUILDNET_HTTP_API_SCHEME://$NIXBUILDNET_HTTP_API_HOST:$NIXBUILDNET_HTTP_API_PORT$NIXBUILDNET_HTTP_API_SUBPATH"
 
 jq -cn \
-  --arg name "$(echo "$2" | jq -r '.label')" \
-  --arg title "Build $(echo "$2" | jq -r  '. as $x | "\($x.top_attr).\($x.system).\($x.attr)"')" \
+  --arg name "$name" \
+  --arg title "$title" \
   --arg installable "$drv^*" '
   [
     {
