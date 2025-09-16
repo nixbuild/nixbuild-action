@@ -127,24 +127,13 @@ runs:
           done < <(echo "${{inputs.nix_args}}")
         fi
 
-        # Save Nix version
+        # Check Nix version
         nix_version="$(nix --version)"
-
-        # Create cache key
-        CACHE_KEY="${{runner.os}}-${{github.job}}-$(
-          {
-            nix flake metadata "$FLAKE_URL" "${nix_args[@]}" --json | jq -r .fingerprint
-            cat "$FLAKE_INSTALLABLES"
-            echo "$nix_version"
-          } | md5sum | cut -d' ' -f1
-        )"
-        echo "CACHE_KEY=$CACHE_KEY" >> "$GITHUB_ENV"
-
-        # For Nix >= 2.14 we need --all-systems
-        if [[ "$nix_version" =~ 2\.1[456789].* ]]; then
-          nix_args+=("--all-systems")
-        elif [[ "$nix_version" =~ 2\.[23456789].* ]]; then
-          nix_args+=("--all-systems")
+        if ! [[ "$nix_version" =~ 2\.1[456789].* ]]; then
+          if ! [[ "$nix_version" =~ 2\.[23456789].* ]]; then
+            echo >&2 "$nix_version is not supported. Use a newer Nix."
+            exit 1
+          fi
         fi
 
         # Flake eval caching stops working when referring to the flake in the
@@ -187,8 +176,18 @@ runs:
           map(select(${{inputs.filter_builds}})) |
           map(. as $x | (${{inputs.label_builds}}) as $l | $x + {label: $l})
         '
-        nix flake show "$FLAKE_URL" "${nix_args[@]}" --quiet --json | \
+        nix flake show "$FLAKE_URL" "${nix_args[@]}" --all-systems --quiet --json | \
           jq -rc "$jq_expr" > "$FLAKE_INSTALLABLES"
+
+        # Create cache key
+        CACHE_KEY="${{runner.os}}-${{github.job}}-$(
+          {
+            nix flake metadata "$FLAKE_URL" "${nix_args[@]}" --json | jq -r .fingerprint
+            cat "$FLAKE_INSTALLABLES"
+            echo "$nix_version"
+          } | md5sum | cut -d' ' -f1
+        )"
+        echo "CACHE_KEY=$CACHE_KEY" >> "$GITHUB_ENV"
 
 
     - name: Evaluate and upload derivations
