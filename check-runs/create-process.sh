@@ -23,7 +23,7 @@ shift
 
 # Retrieve the drv path from the attribute (evaluation has already happened,
 # this command will just read from cache)
-drv="$(nix path-info --derivation "$nix_installable")"
+drv="$(nix path-info --derivation "${nix_args[@]}" "$nix_installable")"
 
 # Register a GC root for the drv. This mean we can garbage collect the store
 # before saving the cache, pruning any things not used since last cache restore
@@ -32,7 +32,7 @@ drv="$(nix path-info --derivation "$nix_installable")"
 # Note that we are not appending '^*' or '^out' to the call below, this means
 # we just "builds" the .drv-file. Effectively, we are just registering a GC
 # root to the .drv-file.
-nix build --out-link "$(mktemp -u)" "${nix_args[@]}" "$drv"
+nix build --out-link "$(mktemp -u)" "$drv"
 
 base_url="$NIXBUILDNET_HTTP_API_SCHEME://$NIXBUILDNET_HTTP_API_HOST:$NIXBUILDNET_HTTP_API_PORT$NIXBUILDNET_HTTP_API_SUBPATH"
 
