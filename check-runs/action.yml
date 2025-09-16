@@ -59,6 +59,16 @@ inputs:
     description: |
       Bash script that should be executed before evaluating the flake.
 
+  nix_args:
+    type: string
+    default: ''
+    required: false
+    description: |
+      Nix command line arguments passed on to `nix flake show` and
+      `nix build`. The string provided here will be split on every space
+      and newline, and the resulting parts will be passed as individual
+      arguments.
+
 runs:
   using: "composite"
   steps:
@@ -165,7 +175,7 @@ runs:
           map(select(${{inputs.filter_builds}})) |
           map(. as $x | (${{inputs.label_builds}}) as $l | $x + {label: $l})
         '
-        nix flake show "$FLAKE_URL" "${nix_args[@]}" --quiet --json | \
+        nix flake show "$FLAKE_URL" "${nix_args[@]}" --quiet --json "${nix_args[@]}" | \
           jq -rc "$jq_expr" > "$FLAKE_INSTALLABLES"
 
         CACHE_KEY="${{runner.os}}-${{github.job}}-$(
@@ -183,6 +193,14 @@ runs:
       run: |
         : 🏃 Evaluate and upload derivations
 
+        nix_args=()
+        if [ -n "${{inputs.nix_args}}" ]; then
+          IFS='\n'
+          while read l; do
+            readarray -d ' ' -O "${#nix_args[@]}" -t nix_args < <(echo -n "$l")
+          done < <(echo "${{inputs.nix_args}}")
+        fi
+
         # TODO It seems that even when everything exists remotely, `nix copy`
         # is somewhat slow. This is because Nix has no way of asking for the
         # validity of complete closures. Instead it will assemble the full
@@ -199,7 +217,7 @@ runs:
 
         jq_expr='map(. as $x | "\(env.FLAKE_URL)#\($x.top_attr).\($x.system).\($x.attr)")|.[]'
         time (jq <"$FLAKE_INSTALLABLES" -r "$jq_expr" | \
-          xargs nix copy --derivation --to ssh-ng://nixbuild)
+          xargs nix copy --derivation --to ssh-ng://nixbuild "${nix_args[@]}")
 
 
     - name: Create check runs
