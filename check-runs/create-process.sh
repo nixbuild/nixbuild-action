@@ -2,8 +2,6 @@
 
 set -e
 
-set -x
-
 nix_args=()
 if [ -n "$1" ]; then
   IFS='\n'
@@ -19,8 +17,8 @@ shift
 nix_installable="$(echo "$1" | \
   jq -r '. as $x | "\(env.FLAKE_URL)#\($x.top_attr).\($x.system).\($x.attr)"'
 )"
-name="$(echo "$1" | jq -r '.label')" \
-title="Build $(echo "$1" | jq -r  '. as $x | "\($x.top_attr).\($x.system).\($x.attr)"')" \
+name="$(echo "$1" | jq -r '.label')"
+title="Build $(echo "$1" | jq -r  '. as $x | "\($x.top_attr).\($x.system).\($x.attr)"')"
 shift
 
 # Retrieve the drv path from the attribute (evaluation has already happened,
@@ -47,8 +45,8 @@ jq -cn \
       "installable": $installable,
       "attributes": [
         [ "NIXBUILDNET_HOOK_GITHUB_CHECK_RUN", "" ],
-        [ "NIXBUILDNET_GITHUB_CHECK_RUN_NAME", $name ],
-        [ "NIXBUILDNET_GITHUB_CHECK_RUN_TITLE", $title ]
+        [ "NIXBUILDNET_GITHUB_CHECK_RUN_NAME", "\($name)" ],
+        [ "NIXBUILDNET_GITHUB_CHECK_RUN_TITLE", "\($title)" ]
       ]
     }
   ]

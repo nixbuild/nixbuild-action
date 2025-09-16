@@ -175,12 +175,12 @@ runs:
           map(select(${{inputs.filter_builds}})) |
           map(. as $x | (${{inputs.label_builds}}) as $l | $x + {label: $l})
         '
-        nix flake show "$FLAKE_URL" "${nix_args[@]}" --quiet --json "${nix_args[@]}" | \
+        nix flake show "$FLAKE_URL" "${nix_args[@]}" --quiet --json | \
           jq -rc "$jq_expr" > "$FLAKE_INSTALLABLES"
 
         CACHE_KEY="${{runner.os}}-${{github.job}}-$(
           {
-            nix flake metadata "$FLAKE_URL" --json | jq -r .fingerprint
+            nix flake metadata "$FLAKE_URL" "${nix_args[@]}" --json | jq -r .fingerprint
             cat "$FLAKE_INSTALLABLES"
             echo "$nix_version"
           } | md5sum | cut -d' ' -f1
