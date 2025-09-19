@@ -46,6 +46,16 @@ inputs:
       the sub-attribute of 'flake_attr' that will be used for the build. The
       'label' attribute will be used to name the resulting GitHub Check Run.
 
+  derivations_per_concurrent_evaluation:
+    type: number
+    required: false
+    default: 100
+
+  concurrent_evaluations:
+    type: number
+    required: false
+    default: 1
+
   pre_evaluation_script:
     type: string
     required: false
@@ -202,7 +212,10 @@ runs:
         # Evaluate and copy drvs in one step (this also fills the eval cache)
         jq_expr='map(. as $x | "\(env.FLAKE_URL)#${{inputs.flake_attr}}.\($x.attr)")|.[]'
         time (jq <"$FLAKE_INSTALLABLES" -r "$jq_expr" | \
-          xargs nix copy --derivation --to ssh-ng://nixbuild "${nix_args[@]}")
+          xargs \
+            -n '${{inputs.derivations_per_concurrent_evaluation}}' \
+            -P '${{inputs.concurrent_evaluations}}' \
+            nix copy --derivation --to ssh-ng://nixbuild "${nix_args[@]}")
 
 
     - name: Create check runs
