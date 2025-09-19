@@ -22,7 +22,7 @@ nix_installable="$(echo "$1" | \
   jq -r '. as $x | "\(env.FLAKE_URL)#\(env.FLAKE_ATTR).\($x.attr)"'
 )"
 name="$(echo "$1" | jq -r '.label')"
-title="Build $(echo "$1" | jq -r  '. as $x | "\($env.FLAKE_ATTR).\($x.attr)"')"
+title="Build $(echo "$1" | jq -r  '. as $x | "\(env.FLAKE_ATTR).\($x.attr)"')"
 shift
 
 # Retrieve the drv path from the attribute (evaluation has already happened,
