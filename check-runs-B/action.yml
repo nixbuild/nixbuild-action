@@ -49,12 +49,16 @@ inputs:
   derivations_per_concurrent_evaluation:
     type: number
     required: false
-    default: 100
+    default: 1000
+    description: |
+      Don't change, not properly supported by Nix yet
 
   concurrent_evaluations:
     type: number
     required: false
     default: 1
+    description: |
+      Don't change, not properly supported by Nix yet
 
   pre_evaluation_script:
     type: string
