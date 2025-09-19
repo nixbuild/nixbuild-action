@@ -1,7 +1,6 @@
 #!/bin/bash
 
 set -e
-set -x
 
 nix_args=()
 if [ -n "$1" ]; then
