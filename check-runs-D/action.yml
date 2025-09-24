@@ -46,6 +46,11 @@ inputs:
       the sub-attribute of 'flake_attr' that will be used for the build. The
       'label' attribute will be used to name the resulting GitHub Check Run.
 
+  derivations_per_concurrent_evaluation:
+    type: number
+    required: false
+    default: 3
+
   concurrent_evaluations:
     type: number
     required: false
@@ -201,10 +206,14 @@ runs:
         # operation to nixbuild.net's HTTP API. Then we could first do that
         # request then `nix copy` the paths that lack valid closures remotely.
 
+        set -x
+
         PROCESS_DIR="$(mktemp -d)"
         time (jq <"$FLAKE_INSTALLABLES" -c '.[]' | \
           xargs \
-            -d '\n' -n1 -P '${{inputs.concurrent_evaluations}}' \
+            -d '\n' \
+            -n '${{inputs.derivations_per_concurrent_evaluation}}' \
+            -P '${{inputs.concurrent_evaluations}}' \
             "${{github.action_path}}/create-process.sh" \
               "${{inputs.nix_args}}" "$PROCESS_DIR" '${{inputs.flake_attr}}')
         jq -s . "$PROCESS_DIR"/*.json
