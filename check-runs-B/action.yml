@@ -244,7 +244,7 @@ runs:
     - name: Collect garbage
       if: always() &&
           steps.restore-nix-eval-store.outputs.cache-matched-key != env.CACHE_KEY &&
-          inputs.gc
+          (inputs.gc == 'true' || inputs.gc == 'True' || inputs.gc == 'TRUE')
       shell: bash
       run: |
         : 🏃 Collect garbage
