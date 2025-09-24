@@ -77,6 +77,11 @@ inputs:
       and newline, and the resulting parts will be passed as individual
       arguments.
 
+  gc:
+    type: boolean
+    default: true
+    required: false
+
 runs:
   using: "composite"
   steps:
@@ -237,7 +242,9 @@ runs:
 
 
     - name: Collect garbage
-      if: always() && steps.restore-nix-eval-store.outputs.cache-matched-key != env.CACHE_KEY
+      if: always() &&
+          steps.restore-nix-eval-store.outputs.cache-matched-key != env.CACHE_KEY &&
+          inputs.gc
       shell: bash
       run: |
         : 🏃 Collect garbage
