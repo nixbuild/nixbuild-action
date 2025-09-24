@@ -119,6 +119,7 @@ runs:
         # Create cache key prefix
         CACHE_KEY_PREFIX="$(
           {
+            echo '${{github.job}}'
             echo "$nix_version"
             echo '${{inputs.flake}}'
             echo '${{inputs.flake_attr}}'
