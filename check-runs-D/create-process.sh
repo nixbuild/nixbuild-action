@@ -2,8 +2,6 @@
 
 set -e
 
-set -x
-
 nix_args=()
 if [ -n "$1" ]; then
   IFS='\n'

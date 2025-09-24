@@ -200,13 +200,10 @@ runs:
         # operation to nixbuild.net's HTTP API. Then we could first do that
         # request then `nix copy` the paths that lack valid closures remotely.
 
-        set -x
-        cat "$FLAKE_INSTALLABLES"
-
         PROCESS_DIR="$(mktemp -d)"
         time (jq <"$FLAKE_INSTALLABLES" -c '.[]' | \
           xargs \
-            -n 1 -P '${{inputs.concurrent_evaluations}}' \
+            -d '\n' -n1 -P '${{inputs.concurrent_evaluations}}' \
             "${{github.action_path}}/create-process.sh" \
               "${{inputs.nix_args}}" "$PROCESS_DIR" '${{inputs.flake_attr}}')
         jq -s . "$PROCESS_DIR"/*.json
