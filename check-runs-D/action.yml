@@ -186,15 +186,6 @@ runs:
       run: |
         : 🏃 Evaluate and upload derivations and create check runs
 
-        # Parse Nix args
-        nix_args=()
-        if [ -n "${{inputs.nix_args}}" ]; then
-          IFS='\n'
-          while read l; do
-            readarray -d ' ' -O "${#nix_args[@]}" -t nix_args < <(echo -n "$l")
-          done < <(echo "${{inputs.nix_args}}")
-        fi
-
         # TODO It seems that even when everything exists remotely, `nix copy`
         # is somewhat slow. This is because Nix has no way of asking for the
         # validity of complete closures. Instead it will assemble the full
@@ -208,6 +199,9 @@ runs:
         # valid, things would be much faster. We could perhaps add such an
         # operation to nixbuild.net's HTTP API. Then we could first do that
         # request then `nix copy` the paths that lack valid closures remotely.
+
+        set -x
+        cat "$FLAKE_INSTALLABLES"
 
         PROCESS_DIR="$(mktemp -d)"
         time (jq <"$FLAKE_INSTALLABLES" -c '.[]' | \
