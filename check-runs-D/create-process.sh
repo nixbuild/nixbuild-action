@@ -21,9 +21,9 @@ shift
 
 nix_installables=()
 for x; do
-  nix_installables+="$(echo "$x" | \
+  nix_installables+=("$(echo "$x" | \
     jq -r '. as $x | "\(env.FLAKE_URL)#\(env.FLAKE_ATTR).\($x.attr)"'
-  )"
+  )")
 done
 
 export XDG_CACHE_HOME="$XDG_CACHE_HOME/$(echo "${nix_installables[@]}" | md5sum | cut -d' ' -f1)"
