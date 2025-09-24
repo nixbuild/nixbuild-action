@@ -234,10 +234,10 @@ runs:
 
         # Create a process in nixbuild.net for each flake installable
         PROCESS_DIR="$(mktemp -d)"
-        jq <"$FLAKE_INSTALLABLES" -c '.[]' | \
+        time (jq <"$FLAKE_INSTALLABLES" -c '.[]' | \
           xargs -d '\n' -n1 -P4 \
             "${{github.action_path}}/create-process.sh" \
-              "${{inputs.nix_args}}" "$PROCESS_DIR" '${{inputs.flake_attr}}'
+              "${{inputs.nix_args}}" "$PROCESS_DIR" '${{inputs.flake_attr}}')
         jq -s . "$PROCESS_DIR"/*.json
 
 
