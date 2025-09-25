@@ -46,12 +46,12 @@ inputs:
       the sub-attribute of 'flake_attr' that will be used for the build. The
       'label' attribute will be used to name the resulting GitHub Check Run.
 
-  derivations_per_concurrent_evaluation:
+  derivations_per_worker:
     type: number
     required: false
     default: 3
 
-  concurrent_evaluations:
+  evaluation_workers:
     type: number
     required: false
     default: 2
@@ -208,15 +208,23 @@ runs:
 
         set -x
 
-        PROCESS_DIR="$(mktemp -d)"
+        derivations_per_worker='${{inputs.derivations_per_worker}}'
+        evaluation_workers='${{inputs.evaluation_workers}}'
+        if (( evaluation_workers <= 0 )); then
+          derivations_per_worker=9999
+          evaluation_workers=1
+        fi
+
+        process_dir="$(mktemp -d)"
+
         time (jq <"$FLAKE_INSTALLABLES" -c '.[]' | \
           xargs \
             -d '\n' \
-            -n '${{inputs.derivations_per_concurrent_evaluation}}' \
-            -P '${{inputs.concurrent_evaluations}}' \
+            -n "$derivations_per_worker" \
+            -P "$evaluation_workers" \
             "${{github.action_path}}/create-process.sh" \
-              "${{inputs.nix_args}}" "$PROCESS_DIR" '${{inputs.flake_attr}}')
-        jq -s . "$PROCESS_DIR"/*.json
+              "${{inputs.nix_args}}" "$process_dir" '${{inputs.flake_attr}}')
+        jq -s . "$process_dir"/*.json
 
 
     - name: Collect garbage
