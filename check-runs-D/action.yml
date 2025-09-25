@@ -174,7 +174,7 @@ runs:
         echo "FLAKE_INSTALLABLES=$FLAKE_INSTALLABLES" >> "$GITHUB_ENV"
         time {
           nix eval --json "$FLAKE_URL#$FLAKE_ATTR" \
-            --apply '${{inputs.flake_apply}}' | \
+            --apply '${{inputs.flake_apply}}' "${nix_args[@]}" | \
             jq -cS '.[]' > "$FLAKE_INSTALLABLES"
         }
 
