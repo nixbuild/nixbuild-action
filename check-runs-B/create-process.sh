@@ -57,7 +57,9 @@ jq -cn \
   curl "$base_url/processes" \
     -sL \
     --fail-with-body \
-    --json "@-" \
+    --data-binary "@-" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
     -o "$PROCESS_DIR/$RANDOM$RANDOM.json" \
     -H "Authorization: Bearer $NIXBUILDNET_TOKEN" \
     -H "NIXBUILDNET-OIDC-ID-TOKEN: $NIXBUILDNET_OIDC_ID_TOKEN"
