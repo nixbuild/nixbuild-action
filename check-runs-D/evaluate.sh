@@ -34,7 +34,7 @@ for x; do
   nix_installable+=(
     "$(jq -nr --argjson x "$x" '"\(env.FLAKE_URL)#\(env.FLAKE_ATTR).\($x.attr)"')"
   )
-  name="$(jq -nr --argjson x "$x" '.label')"
+  name="$(jq -nr --argjson x "$x" '$x.label')"
   title="Build $(jq -nr --argjson x "$x" '"\(env.FLAKE_ATTR).\($x.attr)"')"
 
   # Retrieve the drv path from the attribute
