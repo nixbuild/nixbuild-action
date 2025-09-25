@@ -49,12 +49,17 @@ inputs:
   derivations_per_worker:
     type: number
     required: false
-    default: 3
+    default: 4
 
   evaluation_workers:
     type: number
     required: false
     default: 2
+
+  upload_workers:
+    type: number
+    required: false
+    default: 4
 
   pre_evaluation_script:
     type: string
@@ -159,23 +164,19 @@ runs:
           done < <(echo "${{inputs.nix_args}}")
         fi
 
-        # Flake eval caching stops working when referring to the flake in the
-        # eval store. Look into if this can be fixed, because it would be nice
-        # to avoid having the flake change under our feet during the workflow
-        # run
-        #FLAKE_URL="path:/run/nix-eval-store/$(
-        #  nix flake metadata "${{inputs.flake}}" --json | \
-        #    jq -r '.locked.dir as $dir | "\(.path)\(if $dir != "" and $dir != null then "/"+$dir else "" end)"'
-        #)"
         FLAKE_URL="${{inputs.flake}}"
         echo "FLAKE_URL=$FLAKE_URL" >> "$GITHUB_ENV"
+        FLAKE_ATTR="${{inputs.flake_attr}}"
+        echo "FLAKE_ATTR=$FLAKE_ATTR" >> "$GITHUB_ENV"
 
         # Filter flake installables
         FLAKE_INSTALLABLES="$(mktemp)"
         echo "FLAKE_INSTALLABLES=$FLAKE_INSTALLABLES" >> "$GITHUB_ENV"
-        time nix eval --json "$FLAKE_URL#${{inputs.flake_attr}}" \
-          --apply '${{inputs.flake_apply}}' | \
-          jq -rcS > "$FLAKE_INSTALLABLES"
+        time {
+          nix eval --json "$FLAKE_URL#$FLAKE_ATTR" \
+            --apply '${{inputs.flake_apply}}' | \
+            jq -cS '.[]' > "$FLAKE_INSTALLABLES"
+        }
 
         # Create cache key
         CACHE_KEY="$CACHE_KEY_PREFIX-$(
@@ -192,20 +193,6 @@ runs:
       run: |
         : 🏃 Evaluate and upload derivations and create check runs
 
-        # TODO It seems that even when everything exists remotely, `nix copy`
-        # is somewhat slow. This is because Nix has no way of asking for the
-        # validity of complete closures. Instead it will assemble the full
-        # closure locally, then send over this complete list of paths to the
-        # remote. The remote will then send back a list of all paths that are
-        # valid in that list. So, if the closure is big (which is common for
-        # eg NixOS .drv-closures), and if most or all paths exist remotely then
-        # a lot of time is wasted. First assembling the big list locally, then
-        # sending it over the network, then receiving a big list back again.
-        # Instead, if we had a way to ask if a path and its closure is
-        # valid, things would be much faster. We could perhaps add such an
-        # operation to nixbuild.net's HTTP API. Then we could first do that
-        # request then `nix copy` the paths that lack valid closures remotely.
-
         set -x
 
         derivations_per_worker='${{inputs.derivations_per_worker}}'
@@ -216,15 +203,28 @@ runs:
         fi
 
         process_dir="$(mktemp -d)"
+        lock_file="$(mktemp --dry-run)"
 
-        time (jq <"$FLAKE_INSTALLABLES" -c '.[]' | \
-          xargs \
+        time (
+          xargs <"$FLAKE_INSTALLABLES" \
+            -t \
             -d '\n' \
-            -n "$derivations_per_worker" \
             -P "$evaluation_workers" \
-            "${{github.action_path}}/create-process.sh" \
-              "${{inputs.nix_args}}" "$process_dir" '${{inputs.flake_attr}}')
+            -n "$derivations_per_worker" \
+            '${{github.action_path}}/evaluate.sh' '${{inputs.nix_args}}'
+          | xargs \
+              -t \
+              -d '\n' \
+              -P '${{upload_workers}}' \
+              -n 1 \
+              '${{github.action_path}}/upload-and-create-process.sh' \
+                "$process_dir"
+              
+        ) 9>"$lock_file" # fd 9 used for locking stdout of evaluate.sh
+
         jq -s . "$process_dir"/*.json
+
+        rm -rf "$process_dir" "$lock_file"
 
 
     - name: Collect garbage
