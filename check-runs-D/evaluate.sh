@@ -28,7 +28,7 @@ cache_dir="$XDG_CACHE_HOME/$(echo "${nix_installables[@]}" | md5sum | cut -b-8)"
 
 # Evaluate the installables in one go. This enables eval sharing within Nix.
 XDG_CACHE_HOME="$cache_dir" nix path-info \
-  --derivation "${nix_args[@]}" "${nix_installables[@]}"
+  --derivation "${nix_args[@]}" "${nix_installables[@]}" >/dev/null
 
 # Loop through the (now evaluated) installables one at a time. This is so we
 # can match the installable with its resulting drv-file
