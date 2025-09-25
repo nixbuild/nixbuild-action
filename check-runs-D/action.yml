@@ -211,7 +211,7 @@ runs:
             -d '\n' \
             -P "$evaluation_workers" \
             -n "$derivations_per_worker" \
-            '${{github.action_path}}/evaluate.sh' '${{inputs.nix_args}}'
+            '${{github.action_path}}/evaluate.sh' '${{inputs.nix_args}}' \
           | xargs \
               -t \
               -d '\n' \
