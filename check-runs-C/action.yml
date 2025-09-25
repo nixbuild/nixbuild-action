@@ -80,7 +80,7 @@ runs:
         # because the eval-store is likely very compressible
         sudo mkdir /run/nix-eval-store
         sudo mount -t tmpfs none /run/nix-eval-store \
-          -o uid=1001,gid=1001,size=100%
+          -o "uid=$(id -ru),gid=$(id -rg),size=100%"
         {
           echo "NIX_CONFIG<<EOF"
           echo -ne "${NIX_CONFIG+$NIX_CONFIG\n}"
