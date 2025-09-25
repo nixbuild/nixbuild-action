@@ -2,8 +2,6 @@
 
 set -e
 
-set -x
-
 process_dir="$1"
 shift
 

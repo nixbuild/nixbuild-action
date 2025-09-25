@@ -193,8 +193,6 @@ runs:
       run: |
         : 🏃 Evaluate and upload derivations and create check runs
 
-        set -x
-
         derivations_per_worker='${{inputs.derivations_per_worker}}'
         evaluation_workers='${{inputs.evaluation_workers}}'
         if (( evaluation_workers <= 0 )); then

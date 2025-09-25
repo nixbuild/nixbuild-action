@@ -2,8 +2,6 @@
 
 set -e
 
-set -x
-
 # Parse Nix args
 nix_args=()
 if [ -n "$1" ]; then
