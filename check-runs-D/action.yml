@@ -215,7 +215,7 @@ runs:
           | xargs \
               -t \
               -d '\n' \
-              -P '${{upload_workers}}' \
+              -P '${{inputs.upload_workers}}' \
               -n 1 \
               '${{github.action_path}}/upload-and-create-process.sh' \
                 "$process_dir"
