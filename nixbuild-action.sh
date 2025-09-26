@@ -18,7 +18,7 @@ function add_env() {
 }
 
 function get_input() {
-  jq --argjson inputs "$INPUTS_JSON" --arg k "$1" -rn '$inputs.[$k]'
+  jq --argjson inputs "$INPUTS_JSON" --arg k "$1" -rn '$inputs."\($k)"'
 }
 
 # Create a unique invocation id, since there is no way to separate different
@@ -117,14 +117,14 @@ fi
 
 # Setup nixbuild.net settings
 jq -r 'keys|.[]' "$NIXBUILDNET_SETTINGS" | while read setting; do
-  val="$(jq -r --arg setting "$setting" '.[$setting]' "$NIXBUILDNET_SETTINGS")"
+  val="$(jq -r --arg setting "$setting" '."\($setting)"' "$NIXBUILDNET_SETTINGS")"
   add_env "NIXBUILDNET_$(echo "$setting" | tr a-z- A-Z_)" "$val"
 done
 
 
 # Setup nixbuild.net tags
 jq -r 'keys|.[]' "$NIXBUILDNET_TAGS" | while read tag; do
-  val="$(jq -r --arg tag "$tag" '.[$tag]' "$NIXBUILDNET_TAGS")"
+  val="$(jq -r --arg tag "$tag" '."\($tag)"' "$NIXBUILDNET_TAGS")"
   add_env "NIXBUILDNET_TAG_$tag" "$val"
 done
 
