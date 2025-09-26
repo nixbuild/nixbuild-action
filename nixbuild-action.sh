@@ -18,7 +18,7 @@ function add_env() {
 }
 
 function get_input() {
-  printenv INPUTS_JSON | jq -r ".\"$1\""
+  jq --argjson inputs "$INPUTS_JSON" --arg k "$1" -rn '$inputs.[$k]'
 }
 
 # Create a unique invocation id, since there is no way to separate different
@@ -26,6 +26,26 @@ function get_input() {
 # expose a "step id" in addition to their run id.
 export INVOCATION_ID="$(od -x /dev/urandom | head -1 | awk '{OFS="-"; srand($6); sub(/./,"4",$5); sub(/./,substr("89ab",rand()*4,1),$6); print $2$3,$4,$5,$6,$7$8$9}')"
 echo -n "$INVOCATION_ID" > "$HOME/__nixbuildnet_invocation_id"
+
+
+# Parse and store nixbuild.net settings
+export NIXBUILDNET_SETTINGS="$(mktemp --suffix .json)"
+get_input "settings" | \
+  sed -nE 's/^([-_a-zA-Z]+)[[:space:]]*=[[:space:]]*([^"]*)/\1\n\2/p' | \
+  while read k; do
+    read v
+    jq -c --arg k "$k" --arg v "$v" -n '{($k):$v}'
+  done | jq -s 'add // {}' > "$NIXBUILDNET_SETTINGS"
+
+
+# Parse and store nixbuild.net tags
+export NIXBUILDNET_TAGS="$(mktemp --suffix .json)"
+get_input "tags" | \
+  sed -nE 's/^([-_a-zA-Z]+)[[:space:]]*=[[:space:]]*([^"]*)/\1\n\2/p' | \
+  while read k; do
+    read v
+    jq -c --arg k "$k" --arg v "$v" -n '{($k):$v}'
+  done | jq -s 'add // {}' > "$NIXBUILDNET_TAGS"
 
 
 # Export the HTTP API address
@@ -96,16 +116,16 @@ fi
 
 
 # Setup nixbuild.net settings
-for setting in \
-  caches \
-  reuse-build-failures \
-  reuse-build-timeouts \
-  keep-builds-running
-do
-  val="$(printenv INPUTS_JSON | jq -r ".\"$setting\"")"
-  if [ -n "$val" ] && [ "$val" != "null" ]; then
-    add_env "NIXBUILDNET_$(echo "$setting" | tr a-z- A-Z_)" "$val"
-  fi
+jq -r 'keys|.[]' "$NIXBUILDNET_SETTINGS" | while read setting; do
+  val="$(jq -r --arg setting "$setting" '.[$setting]' "$NIXBUILDNET_SETTINGS")"
+  add_env "NIXBUILDNET_$(echo "$setting" | tr a-z- A-Z_)" "$val"
+done
+
+
+# Setup nixbuild.net tags
+jq -r 'keys|.[]' "$NIXBUILDNET_TAGS" | while read tag; do
+  val="$(jq -r --arg tag "$tag" '.[$tag]' "$NIXBUILDNET_TAGS")"
+  add_env "NIXBUILDNET_TAG_$tag" "$val"
 done
 
 

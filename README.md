@@ -238,11 +238,7 @@ The build summaries look like this:
 
 Optionally, you can configure [nixbuild.net
 settings](https://docs.nixbuild.net/settings/) that you want your builds to
-use. Some settings are available directly as [inputs](action.yml) of this
-action. Other settings, like
-[max-cpu-hours-per-month](https://docs.nixbuild.net/settings/#max-cpu-hours-per-month),
-can only be configured through the [nixbuild.net
-shell](http://docs.nixbuild.net/nixbuild-shell/#configure-settings).
+use. You do this using the `settings` action input.
 
 The settings configured for this action is communicated to nixbuild.net through
 the [SSH environment](https://docs.nixbuild.net/settings/#ssh-environment).
@@ -273,6 +269,7 @@ jobs:
       - uses: nixbuild/nixbuild-action@v20
         with:
           nixbuild_token: ${{ secrets.nixbuild_token }}
-          reuse-build-timeouts: true
+          settings: |
+            reuse-build-timeouts = true
       - run: nix-build
 ```
