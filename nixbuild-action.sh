@@ -29,7 +29,7 @@ echo -n "$INVOCATION_ID" > "$HOME/__nixbuildnet_invocation_id"
 
 
 # Parse and store nixbuild.net settings
-export NIXBUILDNET_SETTINGS="$(mktemp --suffix .json)"
+export NIXBUILDNET_SETTINGS="$(mktemp)"
 get_input "settings" | \
   sed -nE 's/^([-_a-zA-Z]+)[[:space:]]*=[[:space:]]*([^"]*)/\1\n\2/p' | \
   while read k; do
@@ -39,7 +39,7 @@ get_input "settings" | \
 
 
 # Parse and store nixbuild.net tags
-export NIXBUILDNET_TAGS="$(mktemp --suffix .json)"
+export NIXBUILDNET_TAGS="$(mktemp)"
 get_input "tags" | \
   sed -nE 's/^([-_a-zA-Z]+)[[:space:]]*=[[:space:]]*([^"]*)/\1\n\2/p' | \
   while read k; do
