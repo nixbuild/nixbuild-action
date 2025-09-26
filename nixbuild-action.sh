@@ -118,17 +118,17 @@ fi
 
 
 # Setup nixbuild.net settings
-jq -r 'keys|.[]' "$NIXBUILDNET_SETTINGS" | while read setting; do
+while read setting; do
   val="$(jq -r --arg setting "$setting" '."\($setting)"' "$NIXBUILDNET_SETTINGS")"
   add_env "NIXBUILDNET_$(echo "$setting" | tr a-z- A-Z_)" "$val"
-done
+done <<<$(jq -r 'keys|.[]' "$NIXBUILDNET_SETTINGS")
 
 
 # Setup nixbuild.net tags
-jq -r 'keys|.[]' "$NIXBUILDNET_TAGS" | while read tag; do
+while read tag; do
   val="$(jq -r --arg tag "$tag" '."\($tag)"' "$NIXBUILDNET_TAGS")"
   add_env "NIXBUILDNET_TAG_$tag" "$val"
-done
+done <<<$(jq -r 'keys|.[]' "$NIXBUILDNET_TAGS")
 
 
 # Propagate selected GitHub Actions environment variables as nixbuild.net tags
