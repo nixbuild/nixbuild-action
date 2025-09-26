@@ -51,6 +51,9 @@ jobs:
         with:
           nixbuild_token: ${{ secrets.nixbuild_token }}
           generate_summary_for: 'job'
+          # test that we can set a tag
+          tags: |
+            label = Simple build
           # test that we can set a setting
           settings: |
             keep-builds-running = true
