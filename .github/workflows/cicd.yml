@@ -51,7 +51,12 @@ jobs:
         with:
           nixbuild_token: ${{ secrets.nixbuild_token }}
           generate_summary_for: 'job'
-          keep-builds-running: true # test that we can set a setting
+          # test that we can set a tag
+          tags: |
+            label = Simple build
+          # test that we can set a setting
+          settings: |
+            keep-builds-running = true
       - name: Run a test build
         run: |
           cat flake.nix | sed "s/__SIMPLE_TEST_BUILD__/$RANDOM$RANDOM$RANDOM$RANDOM/" > flake.nix.new
@@ -88,7 +93,9 @@ jobs:
       - uses: ./
         with:
           nixbuild_token: ${{ secrets.nixbuild_token }}
-          keep-builds-running: true # test that we can set a setting
+          # test that we can set a setting
+          settings: |
+            keep-builds-running = true
 
 
   install-with-install-nix-action:
@@ -105,4 +112,6 @@ jobs:
       - uses: ./
         with:
           nixbuild_token: ${{ secrets.nixbuild_token }}
-          keep-builds-running: true # test that we can set a setting
+          # test that we can set a setting
+          settings: |
+            keep-builds-running = true

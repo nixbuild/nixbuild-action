@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -x
+
 set -eu
 set -o pipefail
 
@@ -18,7 +20,7 @@ function add_env() {
 }
 
 function get_input() {
-  printenv INPUTS_JSON | jq -r ".\"$1\""
+  printenv INPUTS_JSON | jq --arg k "$1" -r '."\($k)"'
 }
 
 # Create a unique invocation id, since there is no way to separate different
@@ -26,6 +28,26 @@ function get_input() {
 # expose a "step id" in addition to their run id.
 export INVOCATION_ID="$(od -x /dev/urandom | head -1 | awk '{OFS="-"; srand($6); sub(/./,"4",$5); sub(/./,substr("89ab",rand()*4,1),$6); print $2$3,$4,$5,$6,$7$8$9}')"
 echo -n "$INVOCATION_ID" > "$HOME/__nixbuildnet_invocation_id"
+
+
+# Parse and store nixbuild.net settings
+export NIXBUILDNET_SETTINGS="$(mktemp)"
+get_input "SETTINGS" | \
+  sed -nE 's/^([-_a-zA-Z]+)[[:space:]]*=[[:space:]]*([^"]*)/\1\n\2/p' | \
+  while read k; do
+    read v
+    jq -c --arg k "$k" --arg v "$v" -n '{($k):$v}'
+  done | jq -s 'add // {}' > "$NIXBUILDNET_SETTINGS"
+
+
+# Parse and store nixbuild.net tags
+export NIXBUILDNET_TAGS="$(mktemp)"
+get_input "TAGS" | \
+  sed -nE 's/^([-_a-zA-Z]+)[[:space:]]*=[[:space:]]*([^"]*)/\1\n\2/p' | \
+  while read k; do
+    read v
+    jq -c --arg k "$k" --arg v "$v" -n '{($k):$v}'
+  done | jq -s 'add // {}' > "$NIXBUILDNET_TAGS"
 
 
 # Export the HTTP API address
@@ -73,7 +95,7 @@ fi
 
 
 # Fetch OIDC ID Token
-if [ "$(printenv INPUTS_JSON | jq -r .OIDC)" = "true" ]; then
+if [ "$(get_input OIDC)" = "true" ]; then
   if [ -z "${ACTIONS_ID_TOKEN_REQUEST_TOKEN+x}" ]; then
     echo >&2 \
       "OIDC ID Token retrieval requested, but it seems your job lacks the" \
@@ -96,17 +118,17 @@ fi
 
 
 # Setup nixbuild.net settings
-for setting in \
-  caches \
-  reuse-build-failures \
-  reuse-build-timeouts \
-  keep-builds-running
-do
-  val="$(printenv INPUTS_JSON | jq -r ".\"$setting\"")"
-  if [ -n "$val" ] && [ "$val" != "null" ]; then
-    add_env "NIXBUILDNET_$(echo "$setting" | tr a-z- A-Z_)" "$val"
-  fi
-done
+while read setting; do
+  val="$(jq -r --arg setting "$setting" '."\($setting)"' "$NIXBUILDNET_SETTINGS")"
+  add_env "NIXBUILDNET_$(echo "$setting" | tr a-z- A-Z_)" "$val"
+done <<<$(jq -r 'keys|.[]' "$NIXBUILDNET_SETTINGS")
+
+
+# Setup nixbuild.net tags
+while read tag; do
+  val="$(jq -r --arg tag "$tag" '."\($tag)"' "$NIXBUILDNET_TAGS")"
+  add_env "NIXBUILDNET_TAG_$tag" "$val"
+done <<<$(jq -r 'keys|.[]' "$NIXBUILDNET_TAGS")
 
 
 # Propagate selected GitHub Actions environment variables as nixbuild.net tags

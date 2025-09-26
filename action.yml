@@ -53,6 +53,28 @@ inputs:
       installing nixbuild-action. The OIDC ID Token must have the audience
       'nixbuild.net'.
 
+  settings:
+    required: false
+    default: ''
+    description: |
+      Set any nixbuild.net settings to be used for builds and requests against
+      nixbuild.net. See https://docs.nixbuild.net/settings for available
+      settings. You must have
+      https://docs.nixbuild.net/settings/index.html#settings-from-ssh-env set
+      to true (the default), otherwise the settings defined here will be
+      ignored.
+      Settings are defined by `<name> = <value>` pairs, one per line. An
+      example: `max-cpu = 2` (see https://docs.nixbuild.net/settings/#max-cpu).
+
+  tags:
+    required: false
+    default: ''
+    description: |
+      Set any nixbuild.net tags to be used for builds and requests against
+      nixbuild.net. In addition to the tags defined here, `nixbuild-action` will
+      also add a set of tags specific to the GitHub Actions workflow run.
+      Tags are defined by `<name> = <value>` pairs, one per line.
+
   ssh_address:
     required: false
     default: 'eu.nixbuild.net'
@@ -101,33 +123,6 @@ inputs:
     description: |
       If you are running a self-hosted nixbuild.net deployment you can set
       this option to the subpath of your HTTP API endpoint.
-
-  caches:
-    required: false
-    description: |
-      Set the caches setting in nixbuild.net. For documentation
-      see https://docs.nixbuild.net/settings/#caches.
-      Separate multiple caches with a comma.
-      You must have corresponding access tokens setup in your account on
-      nixbuild.net, see https://docs.nixbuild.net/settings/#access-tokens.
-
-  reuse-build-failures:
-    required: false
-    description: |
-      Set the reuse-build-failures setting in nixbuild.net. For documentation
-      see https://docs.nixbuild.net/settings/#reuse-build-failures.
-
-  reuse-build-timeouts:
-    required: false
-    description: |
-      Set the reuse-build-timeouts setting in nixbuild.net. For documentation
-      see https://docs.nixbuild.net/settings/#reuse-build-timeouts.
-
-  keep-builds-running:
-    required: false
-    description: |
-      Set the keep-builds-running setting in nixbuild.net. For documentation
-      see https://docs.nixbuild.net/settings/#keep-builds-running.
 
 runs:
   using: 'node20'
