@@ -1,6 +1,15 @@
-v22
+v23
 
 ## Changes
 
-* ci-workflow: Fix an issue causing failures due to missing `id-token: write`
-  permission even though `oidc` set to `false`.
+* Add support for pointing `nixbuild-action` to a self-hosted nixbuild.net
+  deployment.
+
+* Make it possible to set any nixbuild.net settings through the new `settings`
+  input. This also removes the inputs `caches`, `reuse-build-failures` and
+  `reuse-build-timeouts`, which can be set through the new general `settings`
+  input instead.
+
+* Make it possible to attach tags to your builds through the new `tags` input.
+  The tags can later be used in the nixbuild.net HTTP API to find specific
+  builds.
