@@ -91,7 +91,7 @@ Nix expressions, use `nixbuild-action`.
 4. Configure `nixbuild-action` to use the auth token secret like this:
 
    ```yaml
-   uses: nixbuild/nixbuild-action@v19
+   uses: nixbuild/nixbuild-action@v23
    with:
      nixbuild_token: ${{ secrets.nixbuild_token }}
    ```
@@ -106,7 +106,7 @@ name: Examples
 on: push
 jobs:
   checks:
-    uses: nixbuild/nixbuild-action/.github/workflows/ci-workflow.yml@v19
+    uses: nixbuild/nixbuild-action/.github/workflows/ci-workflow.yml@v23
     secrets:
       nixbuild_token: ${{ secrets.nixbuild_token }}
 ```
@@ -153,8 +153,8 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
-      - uses: nixbuild/nix-quick-install-action@v33
-      - uses: nixbuild/nixbuild-action@v20
+      - uses: nixbuild/nix-quick-install-action@v34
+      - uses: nixbuild/nixbuild-action@v23
         with:
           nixbuild_token: ${{ secrets.nixbuild_token }}
       - run: nix-build ...
@@ -213,7 +213,7 @@ summaries for an individual job, or for the complete workflow. To generate a
 summary for the job that uses `nixbuild-action`, configure it like this:
 
 ```yaml
-- uses: nixbuild/nixbuild-action@v19
+- uses: nixbuild/nixbuild-action@v23
   with:
     nixbuild_token: ${{ secrets.nixbuild_token }}
     generate_summary_for: 'job'
@@ -224,7 +224,7 @@ workflow, add a job that runs on the very end of the workflow, and configure
 it like this:
 
 ```yaml
-- uses: nixbuild/nixbuild-action@v19
+- uses: nixbuild/nixbuild-action@v23
   with:
     nixbuild_token: ${{ secrets.nixbuild_token }}
     generate_summary_for: 'workflow'
@@ -265,8 +265,8 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
-      - uses: nixbuild/nix-quick-install-action@v33
-      - uses: nixbuild/nixbuild-action@v20
+      - uses: nixbuild/nix-quick-install-action@v34
+      - uses: nixbuild/nixbuild-action@v23
         with:
           nixbuild_token: ${{ secrets.nixbuild_token }}
           settings: |
