@@ -271,5 +271,32 @@ jobs:
           nixbuild_token: ${{ secrets.nixbuild_token }}
           settings: |
             reuse-build-timeouts = true
-      - run: nix-build
+      - run: nix build ...
+```
+
+### nixbuild.net Enterprise Deployments
+
+`nixbuild-action` can be used together with self-hosted enterprise deployments
+of nixbuild.net like this:
+
+```yaml
+name: nixbuild.net Enterprise
+on: push
+jobs:
+  minimal:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: nixbuild/nix-quick-install-action@v34
+      - uses: nixbuild/nixbuild-action@v23
+        with:
+          nixbuild_token: ${{ secrets.nixbuild_token }}
+          ssh_address: <IP or domain name of your nixbuild.net server>
+          ssh_port: <SSH port>
+          ssh_public_host_key: 'ssh-ed25519 ...'
+          http_api_host: <IP or domain name of your nixbuild.net HTTP API>
+          http_api_port: <HTTP port>
+          http_api_scheme: <'http' or 'https'>
+          http_api_subpath: '/api/v1'
+      - run: nix build ...
 ```
