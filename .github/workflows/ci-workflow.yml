@@ -331,7 +331,7 @@ jobs:
           nix build "${{inputs.flake}}#${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}" \
             --print-build-logs \
             --eval-store auto \
-            --store ssh-ng://eu.nixbuild.net \
+            --store ssh-ng://nixbuild \
             --builders "" --max-jobs 2 \
             --json "${nix_args[@]}" > "$RESULTS" \
             2> >(tee -a "$LOGS" >&2) || true
