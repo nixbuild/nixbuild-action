@@ -130,8 +130,12 @@ done <<<$(jq -r 'keys|.[]' "$NIXBUILDNET_SETTINGS")
 
 # Setup nixbuild.net tags
 while read tag; do
-  val="$(jq -r --arg tag "$tag" '."\($tag)"' "$NIXBUILDNET_TAGS")"
-  add_env "NIXBUILDNET_TAG_$tag" "$val"
+  if [ -n "$tag" ]; then
+    val="$(jq -r --arg tag "$tag" '."\($tag)"' "$NIXBUILDNET_TAGS")"
+    if [ "$val" != "null" ]; then
+      add_env "NIXBUILDNET_TAG_$tag" "$val"
+    fi
+  fi
 done <<<$(jq -r 'keys|.[]' "$NIXBUILDNET_TAGS")
 
 
