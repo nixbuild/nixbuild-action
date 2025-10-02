@@ -119,8 +119,12 @@ fi
 
 # Setup nixbuild.net settings
 while read setting; do
-  val="$(jq -r --arg setting "$setting" '."\($setting)"' "$NIXBUILDNET_SETTINGS")"
-  add_env "NIXBUILDNET_$(echo "$setting" | tr a-z- A-Z_)" "$val"
+  if [ -n "$setting" ]; then
+    val="$(jq -r --arg setting "$setting" '."\($setting)"' "$NIXBUILDNET_SETTINGS")"
+    if [ "$val" != "null" ]; then
+      add_env "NIXBUILDNET_$(echo "$setting" | tr a-z- A-Z_)" "$val"
+    fi
+  fi
 done <<<$(jq -r 'keys|.[]' "$NIXBUILDNET_SETTINGS")
 
 
