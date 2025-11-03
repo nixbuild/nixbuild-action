@@ -90,6 +90,22 @@ if [ "$(printenv INPUTS_JSON | jq -r .OIDC)" = "true" ]; then
       exit 1
     else
       echo "NIXBUILDNET_OIDC_ID_TOKEN=$NIXBUILDNET_OIDC_ID_TOKEN" >> "$GITHUB_ENV"
+      if [ "$(printenv INPUTS_JSON | jq -r .OIDC_TOKEN_EXCHANGE)" = "true" ]; then
+        base_url="$NIXBUILDNET_HTTP_API_SCHEME://$NIXBUILDNET_HTTP_API_HOST:$NIXBUILDNET_HTTP_API_PORT$NIXBUILDNET_HTTP_API_SUBPATH"
+        NEW_NIXBUILDNET_TOKEN="$(curl -sSL \
+          $base_url/auth/oidc-token-exchange" \
+          -H "Authorization: Bearer $NIXBUILDNET_TOKEN" \
+          -H "NIXBUILDNET-OIDC-ID-TOKEN: $NIXBUILDNET_OIDC_ID_TOKEN" \
+          -H "Content-Type: application/json" | \
+          jq -j .token
+        )"
+        if [ -z "${NEW_NIXBUILDNET_OIDC_ID_TOKEN+x}" ]; then
+          echo >&2 "Failed to exchange OIDC token. Keeping the old nixbuild token."
+        else
+          NIXBUILDNET_TOKEN="$NEW_NIXBUILDNET_TOKEN"
+          echo >&2 "Token exchange successful."
+        fi
+      fi
     fi
   fi
 fi
