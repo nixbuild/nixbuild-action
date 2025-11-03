@@ -95,7 +95,7 @@ if [ "$(printenv INPUTS_JSON | jq -r .OIDC)" = "true" ]; then
       echo "NIXBUILDNET_OIDC_ID_TOKEN=$NIXBUILDNET_OIDC_ID_TOKEN" >> "$GITHUB_ENV"
       if [ "$(printenv INPUTS_JSON | jq -r .OIDC_TOKEN_EXCHANGE)" = "true" ]; then
         base_url="$NIXBUILDNET_HTTP_API_SCHEME://$NIXBUILDNET_HTTP_API_HOST:$NIXBUILDNET_HTTP_API_PORT$NIXBUILDNET_HTTP_API_SUBPATH"
-        NEW_NIXBUILDNET_TOKEN="$(curl -sSL \
+        NEW_NIXBUILDNET_TOKEN="$(curl --fail-with-body -L \
           "$base_url/auth/oidc-token-exchange" \
           -H "Authorization: Bearer $NIXBUILDNET_TOKEN" \
           -H "NIXBUILDNET-OIDC-ID-TOKEN: $NIXBUILDNET_OIDC_ID_TOKEN" \
