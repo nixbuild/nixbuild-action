@@ -101,7 +101,7 @@ if [ "$(printenv INPUTS_JSON | jq -r .OIDC)" = "true" ]; then
           -H "NIXBUILDNET-OIDC-ID-TOKEN: $NIXBUILDNET_OIDC_ID_TOKEN" \
           -H "Content-Type: application/json"
         )"
-        if [ -z "${NEW_NIXBUILDNET_OIDC_ID_TOKEN+x}" ]; then
+        if [ -z "${NEW_NIXBUILDNET_TOKEN+x}" ]; then
           echo >&2 "Failed to exchange OIDC token. Keeping the old nixbuild token."
         else
           NIXBUILDNET_TOKEN="$NEW_NIXBUILDNET_TOKEN"
