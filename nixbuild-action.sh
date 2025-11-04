@@ -105,6 +105,7 @@ if [ "$(printenv INPUTS_JSON | jq -r .OIDC)" = "true" ]; then
           echo >&2 "Failed to exchange OIDC token. Keeping the old nixbuild token."
         else
           NIXBUILDNET_TOKEN="$NEW_NIXBUILDNET_TOKEN"
+          echo "NIXBUILDNET_TOKEN=$NIXBUILDNET_TOKEN" >> "$GITHUB_ENV"
           echo >&2 "Token exchange successful."
         fi
       fi
