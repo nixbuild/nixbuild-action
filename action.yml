@@ -59,10 +59,12 @@ inputs:
     description: |
       If enabled in tandem with 'oidc', the action will try to exchange the
       OIDC token for a nixbuild.net auth token by issuing a token exchange
-      request to nixbuild.net right after fetching the OIDC token. The exchange
-      should succeed as long as 'nixbuild_token' has account write permission.
-      The new auth token internalises the claims of the OIDC token and replaces
-      'nixbuild_token' in subsequent requests to nixbuild.net.
+      request to nixbuild.net after fetching the OIDC token. The obtained auth
+      token inherits the contents of the configured 'nixbuild_token', as well
+      as the claims of the OIDC token. The new token replaces 'nixbuild_token'
+      in subsequent requests to nixbuild.net. The new token expires after 6
+      hours, which is typically significantly longer than the duration of the
+      OIDC token, which is why you may want to this enable this setting.
 
   ssh_address:
     required: false
