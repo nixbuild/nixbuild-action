@@ -1,0 +1,247 @@
+name: nixbuild.net Check Runs
+description: |
+  Evaluate flake installables and schedule asynchronous builds on nixbuild.net,
+  automatically creating GitHub Check Runs.
+author: Rickard Nilsson
+
+inputs:
+  flake:
+    type: string
+    required: false
+    default: '.'
+    description: |
+      The flake that should be evaluated and built. By default this is `.`,
+      which means the flake located in your repository root. But you can
+      change this if your `flake.nix` is somewhere else in your repository,
+      or if you want to evaluate a flake from some other repository.
+      If you want to evaluate a flake in some subdirectory of your
+      repository you must prefix that directory with `./`.
+
+  flake_attr:
+    type: string
+    required: false
+    default: 'checks'
+    description: |
+      The top-level flake attribute that should be selected for evaluation.
+      This can be a single attribute like 'checks' or 'packages', or an
+      attribute path like 'checks.x86_64-linux'. The attribute selected will
+      be used when applying the 'flake_apply' function (see below).
+
+  flake_apply:
+    type: string
+    required: false
+    default: |
+      systems: with builtins; concatLists (
+        attrValues (mapAttrs (sys: sysAttrs: map (x: {
+          attr = "${sys}.${x}";
+          label = "${sys}.${x}";
+        }) (attrNames sysAttrs)) systems)
+      )
+    description: |
+      The function passed to 'nix eval --apply' to compute the list of builds
+      to perform. The function should take one argument which will be the result
+      of the 'flake_attr' selection (see above). The result of the function
+      should be a list of attribute sets. Each attribute set in the list should
+      have the attributes 'attr' and 'label'. The 'attr' attribute represents
+      the sub-attribute of 'flake_attr' that will be used for the build. The
+      'label' attribute will be used to name the resulting GitHub Check Run.
+
+  derivations_per_worker:
+    type: number
+    required: false
+    default: 4
+
+  evaluation_workers:
+    type: number
+    required: false
+    default: 2
+
+  upload_workers:
+    type: number
+    required: false
+    default: 4
+
+  pre_evaluation_script:
+    type: string
+    required: false
+    default: ''
+    description: |
+      Bash script that should be executed before evaluating the flake.
+
+  nix_args:
+    type: string
+    default: ''
+    required: false
+    description: |
+      Nix command line arguments passed on to `nix flake show` and
+      `nix build`. The string provided here will be split on every space
+      and newline, and the resulting parts will be passed as individual
+      arguments.
+
+  gc:
+    type: boolean
+    default: true
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup eval store
+      shell: bash
+      run: |
+        : 🏃 Setup eval store
+
+        # TODO We could use a zram-backed filesystem instead,
+        # because the eval-store is likely very compressible
+        sudo mkdir /run/nix-eval-store
+        sudo mount -t tmpfs none /run/nix-eval-store \
+          -o "uid=$(id -ru),gid=$(id -rg),size=100%"
+        {
+          echo "NIX_CONFIG<<EOF"
+          echo -ne "${NIX_CONFIG+$NIX_CONFIG\n}"
+          echo "store = /run/nix-eval-store"
+          echo "auto-optimise-store = false"
+          echo "fsync-metadata = false"
+          echo "keep-derivations = true"
+          echo "keep-outputs = true"
+          echo "EOF"
+        } >> "$GITHUB_ENV"
+        echo "XDG_CACHE_HOME=/run/nix-eval-store/cache" >> "$GITHUB_ENV"
+
+        # Check Nix version
+        nix_version="$(nix --version)"
+        if ! [[ "$nix_version" =~ 2\.1[456789].* ]]; then
+          if ! [[ "$nix_version" =~ 2\.[23456789].* ]]; then
+            echo >&2 "$nix_version is not supported. Use a newer Nix."
+            exit 1
+          fi
+        fi
+
+        # Create cache key prefix
+        CACHE_KEY_PREFIX="$(
+          {
+            echo '${{github.job}}'
+            echo "$nix_version"
+            echo '${{inputs.flake}}'
+            echo '${{inputs.flake_attr}}'
+            echo '${{inputs.flake_apply}}'
+          } | md5sum | cut -d' ' -f1
+        )"
+        echo "CACHE_KEY_PREFIX=$CACHE_KEY_PREFIX" >> "$GITHUB_ENV"
+
+
+    - name: Restore nix-eval-store cache
+      id: restore-nix-eval-store
+      uses: actions/cache/restore@v4
+      with:
+        path: |
+          /run/nix-eval-store/cache
+          /run/nix-eval-store/nix/var/nix/db
+          /run/nix-eval-store/nix/store
+        key: ${{env.CACHE_KEY_PREFIX}}-
+        restore-keys: ${{env.CACHE_KEY_PREFIX}}-
+
+
+    - name: Pre-evaluation script
+      shell: bash
+      run: |
+        : 🏃 Run pre-evaluation script
+
+        ${{inputs.pre_evaluation_script}}
+
+
+    - name: Find installables
+      shell: bash
+      run: |
+        : 🏃 Find installables
+
+        # Parse Nix args
+        nix_args=()
+        if [ -n "${{inputs.nix_args}}" ]; then
+          IFS='\n'
+          while read l; do
+            readarray -d ' ' -O "${#nix_args[@]}" -t nix_args < <(echo -n "$l")
+          done < <(echo "${{inputs.nix_args}}")
+        fi
+
+        FLAKE_URL="${{inputs.flake}}"
+        echo "FLAKE_URL=$FLAKE_URL" >> "$GITHUB_ENV"
+        FLAKE_ATTR="${{inputs.flake_attr}}"
+        echo "FLAKE_ATTR=$FLAKE_ATTR" >> "$GITHUB_ENV"
+
+        # Filter flake installables
+        FLAKE_INSTALLABLES="$(mktemp)"
+        echo "FLAKE_INSTALLABLES=$FLAKE_INSTALLABLES" >> "$GITHUB_ENV"
+        time {
+          nix eval --json "$FLAKE_URL#$FLAKE_ATTR" \
+            --apply '${{inputs.flake_apply}}' "${nix_args[@]}" | \
+            jq -cS '.[]' > "$FLAKE_INSTALLABLES"
+        }
+
+        # Create cache key
+        CACHE_KEY="$CACHE_KEY_PREFIX-$(
+          {
+            nix flake metadata "$FLAKE_URL" "${nix_args[@]}" --json | jq -r .fingerprint
+            cat "$FLAKE_INSTALLABLES"
+          } | md5sum | cut -d' ' -f1
+        )"
+        echo "CACHE_KEY=$CACHE_KEY" >> "$GITHUB_ENV"
+
+
+    - name: Evaluate and upload derivations and create check runs
+      shell: bash
+      run: |
+        : 🏃 Evaluate and upload derivations and create check runs
+
+        derivations_per_worker='${{inputs.derivations_per_worker}}'
+        evaluation_workers='${{inputs.evaluation_workers}}'
+        if (( evaluation_workers <= 0 )); then
+          derivations_per_worker=9999
+          evaluation_workers=1
+        fi
+
+        process_dir="$(mktemp -d)"
+        lock_file="$(mktemp --dry-run)"
+
+        time (
+          xargs <"$FLAKE_INSTALLABLES" \
+            -t \
+            -d '\n' \
+            -P "$evaluation_workers" \
+            -n "$derivations_per_worker" \
+            '${{github.action_path}}/evaluate.sh' '${{inputs.nix_args}}' \
+          | xargs \
+              -t \
+              -d '\n' \
+              -P '${{inputs.upload_workers}}' \
+              -n 1 \
+              '${{github.action_path}}/upload-and-create-process.sh' \
+                "$process_dir"
+              
+        ) 9>"$lock_file" # fd 9 used for locking stdout of evaluate.sh
+
+        jq -s . "$process_dir"/*.json
+
+        rm -rf "$process_dir" "$lock_file"
+
+
+    - name: Collect garbage
+      if: always() &&
+          steps.restore-nix-eval-store.outputs.cache-matched-key != env.CACHE_KEY &&
+          (inputs.gc == 'true' || inputs.gc == 'True' || inputs.gc == 'TRUE')
+      shell: bash
+      run: |
+        : 🏃 Collect garbage
+        nix store gc --quiet
+
+
+    - name: Save nix-eval-store cache
+      id: save-nix-eval-store
+      uses: actions/cache/save@v4
+      if: always() && steps.restore-nix-eval-store.outputs.cache-matched-key != env.CACHE_KEY
+      with:
+        path: |
+          /run/nix-eval-store/cache
+          /run/nix-eval-store/nix/var/nix/db
+          /run/nix-eval-store/nix/store
+        key: ${{env.CACHE_KEY}}

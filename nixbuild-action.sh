@@ -51,11 +51,14 @@ get_input "TAGS" | \
 
 
 # Export the HTTP API address
-echo "NIXBUILDNET_HTTP_API_HOST=$(get_input HTTP_API_HOST)" >> "$GITHUB_ENV"
-echo "NIXBUILDNET_HTTP_API_SCHEME=$(get_input HTTP_API_SCHEME)" >> "$GITHUB_ENV"
-echo "NIXBUILDNET_HTTP_API_PORT=$(get_input HTTP_API_PORT)" >> "$GITHUB_ENV"
-echo "NIXBUILDNET_HTTP_API_SUBPATH=$(get_input HTTP_API_SUBPATH)" >> "$GITHUB_ENV"
-
+NIXBUILDNET_HTTP_API_HOST=$(get_input HTTP_API_HOST)
+NIXBUILDNET_HTTP_API_SCHEME=$(get_input HTTP_API_SCHEME)
+NIXBUILDNET_HTTP_API_PORT=$(get_input HTTP_API_PORT)
+NIXBUILDNET_HTTP_API_SUBPATH=$(get_input HTTP_API_SUBPATH)
+echo "NIXBUILDNET_HTTP_API_HOST=$NIXBUILDNET_HTTP_API_HOST" >> "$GITHUB_ENV"
+echo "NIXBUILDNET_HTTP_API_SCHEME=$NIXBUILDNET_HTTP_API_SCHEME" >> "$GITHUB_ENV"
+echo "NIXBUILDNET_HTTP_API_PORT=$NIXBUILDNET_HTTP_API_PORT" >> "$GITHUB_ENV"
+echo "NIXBUILDNET_HTTP_API_SUBPATH=$NIXBUILDNET_HTTP_API_SUBPATH" >> "$GITHUB_ENV"
 
 # Setup known_hosts
 SSH_KNOWN_HOSTS_FILE="$(mktemp)"
@@ -112,6 +115,22 @@ if [ "$(get_input OIDC)" = "true" ]; then
       exit 1
     else
       echo "NIXBUILDNET_OIDC_ID_TOKEN=$NIXBUILDNET_OIDC_ID_TOKEN" >> "$GITHUB_ENV"
+      if [ "$(printenv INPUTS_JSON | jq -r .OIDC_TOKEN_EXCHANGE)" = "true" ]; then
+        base_url="$NIXBUILDNET_HTTP_API_SCHEME://$NIXBUILDNET_HTTP_API_HOST:$NIXBUILDNET_HTTP_API_PORT$NIXBUILDNET_HTTP_API_SUBPATH"
+        NEW_NIXBUILDNET_TOKEN="$(curl --fail-with-body -L \
+          "$base_url/auth/oidc-token-exchange" \
+          -H "Authorization: Bearer $NIXBUILDNET_TOKEN" \
+          -H "NIXBUILDNET-OIDC-ID-TOKEN: $NIXBUILDNET_OIDC_ID_TOKEN" \
+          -H "Content-Type: application/json"
+        )"
+        if [ -z "${NEW_NIXBUILDNET_TOKEN+x}" ]; then
+          echo >&2 "Failed to exchange OIDC token. Keeping the old nixbuild token."
+        else
+          NIXBUILDNET_TOKEN="$NEW_NIXBUILDNET_TOKEN"
+          echo "NIXBUILDNET_TOKEN=$NIXBUILDNET_TOKEN" >> "$GITHUB_ENV"
+          echo >&2 "Token exchange successful."
+        fi
+      fi
     fi
   fi
 fi

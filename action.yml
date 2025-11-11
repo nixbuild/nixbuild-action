@@ -1,5 +1,5 @@
-name: nixbuild.net
-description: Run Nix builds on nixbuild.net
+name: Setup nixbuild.net
+description: Setup Nix to use nixbuild.net
 author: Rickard Nilsson
 
 inputs:
@@ -74,6 +74,19 @@ inputs:
       nixbuild.net. In addition to the tags defined here, `nixbuild-action` will
       also add a set of tags specific to the GitHub Actions workflow run.
       Tags are defined by `<name> = <value>` pairs, one per line.
+
+  oidc_token_exchange:
+    required: false
+    default: false
+    description: |
+      If enabled in tandem with 'oidc', the action will try to exchange the
+      OIDC token for a nixbuild.net auth token by issuing a token exchange
+      request to nixbuild.net after fetching the OIDC token. The obtained auth
+      token inherits the contents of the configured 'nixbuild_token', as well
+      as the claims of the OIDC token. The new token replaces 'nixbuild_token'
+      in subsequent requests to nixbuild.net. The new token expires after 6
+      hours, which is typically significantly longer than the duration of the
+      OIDC token, which is why you may want to this enable this setting.
 
   ssh_address:
     required: false
