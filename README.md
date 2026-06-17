@@ -150,10 +150,10 @@ name: Examples
 on: push
 jobs:
   minimal:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: nixbuild/nix-quick-install-action@v34
+      - uses: actions/checkout@v6
+      - uses: nixbuild/nix-quick-install-action@v35
       - uses: nixbuild/nixbuild-action@v24
         with:
           nixbuild_token: ${{ secrets.nixbuild_token }}
@@ -262,10 +262,10 @@ name: Examples
 on: push
 jobs:
   minimal:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: nixbuild/nix-quick-install-action@v34
+      - uses: actions/checkout@v6
+      - uses: nixbuild/nix-quick-install-action@v35
       - uses: nixbuild/nixbuild-action@v24
         with:
           nixbuild_token: ${{ secrets.nixbuild_token }}
@@ -284,10 +284,10 @@ name: nixbuild.net Enterprise
 on: push
 jobs:
   minimal:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: nixbuild/nix-quick-install-action@v34
+      - uses: actions/checkout@v6
+      - uses: nixbuild/nix-quick-install-action@v35
       - uses: nixbuild/nixbuild-action@v24
         with:
           nixbuild_token: ${{ secrets.nixbuild_token }}
