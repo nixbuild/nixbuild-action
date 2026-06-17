@@ -138,7 +138,7 @@ inputs:
       this option to the subpath of your HTTP API endpoint.
 
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'index.js'
   post: 'summary.js'
 
