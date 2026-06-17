@@ -47,4 +47,4 @@ jobs:
         run: |
           diff \
             <(jq . ./examples/using-the-ci-workflow/expected-result.json) \
-            <(echo '${{ needs.checks.outputs.results }}' | jq -S .)
+            <(echo '${{ needs.checks.outputs.results }}' | jq -S 'walk(if type == "object" then del(.startTime, .stopTime) else . end)')
