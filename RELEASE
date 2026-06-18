@@ -1,8 +1,8 @@
-v24
+v25
 
 ## Changes
 
-* Correctly clean up tags and settings propagated to nixbuild.net.
-  deployment.
+* When OIDC is enabled, a token exchange with the nixbuild.net server is
+  performed, to allow for runs outliving the temporary initial OIDC token.
 
-* ci-workflow: Fix for self-hosted nixbuild.net deployments.
+* ci-workflow: Bump nix-quick-install-action version
