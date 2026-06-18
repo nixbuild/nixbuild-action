@@ -2,29 +2,29 @@
   "checks": {
     "aarch64-linux": {
       "firefox": {
-        "description": "A web browser built from Firefox source tree",
+        "description": "",
         "drvPath": "/nix/store/bv78cfck05q4a1aky2j7gprgsrd4g3bf-firefox-98.0.1.drv",
         "label": "firefox.aarch64-linux",
-        "name": "firefox-98.0.1",
+        "name": "",
         "outputs": {
           "out": "/nix/store/hw8x8kb8lxbh6fpq7rx250da80bcrxy7-firefox-98.0.1"
         },
         "success": true
       },
       "hello": {
-        "description": "A program that produces a familiar, friendly greeting",
+        "description": "",
         "drvPath": "/nix/store/2a60nfmxaj5160i9g2j2pygz5rjdlpnf-hello-2.12.drv",
         "label": "hello.aarch64-linux",
-        "name": "hello-2.12",
+        "name": "",
         "outputs": {
           "out": "/nix/store/q6y2d4vikjj8ahvjlikn95rhw53rc69s-hello-2.12"
         },
         "success": true
       },
       "hello-fail": {
-        "description": "A program that produces a familiar, friendly greeting",
+        "description": "",
         "label": "hello-fail.aarch64-linux",
-        "name": "hello-2.12",
+        "name": "",
         "success": false
       }
     },
