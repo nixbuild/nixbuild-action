@@ -205,6 +205,62 @@ on:
         description: |
           Set the `tags` input for nixbuild-action
 
+      ssh_address:
+        type: string
+        default: 'eu.nixbuild.net'
+        required: false
+        description: |
+          If you are running a self-hosted nixbuild.net deployment you can set
+          this option to the address of your SSH endpoint.
+
+      ssh_port:
+        type: string
+        default: '22'
+        required: false
+        description: |
+          If you are running a self-hosted nixbuild.net deployment you can set
+          this option to the port of your SSH endpoint.
+
+      ssh_public_host_key:
+        type: string
+        default: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPIQCZc54poJ8vqawd8TraNryQeJnvH1eLpIDgbiqymM'
+        required: false
+        description: |
+          If you are running a self-hosted nixbuild.net deployment you can set
+          this option to the public host key of your SSH endpoint.
+
+      http_api_host:
+        type: string
+        default: 'api.nixbuild.net'
+        required: false
+        description: |
+          If you are running a self-hosted nixbuild.net deployment you can set
+          this option to the host address of your HTTP API endpoint.
+
+      http_api_port:
+        type: string
+        default: '443'
+        required: false
+        description: |
+          If you are running a self-hosted nixbuild.net deployment you can set
+          this option to the port of your HTTP API endpoint.
+
+      http_api_scheme:
+        type: string
+        default: 'https'
+        required: false
+        description: |
+          If you are running a self-hosted nixbuild.net deployment you can set
+          this option to the schema (http or https) of your HTTP API endpoint.
+
+      http_api_subpath:
+        type: string
+        default: ''
+        required: false
+        description: |
+          If you are running a self-hosted nixbuild.net deployment you can set
+          this option to the subpath of your HTTP API endpoint.
+
       lfs:
         type: boolean
         default: false
@@ -303,6 +359,13 @@ jobs:
           oidc: ${{inputs.oidc}}
           settings: ${{inputs.settings}}
           tags: ${{inputs.tags}}
+          ssh_address: ${{inputs.ssh_address}}
+          ssh_port: ${{inputs.ssh_port}}
+          ssh_public_host_key: ${{inputs.ssh_public_host_key}}
+          http_api_host: ${{inputs.http_api_host}}
+          http_api_port: ${{inputs.http_api_port}}
+          http_api_scheme: ${{inputs.http_api_scheme}}
+          http_api_subpath: ${{inputs.http_api_subpath}}
 
       - name: Pre-build script
         run: ${{inputs.pre_build_script}}
@@ -416,3 +479,10 @@ jobs:
           nixbuild_token: ${{secrets.nixbuild_token}}
           oidc: ${{inputs.oidc}}
           generate_summary_for: 'workflow'
+          ssh_address: ${{inputs.ssh_address}}
+          ssh_port: ${{inputs.ssh_port}}
+          ssh_public_host_key: ${{inputs.ssh_public_host_key}}
+          http_api_host: ${{inputs.http_api_host}}
+          http_api_port: ${{inputs.http_api_port}}
+          http_api_scheme: ${{inputs.http_api_scheme}}
+          http_api_subpath: ${{inputs.http_api_subpath}}
