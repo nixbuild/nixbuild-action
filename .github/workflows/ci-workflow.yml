@@ -263,10 +263,7 @@ jobs:
           flake_json="$(mktemp)"
           nix_args=()
 
-          # For Nix >= 2.14 we need --all-systems
-          if [[ "${{inputs.nix_version}}" =~ 2\.1[456789].* ]]; then
-            nix_args+=("--all-systems")
-          elif [[ "${{inputs.nix_version}}" =~ 2\.2.* ]]; then
+          if [[ "$(printf '%s\n' "2.14" "${{inputs.nix_version}}" | sort -V | head -n1)" == "2.14" ]]; then
             nix_args+=("--all-systems")
           fi
 
