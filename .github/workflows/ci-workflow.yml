@@ -300,7 +300,7 @@ jobs:
     outputs:
       builds: ${{ steps.find-builds.outputs.builds }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - if: ${{ ! inputs.skip_nix_install }}
         uses: nixbuild/nix-quick-install-action@v35
         with:
@@ -341,7 +341,7 @@ jobs:
       matrix:
         build: ${{fromJSON(needs.eval-flake.outputs.builds)}}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           lfs: ${{ inputs.lfs }}
       - if: ${{ ! inputs.skip_nix_install }}
@@ -412,7 +412,7 @@ jobs:
 
       - name: Upload result
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: |
             build-result-${{ env.ARTIFACT_PREFIX }}
@@ -421,7 +421,7 @@ jobs:
 
       - name: Upload logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: |
             build-log-${{ env.ARTIFACT_PREFIX }}
@@ -446,19 +446,19 @@ jobs:
           fi
           echo "ARTIFACT_PREFIX=$ARTIFACT_PREFIX" >> "$GITHUB_ENV"
       - id: merge-results
-        uses: actions/upload-artifact/merge@v4
+        uses: actions/upload-artifact/merge@v7
         with:
           name: ${{ env.ARTIFACT_PREFIX }}-build-results
           pattern: build-result-*
           delete-merged: true
       - id: merge-logs
-        uses: actions/upload-artifact/merge@v4
+        uses: actions/upload-artifact/merge@v7
         with:
           name: ${{ env.ARTIFACT_PREFIX }}-build-logs
           pattern: build-log-*
           delete-merged: true
       - id: download
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: ${{ env.ARTIFACT_PREFIX }}-build-results
           path: ~/results
