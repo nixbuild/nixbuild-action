@@ -91,7 +91,7 @@ Nix expressions, use `nixbuild-action`.
 4. Configure `nixbuild-action` to use the auth token secret like this:
 
    ```yaml
-   uses: nixbuild/nixbuild-action@v25
+   uses: nixbuild/nixbuild-action@v26
    with:
      nixbuild_token: ${{ secrets.nixbuild_token }}
    ```
@@ -106,7 +106,7 @@ name: Examples
 on: push
 jobs:
   checks:
-    uses: nixbuild/nixbuild-action/.github/workflows/ci-workflow.yml@v25
+    uses: nixbuild/nixbuild-action/.github/workflows/ci-workflow.yml@v26
     secrets:
       nixbuild_token: ${{ secrets.nixbuild_token }}
 ```
@@ -152,9 +152,9 @@ jobs:
   minimal:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: nixbuild/nix-quick-install-action@v35
-      - uses: nixbuild/nixbuild-action@v25
+      - uses: nixbuild/nixbuild-action@v26
         with:
           nixbuild_token: ${{ secrets.nixbuild_token }}
       - run: nix-build ...
@@ -213,7 +213,7 @@ summaries for an individual job, or for the complete workflow. To generate a
 summary for the job that uses `nixbuild-action`, configure it like this:
 
 ```yaml
-- uses: nixbuild/nixbuild-action@v25
+- uses: nixbuild/nixbuild-action@v26
   with:
     nixbuild_token: ${{ secrets.nixbuild_token }}
     generate_summary_for: 'job'
@@ -224,7 +224,7 @@ workflow, add a job that runs on the very end of the workflow, and configure
 it like this:
 
 ```yaml
-- uses: nixbuild/nixbuild-action@v25
+- uses: nixbuild/nixbuild-action@v26
   with:
     nixbuild_token: ${{ secrets.nixbuild_token }}
     generate_summary_for: 'workflow'
@@ -266,7 +266,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: nixbuild/nix-quick-install-action@v35
-      - uses: nixbuild/nixbuild-action@v25
+      - uses: nixbuild/nixbuild-action@v26
         with:
           nixbuild_token: ${{ secrets.nixbuild_token }}
           settings: |
@@ -288,7 +288,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: nixbuild/nix-quick-install-action@v35
-      - uses: nixbuild/nixbuild-action@v25
+      - uses: nixbuild/nixbuild-action@v26
         with:
           nixbuild_token: ${{ secrets.nixbuild_token }}
           ssh_address: <IP or domain name of your nixbuild.net server>
@@ -300,3 +300,5 @@ jobs:
           http_api_subpath: '/api/v1'
       - run: nix build ...
 ```
+
+The CI workflow has the corresponding settings.
