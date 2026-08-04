@@ -1,8 +1,8 @@
-v25
+v26
 
 ## Changes
 
-* When OIDC is enabled, a token exchange with the nixbuild.net server is
-  performed, to allow for runs outliving the temporary initial OIDC token.
+* ci-workflow: Make it possible to configure a custom nixbuild.net endpoint
+  (for self-hosted enterprise deployments).
 
-* ci-workflow: Bump nix-quick-install-action version
+* Bump deprecated actions.
