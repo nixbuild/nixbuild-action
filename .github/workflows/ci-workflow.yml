@@ -387,7 +387,7 @@ jobs:
             done < <(echo "${{inputs.nix_args}}")
           fi
 
-          touch "$RESULTS"
+          touch "$RESULTS" "$LOGS"
           nix build "${{inputs.flake}}#${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}" \
             --print-build-logs \
             --eval-store auto \
@@ -452,6 +452,7 @@ jobs:
           pattern: build-result-*
           delete-merged: true
       - id: merge-logs
+        continue-on-error: true
         uses: actions/upload-artifact/merge@v7
         with:
           name: ${{ env.ARTIFACT_PREFIX }}-build-logs
