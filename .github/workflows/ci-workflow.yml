@@ -284,13 +284,12 @@ on:
         default: ''
         required: false
         description: |
-          The CI workflow stores two build artifacts, one for build logs and
-          one for JSON representations of the build results. To be able to
-          reuse the CI workflow multiple times inside the same workflow, a
-          unique artifact prefix is generated. If you want to set the prefix
-          yourself you can do it with this setting. Remember that you can't
-          use the same prefix for multiple invocations of the CI workflow
-          within the same workflow.
+          The CI workflow generates a unique prefix for its artifacts to
+          support being used multiple times within the same workflow. If
+          you want to set the prefix yourself you can do it with this
+          setting. Remember that you can't use the same prefix for
+          multiple invocations of the CI workflow within the same
+          workflow.
 
 jobs:
 
@@ -299,6 +298,7 @@ jobs:
     runs-on: ${{inputs.runs_on}}
     outputs:
       builds: ${{ steps.find-builds.outputs.builds }}
+      artifact_prefix: ${{ steps.find-builds.outputs.artifact_prefix }}
     steps:
       - uses: actions/checkout@v7
       - if: ${{ ! inputs.skip_nix_install }}
@@ -314,8 +314,21 @@ jobs:
         run: ${{inputs.pre_evaluation_script}}
       - name: Find builds
         id: find-builds
+        env:
+          REQUESTED_ARTIFACT_PREFIX: ${{ inputs.artifact_prefix }}
         run: |
           set -eo pipefail
+          if [ -z "$REQUESTED_ARTIFACT_PREFIX" ]; then
+            INVOCATION_PREFIX="$(od -An -tx1 -N16 /dev/urandom | tr -d ' \n')"
+          elif [[ "$REQUESTED_ARTIFACT_PREFIX" =~ ^[A-Za-z0-9_-]+$ ]] && \
+               [[ "$REQUESTED_ARTIFACT_PREFIX" != *"__"* ]]; then
+            INVOCATION_PREFIX="$REQUESTED_ARTIFACT_PREFIX"
+          else
+            echo "::error::Invalid artifact_prefix: must match [A-Za-z0-9_-]+ and not contain '__'"
+            exit 2
+          fi
+          echo "artifact_prefix=$INVOCATION_PREFIX" >> "$GITHUB_OUTPUT"
+
           flake_json="$(mktemp)"
           nix_args=()
 
@@ -420,7 +433,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: |
-            build-result-${{ env.ARTIFACT_PREFIX }}
+            build-result-${{ needs.eval-flake.outputs.artifact_prefix }}__${{ env.ARTIFACT_PREFIX }}
           path: |
             ${{ env.ARTIFACT_PREFIX }}.json
 
@@ -429,51 +442,48 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: |
-            build-log-${{ env.ARTIFACT_PREFIX }}
+            build-log-${{ needs.eval-flake.outputs.artifact_prefix }}__${{ env.ARTIFACT_PREFIX }}
           path: |
             ${{ env.ARTIFACT_PREFIX }}.log
 
 
   summary:
     name: "Summary"
-    needs: build
+    needs: [eval-flake, build]
     runs-on: ${{inputs.runs_on}}
     outputs:
       success: ${{ steps.merge.outputs.success }}
       results: ${{ steps.merge.outputs.results }}
     steps:
-      - id: generate-artifact-prefix
-        run: |
-          if [ -z "${{ inputs.artifact_prefix }}" ]; then
-            ARTIFACT_PREFIX="$RANDOM$RANDOM"
-          else
-            ARTIFACT_PREFIX="${{ inputs.artifact_prefix }}"
-          fi
-          echo "ARTIFACT_PREFIX=$ARTIFACT_PREFIX" >> "$GITHUB_ENV"
-      - id: merge-results
-        uses: actions/upload-artifact/merge@v7
+      - id: download-results
+        continue-on-error: true
+        uses: actions/download-artifact@v8
         with:
-          name: ${{ env.ARTIFACT_PREFIX }}-build-results
-          pattern: build-result-*
-          delete-merged: true
+          pattern: build-result-${{ needs.eval-flake.outputs.artifact_prefix }}__*
+          path: ~/results-1
+          merge-multiple: true
+      - id: retry-download-results
+        if: ${{ steps.download-results.outcome == 'failure' }}
+        uses: actions/download-artifact@v8
+        with:
+          pattern: build-result-${{ needs.eval-flake.outputs.artifact_prefix }}__*
+          path: ~/results-2
+          merge-multiple: true
       - id: merge-logs
         continue-on-error: true
         uses: actions/upload-artifact/merge@v7
         with:
-          name: ${{ env.ARTIFACT_PREFIX }}-build-logs
-          pattern: build-log-*
+          name: ${{ needs.eval-flake.outputs.artifact_prefix }}-build-logs
+          pattern: build-log-${{ needs.eval-flake.outputs.artifact_prefix }}__*
           delete-merged: true
-      - id: download
-        uses: actions/download-artifact@v8
-        with:
-          name: ${{ env.ARTIFACT_PREFIX }}-build-results
-          path: ~/results
       - id: merge
+        env:
+          RESULTS_DIR: ${{ steps.retry-download-results.outputs.download-path || steps.download-results.outputs.download-path }}
         run: |
           jq -rcs 'reduce .[] as $x ({}; . * $x)|"results=\(.)"' \
-            "${{steps.download.outputs.download-path}}"/*.json \
+            "$RESULTS_DIR"/*.json \
             >> "$GITHUB_OUTPUT"
-          if jq -s '..|.success?|select(if . == false then ""|halt_error(1) else false end)' "${{steps.download.outputs.download-path}}"/*.json; then
+          if jq -s '..|.success?|select(if . == false then ""|halt_error(1) else false end)' "$RESULTS_DIR"/*.json; then
             echo "success=true" >> "$GITHUB_OUTPUT"
           else
             echo "success=false" >> "$GITHUB_OUTPUT"
