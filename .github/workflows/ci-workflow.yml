@@ -388,16 +388,19 @@ jobs:
           fi
 
           touch "$RESULTS" "$LOGS"
+          build_status=0
           nix build "${{inputs.flake}}#${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}" \
             --print-build-logs \
             --eval-store auto \
             --store ssh-ng://nixbuild \
             --builders "" --max-jobs 2 \
-            --json "${nix_args[@]}" > "$RESULTS" \
-            2> >(tee -a "$LOGS" >&2) || true
+            --json "${nix_args[@]}" 2>&1 > "$RESULTS" \
+            | tee -a "$LOGS" >&2 \
+            || build_status=${PIPESTATUS[0]}
 
           status=0
-          if ! [ -s "$RESULTS" ]; then
+          if [ "$build_status" -ne 0 ] || \
+             ! jq -e 'type == "array" and length > 0 and (.[0] | type == "object")' "$RESULTS" >/dev/null 2>&1; then
             echo '[{"success":false}]' > "$RESULTS"
             if [ "${{ inputs.ignore_build_failures }}" == "true" ]; then
               echo "::error title=${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}::Build failed"
