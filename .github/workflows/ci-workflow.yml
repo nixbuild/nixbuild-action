@@ -326,7 +326,8 @@ jobs:
           if [ -n "${{inputs.nix_args}}" ]; then
             IFS='\n'
             while read l; do
-              readarray -d ' ' -O "${#nix_args[@]}" -t nix_args < <(echo -n "$l")
+              IFS=' ' read -ra _parts <<< "$l"
+              nix_args+=("${_parts[@]}")
             done < <(echo "${{inputs.nix_args}}")
           fi
           nix flake show "${{inputs.flake}}" "${nix_args[@]}" --json > "$flake_json"
@@ -383,7 +384,8 @@ jobs:
           if [ -n "${{inputs.nix_args}}" ]; then
             IFS='\n'
             while read l; do
-              readarray -d ' ' -O "${#nix_args[@]}" -t nix_args < <(echo -n "$l")
+              IFS=' ' read -ra _parts <<< "$l"
+              nix_args+=("${_parts[@]}")
             done < <(echo "${{inputs.nix_args}}")
           fi
 
