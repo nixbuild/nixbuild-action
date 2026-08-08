@@ -390,6 +390,9 @@ jobs:
           BUILD_NAME: ${{ matrix.build.name }}
           BUILD_DESCRIPTION: ${{ matrix.build.description }}
           BUILD_LABEL: ${{ matrix.build.label }}
+          BUILD_TOP_ATTR: ${{ matrix.build.top_attr }}
+          BUILD_SYSTEM: ${{ matrix.build.system }}
+          BUILD_ATTR: ${{ matrix.build.attr }}
         run: |
           ARTIFACT_PREFIX="$(echo "${{matrix.build.top_attr}}.${{matrix.build.system}}.${{matrix.build.attr}}" | tr '":<>|*?\\/' '_')-$RANDOM$RANDOM"
           echo "ARTIFACT_PREFIX=$ARTIFACT_PREFIX" >> "$GITHUB_ENV"
@@ -430,9 +433,12 @@ jobs:
 
           jq -c \
             --arg name "$BUILD_NAME" \
-            --arg name "$BUILD_DESCRIPTION" \
-            --arg name "$BUILD_LABEL" \
-            '{success: true, name: $name, description: $description, label: $label} + .[0] | {"${{matrix.build.top_attr}}": {"${{matrix.build.system}}": {"${{matrix.build.attr}}": .}}}' "$RESULTS" > "$ARTIFACT_PREFIX.json"
+            --arg description "$BUILD_DESCRIPTION" \
+            --arg label "$BUILD_LABEL" \
+            --arg top_attr "$BUILD_TOP_ATTR" \
+            --arg system "$BUILD_SYSTEM" \
+            --arg attr "$BUILD_ATTR" \
+            '{success: true, name: $name, description: $description, label: $label} + .[0] | {($top_attr): {($system): {($attr): .}}}' "$RESULTS" > "$ARTIFACT_PREFIX.json"
 
           exit "$status"
 
