@@ -112,6 +112,7 @@ if [ "$(get_input OIDC)" = "true" ]; then
       echo >&2 "Failed retrieving OIDC ID Token from GitHub"
       exit 1
     else
+      echo "::add-mask::$NIXBUILDNET_OIDC_ID_TOKEN"
       echo "NIXBUILDNET_OIDC_ID_TOKEN=$NIXBUILDNET_OIDC_ID_TOKEN" >> "$GITHUB_ENV"
       base_url="$NIXBUILDNET_HTTP_API_SCHEME://$NIXBUILDNET_HTTP_API_HOST:$NIXBUILDNET_HTTP_API_PORT$NIXBUILDNET_HTTP_API_SUBPATH"
       NEW_NIXBUILDNET_TOKEN="$(curl -sSL \
@@ -125,6 +126,7 @@ if [ "$(get_input OIDC)" = "true" ]; then
         echo >&2 "Failed to exchange OIDC token. Keeping the old nixbuild token."
       else
         NIXBUILDNET_TOKEN="$NEW_NIXBUILDNET_TOKEN"
+        echo "::add-mask::$NIXBUILDNET_TOKEN"
         echo "NIXBUILDNET_TOKEN=$NIXBUILDNET_TOKEN" >> "$GITHUB_ENV"
         echo >&2 "Token exchange successful."
       fi
