@@ -1,8 +1,8 @@
-v26
+v27
 
 ## Changes
 
-* ci-workflow: Make it possible to configure a custom nixbuild.net endpoint
-  (for self-hosted enterprise deployments).
+* Fixed a vulnerability that could cause nixbuild.net auth tokens be visible in
+  the action log.
 
-* Bump deprecated actions.
+* Improved escaping of problematic flake attribute names.
